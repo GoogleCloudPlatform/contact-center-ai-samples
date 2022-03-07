@@ -41,7 +41,7 @@ to create a webhook for a
    and make a note of the `url` of `httpsTrigger` for the Cloud Function.
 1. Clone this repo and run the sample:
    ```
-   python setup.py --webhook-url <CLOUD_FUNCTION_URL>
+   python main.py --webhook-url <CLOUD_FUNCTION_URL>
    ```
    where `<CLOUD_FUNCTION_URL>` is the URL of the Cloud Function you deployed
    in the previous step. The URL should take the following form:
@@ -57,4 +57,4 @@ to create a webhook for a
 
 ## Running the sample
 
-1. Go to the Dialogflow agent created by `setup.py` and query the agent:
+1. Go to the Dialogflow agent created by `main.py` and query the agent:
