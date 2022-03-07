@@ -31,26 +31,35 @@ to create a webhook for a
    dialogflow.googleapis.com cloudfunctions.googleapis.com`
 1. Setup application default authentication, run: `gcloud auth
    application-default login`
+1. Clone this repo and enter the folder containing the sample code:
+   ```
+   git clone https://github.com/GoogleCloudPlatform/contact-center-ai-samples.git
+   cd contact-center-ai-samples/dialogflow-cx-webhook-python
+   ```
 1. Deploy the Cloud Function:
+   Here `<REGION>` is the Google Cloud region of your function and
+   `<PROJECT_ID>` is the Google Cloud project ID that contains your Cloud
+   Function. 
    ```
    gcloud functions deploy dialogflow_webhook \
      --runtime python39 \
+     --project=${PROJECT_ID?} \
+     --region=${REGION?} \
+     --source=webhook \
+     --entry-point=dialogflow_webhook \
      --trigger-http \
      --allow-unauthenticated
    ```
-   and make a note of the `url` of `httpsTrigger` for the Cloud Function.
-1. Clone this repo and run the sample:
+1. Run the sample:
    ```
-   python main.py --webhook-url <CLOUD_FUNCTION_URL>
+   python main.py --webhook-url ${CLOUD_FUNCTION_URL?}
    ```
    where `<CLOUD_FUNCTION_URL>` is the URL of the Cloud Function you deployed
    in the previous step. The URL should take the following form:
    ```
-   https://<REGION>-<PROJECT_ID>.cloudfunctions.net/dialogflow_webhook
+   CLOUD_FUNCTION_URL="https://${REGION?}-${PROJECT_ID?}.cloudfunctions.net/dialogflow_webhook"
    ```
-   where `<REGION>` is the Google Cloud region of your function and
-   `<PROJECT_ID>` is the Google Cloud project ID that contains your Cloud
-   Function. For example:
+   For example:
    ```
    https://us-central1-my-project-id.cloudfunctions.net/dialogflow_webhook
    ```
