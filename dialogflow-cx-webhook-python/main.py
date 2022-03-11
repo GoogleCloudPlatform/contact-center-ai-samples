@@ -55,20 +55,23 @@ class Setup:
     '''Setup configures a Dialogflow CX agent for a webhook sample'''
     def __init__(self, args):
         '''__init__ gets Dialogflow agent, clients and auth'''
-        _, project_id = google.auth.default()
-        self.project_id = project_id
+        if not args.project_id:
+            _, project_id = google.auth.default()
+            args.project_id = project_id
+        self.project_id = args.project_id
         self.args = args
 
         client_options = {
             "api_endpoint": f'{self.args.location}-dialogflow.googleapis.com'
         }
-        self.agents_client = AgentsClient(client_options=client_options)
-        self.pages_client = PagesClient(client_options=client_options)
-        self.webhooks_client = WebhooksClient(client_options=client_options)
-        self.intents_client = IntentsClient(client_options=client_options)
-        self.flows_client = FlowsClient(client_options=client_options)
-        self.test_cases_client = TestCasesClient(client_options=client_options)
-
+        self.clients = {
+            "agents": AgentsClient(client_options=client_options),
+            "pages": PagesClient(client_options=client_options),
+            "webhooks": WebhooksClient(client_options=client_options),
+            "intents": IntentsClient(client_options=client_options),
+            "flows": FlowsClient(client_options=client_options),
+            "test_cases": TestCasesClient(client_options=client_options),
+        }
         # Create or get Dialogflow CX agent.
         if not self.args.agent_id:
             self.agent = self.create_agent()
@@ -76,7 +79,8 @@ class Setup:
             self.agent = self.get_agent()
 
         self.webhook = None
-
+        self.intent = None
+        self.page = None
 
     def run(self):
         '''run sets up a Dialogflow CX agent for the webhook sample'''
@@ -85,23 +89,38 @@ class Setup:
             return 0
         self.setup_agent()
         self.test_webhook(delay=5)
+        return 0
 
     def test_webhook(self, delay=0):
-
+        '''test_webhook runs a test case to exercise the Dialogflow CX agent's webhook'''
         # Newly created agents might need a short delay to become stable.
         if delay:
             time.sleep(delay)
 
         # Create a test interaction, to confirm the webhook works as-intended:
-        text_response = ResponseMessage.Text(text=['Entering example_page', 'Webhook received: go to example_page (Tag: webhook-tag)'])
-        virtual_agent_output = ConversationTurn.VirtualAgentOutput(current_page=self.page, triggered_intent=self.intent, text_responses=[text_response])
-        conversation_turn = ConversationTurn(virtual_agent_output=virtual_agent_output, user_input=ConversationTurn.UserInput(is_webhook_enabled=True, input=QueryInput(text=TextInput(text=f'go to {PAGE_NAME}'))))
-        test_case = self.test_cases_client.create_test_case(parent=self.agent.name, test_case=TestCase(display_name=TEST_CASE_DISPLAY_NAME, 
-                            test_case_conversation_turns=[conversation_turn],
-                            test_config=TestConfig(flow=self.agent.start_flow)))
+        text_response = ResponseMessage.Text(
+            text=[
+                'Entering example_page',
+                'Webhook received: go to example_page (Tag: webhook-tag)',
+            ]
+        )
+        virtual_agent_output = ConversationTurn.VirtualAgentOutput(
+            current_page=self.page,
+            triggered_intent=self.intent,
+            text_responses=[text_response])
+        conversation_turn = ConversationTurn(
+            virtual_agent_output=virtual_agent_output,
+            user_input=ConversationTurn.UserInput(is_webhook_enabled=True,
+            input=QueryInput(text=TextInput(text=f'go to {PAGE_NAME}'))))
+        test_case = self.clients["test_cases"].create_test_case(
+            parent=self.agent.name,
+            test_case=TestCase(display_name=TEST_CASE_DISPLAY_NAME,
+            test_case_conversation_turns=[conversation_turn],
+            test_config=TestConfig(flow=self.agent.start_flow)))
         print(self.agent.start_flow)
 
-        lro = self.test_cases_client.run_test_case(request=RunTestCaseRequest(name=test_case.name))
+        lro = self.clients["test_cases"].run_test_case(
+            request=RunTestCaseRequest(name=test_case.name))
         while lro.running():
             time.sleep(1)
         assert lro.result().result.test_result == TestResult.PASSED
@@ -116,12 +135,12 @@ class Setup:
             time_zone=self.args.agent_time_zone,
         )
         request = {"agent": agent, "parent": parent}
-        return self.agents_client.create_agent(request=request)
+        return self.clients["agents"].create_agent(request=request)
 
     def get_agent(self):
         '''get_agent gets an existing agent to use for the webhook sample'''
         parent = f'projects/{self.project_id}/locations/{self.args.location}'
-        return self.agents_client.get_agent(request={"parent": parent})
+        return self.clients["agents"].get_agent(request={"parent": parent})
 
     def update_webhook_url(self):
         '''update_webhook_url updates the webhook for the webhook sample'''
@@ -131,14 +150,14 @@ class Setup:
                 'uri': self.args.webhook_url
             }
         })
-        return self.webhooks_client.create_webhook(
+        return self.clients["webhooks"].create_webhook(
             parent=self.agent.name,
             webhook=webhook
         )
 
     def setup_agent(self):
         '''setup_agent creates pages, flows, and intents for the sample'''
-        # Create a page, with a webhook filfillment:
+        # Create a page, with a webhook fulfillment:
         fulfillment = Fulfillment({
             'messages': [
                 ResponseMessage(
@@ -154,7 +173,7 @@ class Setup:
             display_name=PAGE_NAME,
             entry_fulfillment=fulfillment,
         )
-        self.page = self.pages_client.create_page(
+        self.page = self.clients["pages"].create_page(
             parent=self.agent.start_flow,
             page=page,
         )
@@ -172,19 +191,19 @@ class Setup:
                 })
             ],
         })
-        self.intent = self.intents_client.create_intent(
+        self.intent = self.clients["intents"].create_intent(
             parent=self.agent.name,
             intent=intent
         )
 
         # Update start flow to transition to newly created page
-        flow = self.flows_client.get_flow(
+        flow = self.clients["flows"].get_flow(
             name=self.agent.start_flow)
         flow.transition_routes.append(TransitionRoute(
             intent=self.intent.name,
             target_page=self.page.name
         ))
-        self.flows_client.update_flow(flow=flow)
+        self.clients["flows"].update_flow(flow=flow)
 
         print(f'New Agent: https://dialogflow.cloud.google.com/cx/{self.agent.start_flow}')
 
@@ -219,5 +238,8 @@ if __name__ == "__main__":
         '--agent-time-zone',
         help='Time zone of the Dialogflow CX agent',
         default=DEFAULT_AGENT_TIME_ZONE)
+    parser.add_argument(
+        '--project-id',
+        help='Google Cloud project to create/use Dialogflow CX in')
     main = Setup(args=parser.parse_args())
     sys.exit(main.run())
