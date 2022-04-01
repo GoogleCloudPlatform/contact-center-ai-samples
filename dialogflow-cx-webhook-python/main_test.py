@@ -20,13 +20,14 @@ from unittest.mock import MagicMock, patch
 
 from main import Setup
 
-WEBHOOK_URL="webhook_url"
-LOCATION="location"
-AGENT_ID="agent_id"
-AGENT_DEFAULT_LANG_CODE="agent_default_lang_code"
-AGENT_DISPLAY_NAME="agent_display_name"
-AGENT_TIME_ZONE="agent_time_zone"
-PROJECT_ID="project_id"
+WEBHOOK_URL = "webhook_url"
+LOCATION = "location"
+AGENT_ID = "agent_id"
+AGENT_DEFAULT_LANG_CODE = "agent_default_lang_code"
+AGENT_DISPLAY_NAME = "agent_display_name"
+AGENT_TIME_ZONE = "agent_time_zone"
+PROJECT_ID = "project_id"
+
 
 class TestSetup(unittest.TestCase):
     """Test class for Dialogflow CX webhook sample"""
@@ -38,13 +39,15 @@ class TestSetup(unittest.TestCase):
     @patch("main.FlowsClient")
     @patch("main.TestCasesClient")
     # pylint: disable=too-many-arguments,no-self-use
-    def test_init(self,
+    def test_init(
+        self,
         mock_agents_client,
         mock_pages_client,
         mock_webhooks_client,
         mock_intents_client,
         mock_flows_client,
-        mock_test_cases_client):
+        mock_test_cases_client,
+    ):
         """Test for the Setup class' init method"""
 
         # Mock all Dialogflow clients to prevent clients for searching for ADC
@@ -72,5 +75,6 @@ class TestSetup(unittest.TestCase):
         assert setup.args == test_args
         assert setup.project_id == PROJECT_ID
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

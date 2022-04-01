@@ -16,18 +16,23 @@
 
 import json
 
+
 def dialogflow_webhook(request):
-    '''main handles a Dialogflow CX webhook request'''
+    """main handles a Dialogflow CX webhook request"""
     request_dict = request.get_json()
-    tag = request_dict['fulfillmentInfo']['tag']
-    user_query = request_dict['text']
-    return  json.dumps({
-        'fulfillment_response':{
-            'messages': [{
-                'text': {
-                    'text': [f'Webhook received: {user_query} (Tag: {tag})'],
-                    'allow_playback_interruption': False
-                }
-            }]
+    tag = request_dict["fulfillmentInfo"]["tag"]
+    user_query = request_dict["text"]
+    return json.dumps(
+        {
+            "fulfillment_response": {
+                "messages": [
+                    {
+                        "text": {
+                            "text": [f"Webhook received: {user_query} (Tag: {tag})"],
+                            "allow_playback_interruption": False,
+                        }
+                    }
+                ]
+            }
         }
-    })
+    )
