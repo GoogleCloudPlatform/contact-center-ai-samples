@@ -12,8 +12,6 @@ on:
       - dialogflow-cx-webhook-python/**
 jobs:
   unit:
-    needs: ['linting']
-    if: ${{ needs.linting.result == 'success' }}
     runs-on: ubuntu-latest
     defaults:
       run:
