@@ -18,6 +18,7 @@ import json
 
 from webhook.main import dialogflow_webhook
 
+
 def test_dialogflow_webhook(mocked_request):
 
   # Arrange:
