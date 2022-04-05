@@ -11,27 +11,7 @@ on:
       - .github/workflows/dialogflow-cx-webhook-python.yaml
       - dialogflow-cx-webhook-python/**
 jobs:
-  linting:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./dialogflow-cx-webhook-python
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install requirements.txt
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Install pylint
-        run: |
-          python -m pip install --upgrade pip
-          pip install pylint
-      - name: Analyze code with pylint
-        run: |
-          pylint $(git ls-files "*.py")
   unit:
-    needs: ['linting']
-    if: ${{ needs.linting.result == 'success' }}
     runs-on: ubuntu-latest
     defaults:
       run:
