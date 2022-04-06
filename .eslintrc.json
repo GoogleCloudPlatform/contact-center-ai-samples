@@ -5,10 +5,12 @@
       "prettier"
     ],
     "plugins": [
+      "json",
       "node",
       "prettier"
     ],
     "rules": {
+      "node/no-missing-require": "off",
       "prettier/prettier": "error",
       "block-scoped-var": "error",
       "eqeqeq": "error",
