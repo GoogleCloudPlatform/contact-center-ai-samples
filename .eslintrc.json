@@ -4,13 +4,8 @@
       "plugin:node/recommended",
       "prettier"
     ],
-    "parserOptions": {
-      "ecmaVersion": 6,
-      "ecmaFeatures": {
-        "experimentalObjectRestSpread": true
-      }
-    },
     "plugins": [
+      "json",
       "node",
       "prettier"
     ],
