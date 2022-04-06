@@ -24,7 +24,7 @@ async function main(projectId, location, agentId, query, languageCode) {
   // languageCode = 'en';
 
   // Imports the Google Cloud Dialogflow CX API library
-  const {SessionsClient} = require('@google-cloud/dialogflow-cx');
+  const { SessionsClient } = require('@google-cloud/dialogflow-cx');
 
   /**
    * Example for regional endpoint:
@@ -46,12 +46,7 @@ async function main(projectId, location, agentId, query, languageCode) {
   async function detectFirstSessionIntent() {
     // Marshal the current state:
     const sessionId = uuid.v4();
-    const sessionPath = client.projectLocationAgentSessionPath(
-      projectId,
-      location,
-      agentId,
-      sessionId
-    );
+    const sessionPath = client.projectLocationAgentSessionPath(projectId, location, agentId, sessionId);
     console.info(sessionPath);
 
     // Send request:
@@ -60,8 +55,8 @@ async function main(projectId, location, agentId, query, languageCode) {
       queryParams: {
         parameters: {
           fields: {
-            firstName: {kind: 'stringValue', stringValue: 'John'},
-            lastName: {kind: 'stringValue', stringValue: 'Doe'},
+            firstName: { kind: 'stringValue', stringValue: 'John' },
+            lastName: { kind: 'stringValue', stringValue: 'Doe' },
           },
         },
       },
@@ -80,9 +75,7 @@ async function main(projectId, location, agentId, query, languageCode) {
       }
     }
     if (response.queryResult.match.intent) {
-      console.log(
-        `Matched Intent: ${response.queryResult.match.intent.displayName}`
-      );
+      console.log(`Matched Intent: ${response.queryResult.match.intent.displayName}`);
     }
     return marshalSession(response);
   }
@@ -100,12 +93,7 @@ async function main(projectId, location, agentId, query, languageCode) {
 
     const sessionId = uuid.v4().toString;
     const secondRequest = {
-      session: client.projectLocationAgentSessionPath(
-        projectId,
-        location,
-        agentId,
-        sessionId
-      ),
+      session: client.projectLocationAgentSessionPath(projectId, location, agentId, sessionId),
       queryInput: {
         text: {
           text: 'Hello 60 minutes later!',
@@ -126,7 +114,7 @@ async function main(projectId, location, agentId, query, languageCode) {
   // [END dialogflow_revive_previous_session_state_async]
 }
 
-process.on('unhandledRejection', err => {
+process.on('unhandledRejection', (err) => {
   console.error(err.message);
   process.exitCode = 1;
 });

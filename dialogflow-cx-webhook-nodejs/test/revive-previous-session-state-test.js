@@ -14,10 +14,10 @@
 
 'use strict';
 
-const {assert} = require('chai');
-const {describe, it} = require('mocha');
+const { assert } = require('chai');
+const { describe, it } = require('mocha');
 const execSync = require('child_process').execSync;
-const exec = cmd => execSync(cmd, {encoding: 'utf8'});
+const exec = (cmd) => execSync(cmd, { encoding: 'utf8' });
 
 describe('revive previous session state', () => {
   const cmd = 'node revive-previous-session-state.js';
@@ -28,9 +28,7 @@ describe('revive previous session state', () => {
   const languageCode = 'en';
 
   it('should include parameters revived from previous session state"', async () => {
-    const output = exec(
-      `${cmd} ${projectId} ${location} ${agentId} 'Hello!' ${languageCode}`
-    );
+    const output = exec(`${cmd} ${projectId} ${location} ${agentId} 'Hello!' ${languageCode}`);
     assert.include(output, 'firstName');
   });
 });
