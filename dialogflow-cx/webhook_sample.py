@@ -1,94 +1,103 @@
-# Copyright 2022 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-"""setup.py calls the DIalogflow API to setup a webhook sample"""
-
-import argparse
 import time
-import sys
+
+from google.cloud.dialogflowcx import AgentsClient, Agent, ListAgentsRequest, GetAgentRequest
+from google.cloud.dialogflowcx import Webhook, WebhooksClient, ListWebhooksRequest, GetWebhookRequest
+from google.cloud.dialogflowcx import Intent, IntentsClient, ListIntentsRequest, GetIntentRequest
+from google.cloud.dialogflowcx import Page, PagesClient, ListPagesRequest, GetPageRequest, Fulfillment, ResponseMessage
+from google.cloud.dialogflowcx import FlowsClient, TransitionRoute
+from google.cloud.dialogflowcx import TestCasesClient, TestCase, TestConfig, ConversationTurn, QueryInput, TextInput, ListTestCasesRequest, GetTestCaseRequest, RunTestCaseRequest, TestResult
 
 import google.auth
-from google.cloud.dialogflowcx_v3 import (
-    Agent,
-    AgentsClient,
-    FlowsClient,
-    Fulfillment,
-    Intent,
-    IntentsClient,
-    Page,
-    PagesClient,
-    ResponseMessage,
-    TransitionRoute,
-    Webhook,
-    WebhooksClient,
-    ConversationTurn,
-    TestCase,
-    TestCasesClient,
-    TestConfig,
-    RunTestCaseRequest,
-    TestResult,
-    QueryInput,
-    TextInput,
-)
-
-_WEBHOOK_NAME = 'Webhook sample webhook'
-_WEBHOOK_URI = 'Webhook sample page'
-_TAG_NAME = 'webhook sample tag'
-_TEST_CASE_DISPLAY_NAME = 'example_test'
-
-_DEFAULT_AGENT_SETTINGS = {
-    'agent_display_name': 'Webhook sample',
-    'agent_lang_code': 'en',
-    'agent_time_zone': 'America/Los_Angeles',
-}
+import google.api_core.exceptions
 
 
-_DEFAULT_ATTRIBUTES = {
-    'credentials': None,
-    'location': 'global',
-    'project_id': None,
-}
+class DialogflowTestCaseFailure(Exception):
+  """Exception to raise when a test case fails"""
 
 
-class DialogflowController:
-    '''Setup configures a Dialogflow CX agent for a webhook sample'''
+class DialogflowSample:
+    """Base class for samples"""
 
-    def __init__(self, **kwargs):
-        '''Configures Dialogflow agent, clients and auth.'''
-        self._agent = None
-        self._agents_client = None
-        self._webhook = None
-        self._webhooks_client = None
+    @property
+    def project_id(self):
+        return self.auth_delegator.project_id
 
-        for key in _DEFAULT_ATTRIBUTES:
-            setattr(self, key, kwargs.get(key, _DEFAULT_ATTRIBUTES[key]))
+    @property
+    def location(self):
+        return self.auth_delegator.location
 
-    def initialize(self):
-        self.auth_default()
-        self.initialize_clients()
-        self.initialize_agent()
+    @property
+    def start_flow(self):
+        return self.agent_delegator.start_flow
 
-    def auth_default(self):
-        self.credentials, self.project_id = google.auth.default()
+
+class ClientDelegator:
+
+    _CLIENT_CLASS = None  # Override in subclass
+
+    def __init__(self, controller: DialogflowSample, client=None, display_name=None):
+        self.controller = controller
+        self._client = client
+        self._display_name = display_name
 
     @property
     def client_options(self):
-        return {"api_endpoint": f'{self.location}-dialogflow.googleapis.com'}
+        return {"api_endpoint": f'{self.controller.location}-dialogflow.googleapis.com'}
 
     @property
-    def agent_parent(self):
-        return f'projects/{self.project_id}/locations/{self.location}'
+    def client(self):
+      if self._client is None: 
+        self._client = self._CLIENT_CLASS(client_options=self.client_options, credentials=self.controller.auth_delegator.credentials)
+      return self._client
+
+    @property
+    def parent(self):
+        return self.controller.agent_delegator.agent.name
+
+    @property
+    def display_name(self):
+        return self._display_name
+
+    def initialize(self):
+      pass
+
+
+class AgentDelegator(ClientDelegator):
+
+    _DEFAULT_LANGUAGE_CODE = 'en'
+    _DEFAULT_TIME_ZONE = 'America/Los_Angeles'
+    _CLIENT_CLASS = AgentsClient
+
+    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+      super().__init__(controller, **kwargs)
+      self.default_language_code = kwargs.get('default_language_code', self._DEFAULT_LANGUAGE_CODE)
+      self.time_zone = kwargs.get('time_zone', self._DEFAULT_TIME_ZONE)
+
+    def initialize(self):
+        '''Initializes an agent to use for the sample.'''
+        try:
+          agent = Agent(
+              display_name=self.display_name,
+              default_language_code=self.default_language_code,
+              time_zone=self.time_zone,
+          )
+          request = {"agent": agent, "parent": self.parent}
+          self._agent = self.client.create_agent(request=request)
+        except google.api_core.exceptions.AlreadyExists:
+          request = ListAgentsRequest(
+            parent=self.parent,
+          )
+          for agent in self.client.list_agents(request=request):
+            if agent.display_name == self.display_name:
+              request = GetAgentRequest(
+                  name=agent.name,
+              )
+              self._agent = self.client.get_agent(request=request)
+              break
+
+    @property
+    def parent(self):
+        return f'projects/{self.controller.project_id}/locations/{self.controller.location}'
 
     @property
     def agent(self):
@@ -96,179 +105,343 @@ class DialogflowController:
             raise RuntimeError('Agent not yet created')
         return self._agent
 
-    def create_agent(self, **_DEFAULT_AGENT_SETTINGS) -> Agent:
-        '''Initializes an agent to use for the sample.'''
-        self._agents_client = self._agents_client or AgentsClient(client_options=self.client_options)
-        agent = Agent(**_DEFAULT_AGENT_SETTINGS)
-        request = {"agent": agent, "parent": self.agent_parent}
-        self._agent = self._agents_client.create_agent(request=request)
+    @property
+    def start_flow(self):
+      return self.agent.start_flow
+
+
+class AuthDelegator:
+
+    _DEFAULT_LOCATION = 'global'
+
+    def __init__(self, controller: DialogflowSample, quota_project_id=None, **kwargs):
+        self.controller = controller
+        print(quota_project_id)
+        self.credentials, self.project_id = google.auth.default(quota_project_id=quota_project_id)
+        self.location = kwargs.get('location', self._DEFAULT_LOCATION)
+
+
+class WebhookDelegator(ClientDelegator):
+
+    _CLIENT_CLASS = WebhooksClient
+
+    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+        self._uri = kwargs.pop('uri')
+        super().__init__(controller, **kwargs)
+
 
     @property
     def webhook(self):
         if not self._webhook:
-            raise RuntimeError('Agent not yet created')
+            raise RuntimeError('Webhook not yet created')
         return self._webhook
 
-    def create_webhook(
-            self, 
-            display_name=_WEBHOOK_NAME, 
-            uri=_WEBHOOK_URI,
-        ):
-        '''update_webhook_url updates the webhook for the webhook sample'''
-        self._webhooks_client = self._webhooks_client or WebhooksClient(client_options=self.client_options)
+    def initialize(self):
+        '''Initializes an agent to use for the sample.'''
         webhook = Webhook({
-            'display_name': display_name,
+            'display_name': self.display_name,
             'generic_web_service': {
-                'uri': uri
+                'uri': self._uri
             }
         })
-        self._webhook = self._webhooks_client.create_webhook(
-            parent=self.agent.name,
-            webhook=webhook
+        try:
+          self._webhook = self.client.create_webhook(
+              parent=self.parent,
+              webhook=webhook,
+          )
+        except google.api_core.exceptions.AlreadyExists:
+          request = ListWebhooksRequest(
+            parent=self.parent,
+          )
+          for webhook in self.client.list_webhooks(request=request):
+            if webhook.display_name == self.display_name:
+              request = GetWebhookRequest(
+                  name=webhook.name,
+              )
+              self._webhook = self.client.get_webhook(request=request)
+              break
+
+
+class IntentDelegator(ClientDelegator):
+
+    _CLIENT_CLASS = IntentsClient
+
+    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+        super().__init__(controller, **kwargs)
+
+    @property
+    def intent(self):
+        if not self._intent:
+            raise RuntimeError('Intent not yet created')
+        return self._intent
+
+    def initialize(self, training_phrases_text):
+        # Create an intent-triggered transition into the page:
+
+        training_phrases = []
+        for training_phrase_text in training_phrases_text:
+          training_phrase = Intent.TrainingPhrase({
+              'parts':[{
+                  'text': f'{training_phrase_text}'
+              }],
+              'id':'',
+              'repeat_count':1
+          })
+          training_phrases.append(training_phrase)
+
+        intent = Intent({
+            'display_name':self.display_name,
+            'training_phrases':training_phrases,
+        })
+        try:
+          self._intent = self.client.create_intent(
+              parent=self.parent,
+              intent=intent,
+          )
+        except google.api_core.exceptions.AlreadyExists:
+          request = ListIntentsRequest(
+            parent=self.parent,
+          )
+          for intent in self.client.list_intents(request=request):
+            if intent.display_name == self.display_name:
+              request = GetIntentRequest(
+                  name=intent.name,
+              )
+              self._intent = self.client.get_intent(request=request)
+              return
+
+
+class PageDelegator(ClientDelegator):
+
+    _CLIENT_CLASS = PagesClient
+
+    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+        self._page = None
+        self._entry_fulfillment = None
+        super().__init__(controller, **kwargs)
+
+    @property
+    def page(self):
+        if not self._page:
+            raise RuntimeError('Page not yet created')
+        return self._page
+
+    @property
+    def parent(self):
+        return self.controller.start_flow
+
+    @property
+    def entry_fulfillment(self):
+        return self._entry_fulfillment
+
+    def initialize(self):
+
+      page = Page(
+          display_name=self.display_name,
+          entry_fulfillment=self.entry_fulfillment,
+      )
+      try:
+        self._page = self.client.create_page(
+            parent=self.controller.start_flow,
+            page=page,
+        )
+      except google.api_core.exceptions.AlreadyExists:
+
+        request = ListPagesRequest(
+          parent=self.parent
+        )
+        for curr_page in self.client.list_pages(request=request):
+          if curr_page.display_name == self.display_name:
+            request = GetPageRequest(
+                name=curr_page.name,
+            )
+            self._page = self.client.get_page(request=request)
+            return
+
+
+class FulfillmentPageDelegator(PageDelegator):
+
+    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+        self._entry_fulfillment_text = kwargs.pop('entry_fulfillment_text')
+        self._webhook_delegator = kwargs.pop('webhook_delegator')
+        self._tag = kwargs.pop('tag', None)
+        super().__init__(controller, **kwargs)
+
+    def initialize(self):
+        webhook_name = self._webhook_delegator.webhook.name if self._webhook_delegator else None
+        self._entry_fulfillment = Fulfillment({
+            'messages': [
+                ResponseMessage(
+                    text=ResponseMessage.Text(
+                        text=[self._entry_fulfillment_text]
+                    )
+                )
+            ],
+            'webhook': webhook_name,
+            'tag': self._tag,
+        })
+        super().initialize()
+
+
+class FlowDelegator(ClientDelegator):
+
+    _CLIENT_CLASS = FlowsClient
+
+    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+        super().__init__(controller)
+
+    def append_transition_route(self, intent_name, target_page_name, flow_name=None):
+        if not flow_name:
+            flow_name = sample.start_flow
+
+        flow = self.client.get_flow(name=flow_name)
+        flow.transition_routes.append(TransitionRoute(
+            intent=intent_name,
+            target_page=target_page_name,
+        ))
+        self.client.update_flow(flow=flow)
+
+
+class TestCaseDelegator(ClientDelegator):
+
+    _CLIENT_CLASS = TestCasesClient
+
+    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+        self._is_webhook_enabled = kwargs.pop('is_webhook_enabled', True)
+        self._input_text = kwargs.pop('input_text')
+        self._expected_response_text = kwargs.pop('expected_response_text')
+        self.page_delegator = kwargs.pop('page_delegator')
+        self.intent_delegator = kwargs.pop('intent_delegator')
+        self.expected_exception = kwargs.pop('expected_exception', None)
+        self._test_case = None
+        super().__init__(controller, **kwargs)
+
+    @property
+    def test_case(self):
+        if not self._test_case:
+            raise RuntimeError('Page not yet created')
+        return self._test_case
+
+    def initialize(self):
+        text_responses = [ResponseMessage.Text(
+            text=text
+        ) for text in self._expected_response_text]
+        virtual_agent_output = ConversationTurn.VirtualAgentOutput(
+            current_page=self.page_delegator.page,
+            triggered_intent=self.intent_delegator.intent,
+            text_responses=text_responses)
+        conversation_turn = ConversationTurn(
+            virtual_agent_output=virtual_agent_output,
+            user_input=ConversationTurn.UserInput(
+                is_webhook_enabled=self._is_webhook_enabled,
+                input=QueryInput(
+                    text=TextInput(
+                      text=self._input_text,
+                    )
+                )
+            )
         )
 
+        try:
+          self._test_case = self.client.create_test_case(
+              parent=self.controller.agent_delegator.agent.name,
+              test_case=TestCase(display_name=self.display_name,
+              test_case_conversation_turns=[conversation_turn],
+              test_config=TestConfig(flow=self.controller.start_flow))
+          )
+        except google.api_core.exceptions.AlreadyExists:
+          request = ListTestCasesRequest(
+            parent=self.parent
+          )
+          for curr_test_case in self.client.list_test_cases(request=request):
+            if curr_test_case.display_name == self.display_name:
+              request = GetTestCaseRequest(
+                  name=curr_test_case.name,
+              )
+              self._test_case = self.client.get_test_case(request=request)
+              return
 
-    # def initialize_clients(self):
-    #     self._webhooks_client = WebhooksClient(client_options=self.client_options)
-    #     self._intents_client = IntentsClient(client_options=self.client_options)
-    #     self._flows_client = FlowsClient(client_options=self.client_options)
-    #     self._test_cases_client = TestCasesClient(client_options=self.client_options)
-
-
-#     def run(self):
-#         '''run sets up a Dialogflow CX agent for the webhook sample'''
-#         self.webhook = self.update_webhook_url()
-#         if self.args.update_agent_webhook_only:
-#             return 0
-#         self.setup_agent()
-#         self.test_webhook(delay=5)
-#         return 0
-
-#     def test_webhook(self, delay=0):
-#         '''test_webhook runs a test case to exercise the Dialogflow CX agent's webhook'''
-#         # Newly created agents might need a short delay to become stable.
-#         if delay:
-#             time.sleep(delay)
-
-#         # Create a test interaction, to confirm the webhook works as-intended:
-#         text_response = ResponseMessage.Text(
-#             text=[
-#                 'Entering example_page',
-#                 'Webhook received: go to example_page (Tag: webhook-tag)',
-#             ]
-#         )
-#         virtual_agent_output = ConversationTurn.VirtualAgentOutput(
-#             current_page=self.page,
-#             triggered_intent=self.intent,
-#             text_responses=[text_response])
-#         conversation_turn = ConversationTurn(
-#             virtual_agent_output=virtual_agent_output,
-#             user_input=ConversationTurn.UserInput(is_webhook_enabled=True,
-#             input=QueryInput(text=TextInput(text=f'go to {PAGE_NAME}'))))
-#         test_case = self.clients["test_cases"].create_test_case(
-#             parent=self.agent.name,
-#             test_case=TestCase(display_name=TEST_CASE_DISPLAY_NAME,
-#             test_case_conversation_turns=[conversation_turn],
-#             test_config=TestConfig(flow=self.agent.start_flow)))
-#         print(self.agent.start_flow)
-
-#         lro = self.clients["test_cases"].run_test_case(
-#             request=RunTestCaseRequest(name=test_case.name))
-#         while lro.running():
-#             time.sleep(1)
-#         assert lro.result().result.test_result == TestResult.PASSED
-#         print('Test successful!')
+    def run_test_case(self, wait=10, max_retries=3):
+      retry_count = 0
+      result = None
+      while retry_count < max_retries:
+        time.sleep(wait)
+        lro = self.client.run_test_case(request=RunTestCaseRequest(name=self.test_case.name))
+        while lro.running():
+          try:
+            result = lro.result().result
+            agent_response_difference = result.conversation_turns[0].virtual_agent_output.differences
+            test_case_fail = result.test_result != TestResult.PASSED
+            if agent_response_difference or test_case_fail:
+              raise DialogflowTestCaseFailure(f'Test "{self.test_case.display_name}" failed')
+            return
+          except google.api_core.exceptions.NotFound as e:
+            if str(e) == '404 com.google.apps.framework.request.NotFoundException: NLU model for flow \'00000000-0000-0000-0000-000000000000\' does not exist. Please try again after retraining the flow.':
+              retry_count += 1
+      raise RuntimeError(f'Retry count exceeded: {retry_count}')
 
 
 
 
+class WebhookSample(DialogflowSample):
+
+    _AGENT_DISPLAY_NAME = 'Webhook Agent 21'
+    _WEBHOOK_DISPLAY_NAME = 'Webhook 1'
+    _WEBHOOK_URI = 'https://us-central1-df-terraform-dev04cc.cloudfunctions.net/wh-df-terraform-dev04cc'
+    _INTENT_DISPLAY_NAME = 'go-to-example-page'
+    _INTENT_TRAINING_PHRASES_TEXT = ['trigger intent', 'trigger the intent']
+    _PAGE_DISPLAY_NAME = 'Main Page'
+    _PAGE_ENTRY_FULFILLMENT_TEXT=f'Entering {_PAGE_DISPLAY_NAME}'
+    _PAGE_WEBHOOK_ENTRY_TAG = 'enter_main_page'
+
+    def __init__(self, quota_project_id=None):
+      self.auth_delegator = AuthDelegator(self, quota_project_id=quota_project_id)
+      self.agent_delegator = AgentDelegator(self, display_name=self._AGENT_DISPLAY_NAME)
+      self.webhook_delegator = WebhookDelegator(self, display_name=self._WEBHOOK_DISPLAY_NAME, uri=self._WEBHOOK_URI)
+      self.intent_delegator = IntentDelegator(self, display_name=self._INTENT_DISPLAY_NAME)
+      self.page_delegator = FulfillmentPageDelegator(self, 
+          display_name=self._PAGE_DISPLAY_NAME, 
+          entry_fulfillment_text=self._PAGE_ENTRY_FULFILLMENT_TEXT,
+          webhook_delegator=self.webhook_delegator,
+          tag=self._PAGE_WEBHOOK_ENTRY_TAG,
+          )
+      self.flow_delegator = FlowDelegator(self)
+
+      self.test_case_delegators = []
+      for ti, input_text in enumerate(self._INTENT_TRAINING_PHRASES_TEXT):
+        expected_response_text = [self._PAGE_ENTRY_FULFILLMENT_TEXT, f'Webhook received: {input_text} (Tag: {self._PAGE_WEBHOOK_ENTRY_TAG})']
+        self.add_test_case(f'Test Case {ti}', input_text, expected_response_text)
+      # self.add_test_case(f'Test Case XFAIL', 'FAIL', 'FAIL', expected_exception=DialogflowTestCaseFailure)
+    
+    def add_test_case(self, test_case_display_name, input_text, expected_response_text, expected_exception=None):
+      self.test_case_delegators.append(
+        TestCaseDelegator(self,
+          display_name=test_case_display_name,
+          input_text=input_text,
+          expected_response_text=expected_response_text,
+          page_delegator=self.page_delegator,
+          intent_delegator=self.intent_delegator,
+          expected_exception=expected_exception,
+        )
+      )
+
+    def initialize(self):
+      self.agent_delegator.initialize()
+      self.webhook_delegator.initialize()
+      self.intent_delegator.initialize(self._INTENT_TRAINING_PHRASES_TEXT)
+      self.page_delegator.initialize()
+      self.flow_delegator.initialize()
+      self.flow_delegator.append_transition_route(
+          self.intent_delegator.intent.name,
+          self.page_delegator.page.name
+      )
+      for test_case_delegator in self.test_case_delegators:
+        test_case_delegator.initialize()
 
 
-#     def setup_agent(self):
-#         '''setup_agent creates pages, flows, and intents for the sample'''
-#         # Create a page, with a webhook fulfillment:
-#         fulfillment = Fulfillment({
-#             'messages': [
-#                 ResponseMessage(
-#                     text=ResponseMessage.Text(
-#                         text=[f'Entering {PAGE_NAME}']
-#                     )
-#                 )
-#             ],
-#             'webhook': self.webhook.name,
-#             'tag': TAG_NAME,
-#         })
-#         page = Page(
-#             display_name=PAGE_NAME,
-#             entry_fulfillment=fulfillment,
-#         )
-#         self.page = self.clients["pages"].create_page(
-#             parent=self.agent.start_flow,
-#             page=page,
-#         )
+if __name__ == "__main__":
+    sample = WebhookSample(quota_project_id='df-terraform-dev04cc')
+    sample.initialize()
+    for test_case_delegator in sample.test_case_delegators:
+        test_case_delegator.run_test_case()
 
-#         # Create an intent-triggered transition into the page:
-#         intent = Intent({
-#             'display_name':f'go-into-{PAGE_NAME}',
-#             'training_phrases':[
-#                 Intent.TrainingPhrase({
-#                     'parts':[{
-#                         'text': f'go into {PAGE_NAME}'
-#                     }],
-#                     'id':'',
-#                     'repeat_count':1
-#                 })
-#             ],
-#         })
-#         self.intent = self.clients["intents"].create_intent(
-#             parent=self.agent.name,
-#             intent=intent
-#         )
-
-#         # Update start flow to transition to newly created page
-#         flow = self.clients["flows"].get_flow(
-#             name=self.agent.start_flow)
-#         flow.transition_routes.append(TransitionRoute(
-#             intent=self.intent.name,
-#             target_page=self.page.name
-#         ))
-#         self.clients["flows"].update_flow(flow=flow)
-
-#         print(f'New Agent: https://dialogflow.cloud.google.com/cx/{self.agent.start_flow}')
-
-
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser(
-#         description='Setup Dialogflow CX webhook sample')
-#     parser.add_argument(
-#         '--webhook-url',
-#         help='Webhook URL for the Dialogflow CX to use',
-#         required=True)
-#     parser.add_argument(
-#         '--update-agent-webhook-only',
-#         help='Only update the agent\'s webhook, not NLU',
-#         default=False)
-#     parser.add_argument(
-#         '--location',
-#         help='Google Cloud location or region to create/use Dialogflow CX in',
-#         default=DEFAULT_LOCATION)
-#     parser.add_argument(
-#         '--agent-id',
-#         help='ID of the Dialogflow CX agent')
-#     parser.add_argument(
-#         '--agent-default-lang-code',
-#         help='Default language code of the Dialogflow CX agent',
-#         default=DEFAULT_AGENT_LANG_CODE)
-#     parser.add_argument(
-#         '--agent-display-name',
-#         help='Display name of the Dialogflow CX agent',
-#         default=DEFAULT_AGENT_DISPLAY_NAME)
-#     parser.add_argument(
-#         '--agent-time-zone',
-#         help='Time zone of the Dialogflow CX agent',
-#         default=DEFAULT_AGENT_TIME_ZONE)
-#     parser.add_argument(
-#         '--project-id',
-#         help='Google Cloud project to create/use Dialogflow CX in')
-#     main = Setup(args=parser.parse_args())
-#     sys.exit(main.run())
