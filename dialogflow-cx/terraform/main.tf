@@ -23,6 +23,9 @@ resource "google_project_service" "service" {
   for_each = toset([
     "cloudfunctions.googleapis.com",
     "cloudbuild.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "eventarc.googleapis.com",
+    "run.googleapis.com",
   ])
   service = each.key
   project            = google_project.project.project_id
@@ -36,6 +39,7 @@ resource "google_storage_bucket" "bucket" {
   location = "US"
   uniform_bucket_level_access = true
   force_destroy = true
+  depends_on = [google_project_service.service]
 }
 
 data "archive_file" "source" {
@@ -48,6 +52,7 @@ resource "google_storage_bucket_object" "archive" {
   name   = "index.zip"
   bucket = google_storage_bucket.bucket.name
   source = data.archive_file.source.output_path
+  depends_on = [google_storage_bucket.bucket, data.archive_file.source]
 }
 
 resource "google_cloudfunctions_function" "function" {
@@ -62,6 +67,7 @@ resource "google_cloudfunctions_function" "function" {
   timeout               = 60
   entry_point           = "dialogflow_webhook"
   region = "us-central1"
+  depends_on = [google_project_service.service, google_storage_bucket_object.archive]
 }
 
 resource "google_service_account" "sa" {
@@ -77,4 +83,5 @@ resource "google_cloudfunctions_function_iam_member" "invoker" {
   cloud_function = google_cloudfunctions_function.function.name
   role   = "roles/cloudfunctions.invoker"
   member = "serviceAccount:${google_service_account.sa.display_name}@${google_cloudfunctions_function.function.project}.iam.gserviceaccount.com"
+  depends_on = [google_service_account.sa]
 }
