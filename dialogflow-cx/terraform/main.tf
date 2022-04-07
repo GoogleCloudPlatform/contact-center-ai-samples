@@ -26,6 +26,7 @@ resource "google_project_service" "service" {
     "artifactregistry.googleapis.com",
     "eventarc.googleapis.com",
     "run.googleapis.com",
+    "dialogflow.googleapis.com",
   ])
   service = each.key
   project            = google_project.project.project_id

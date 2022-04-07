@@ -43,7 +43,7 @@ class ClientDelegator:
     @property
     def client(self):
       if self._client is None: 
-        self._client = self._CLIENT_CLASS(client_options=self.client_options)
+        self._client = self._CLIENT_CLASS(client_options=self.client_options, credentials=self.controller.auth_delegator.credentials)
       return self._client
 
     @property
@@ -112,6 +112,7 @@ class AuthDelegator:
 
     def __init__(self, controller: DialogflowSample, quota_project_id=None, **kwargs):
         self.controller = controller
+        print(quota_project_id)
         self.credentials, self.project_id = google.auth.default(quota_project_id=quota_project_id)
         self.location = kwargs.get('location', self._DEFAULT_LOCATION)
 
@@ -360,17 +361,17 @@ class TestCaseDelegator(ClientDelegator):
 
 class WebhookSample(DialogflowSample):
 
-    _AGENT_DISPLAY_NAME = 'Webhook Agent 4'
+    _AGENT_DISPLAY_NAME = 'Webhook Agent 19'
     _WEBHOOK_DISPLAY_NAME = 'Webhook 1'
-    _WEBHOOK_URI = 'https://us-central1-dialogflow-dev-15.cloudfunctions.net/dialogflow-webhook-set-param'
+    _WEBHOOK_URI = 'https://us-central1-df-terraform-dev04cc.cloudfunctions.net/wh-df-terraform-dev04cc'
     _INTENT_DISPLAY_NAME = 'go-to-example-page'
     _INTENT_TRAINING_PHRASES_TEXT = ['trigger intent', 'trigger the intent']
     _PAGE_DISPLAY_NAME = 'Main Page'
     _PAGE_ENTRY_FULFILLMENT_TEXT=f'Entering {_PAGE_DISPLAY_NAME}'
     _PAGE_WEBHOOK_ENTRY_TAG = 'enter_main_page'
-    _TEST_CASE_DISPLAY_NAME = 'Test Case 4'
+    _TEST_CASE_DISPLAY_NAME = 'Test Case 5'
     # _TEST_RESPONSE_TEXT = ['ERROR']
-    _TEST_RESPONSE_TEXT = ['Entering Main Page', 'Received: trigger intent']
+    _TEST_RESPONSE_TEXT = [_PAGE_ENTRY_FULFILLMENT_TEXT, f'Webhook received: {_INTENT_TRAINING_PHRASES_TEXT[0]} (Tag: {_PAGE_WEBHOOK_ENTRY_TAG})']
 
     def __init__(self, quota_project_id=None):
       self.auth_delegator = AuthDelegator(self, quota_project_id=quota_project_id)
@@ -404,16 +405,28 @@ class WebhookSample(DialogflowSample):
       )
       self.test_case_delegator.initialize()
 
-    def run(self, wait=1):
-      lro = self.test_case_delegator.client.run_test_case(request=RunTestCaseRequest(name=self.test_case_delegator.test_case.name))
-      while lro.running():
-          time.sleep(wait)
+    def run(self, wait=10, max_retries=3):
 
-      return lro.result().result
+      retry_count = 0
+      result = None
+      while retry_count < max_retries:
+        time.sleep(wait)
+        lro = self.test_case_delegator.client.run_test_case(request=RunTestCaseRequest(name=self.test_case_delegator.test_case.name))
+        while lro.running():
+          try:
+            return lro.result().result
+          except google.api_core.exceptions.NotFound as e:
+            if str(e) == '404 com.google.apps.framework.request.NotFoundException: NLU model for flow \'00000000-0000-0000-0000-000000000000\' does not exist. Please try again after retraining the flow.':
+              retry_count += 1
+
+      if result:
+        return result
+      else:
+        raise RuntimeError(f'Retry count exceeded: {retry_count}')
 
 
 if __name__ == "__main__":
-    sample = WebhookSample(quota_project_id='dialogflow-dev-15')
+    sample = WebhookSample(quota_project_id='df-terraform-dev04cc')
     sample.initialize()
     result = sample.run()
     assert not result.conversation_turns[0].virtual_agent_output.differences
