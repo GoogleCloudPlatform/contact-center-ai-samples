@@ -1,18 +1,38 @@
-variable "build_uuid" {
-  description = "Required uuid for a test build; links apply and destroy"
-  type        = string
+locals {
+  project_name = "df-terraform-dev"
+	root_dir = abspath("./")
+  archive_path = abspath("./tmp/function-${random_id.id.hex}.zip")
+  billing_account = "0145C0-557C58-C970F3"
+  org_id = "298490623289"
+  region = "us-central1"
 }
 
-locals {
-  build_project_id = "nicholascain-starter-project"
-  test_project_id = "nicholascain-starter-project"
-	root_dir = abspath("./")
-  archive_path = abspath("./tmp/function-${var.build_uuid}.zip")
+resource "random_id" "id" {
+  byte_length = 2
+  prefix      = local.project_name
+}
+
+resource "google_project" "project" {
+  name            = random_id.id.hex
+  project_id      = random_id.id.hex
+  billing_account = local.billing_account
+  org_id          = local.org_id
+}
+
+resource "google_project_service" "service" {
+  for_each = toset([
+    "cloudfunctions.googleapis.com",
+    "cloudbuild.googleapis.com",
+  ])
+  service = each.key
+  project            = google_project.project.project_id
+  disable_on_destroy = true
+  disable_dependent_services = true
 }
 
 resource "google_storage_bucket" "bucket" {
-  project = local.build_project_id
-  name     = "contact-center-ai-samples-temp-bucket-${var.build_uuid}"
+  project = google_project.project.project_id
+  name     = "temp-${random_id.id.hex}"
   location = "US"
   uniform_bucket_level_access = true
   force_destroy = true
@@ -31,8 +51,8 @@ resource "google_storage_bucket_object" "archive" {
 }
 
 resource "google_cloudfunctions_function" "function" {
-  project = local.test_project_id
-  name        = "webhook-test-${var.build_uuid}"
+  project = google_project.project.project_id
+  name        = "wh-${random_id.id.hex}"
   description = "Webhook"
   runtime     = "python39"
   available_memory_mb   = 128
@@ -45,8 +65,8 @@ resource "google_cloudfunctions_function" "function" {
 }
 
 resource "google_service_account" "sa" {
-  account_id   = "invoker-${var.build_uuid}"
-  display_name = "invoker-${var.build_uuid}"
+  account_id   = "sa-${random_id.id.hex}"
+  display_name = "sa-${random_id.id.hex}"
   project      = google_cloudfunctions_function.function.project
 }
 
