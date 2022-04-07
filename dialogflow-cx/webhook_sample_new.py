@@ -11,6 +11,10 @@ import google.auth
 import google.api_core.exceptions
 
 
+class DialogflowTestCaseFailure(Exception):
+  """Exception to raise when a test case fails"""
+
+
 class DialogflowSample:
     """Base class for samples"""
 
@@ -308,6 +312,7 @@ class TestCaseDelegator(ClientDelegator):
         self._expected_response_text = kwargs.pop('expected_response_text')
         self.page_delegator = kwargs.pop('page_delegator')
         self.intent_delegator = kwargs.pop('intent_delegator')
+        self.expected_exception = kwargs.pop('expected_exception', None)
         self._test_case = None
         super().__init__(controller, **kwargs)
 
@@ -356,12 +361,31 @@ class TestCaseDelegator(ClientDelegator):
               self._test_case = self.client.get_test_case(request=request)
               return
 
+    def run_test_case(self, wait=10, max_retries=3):
+      retry_count = 0
+      result = None
+      while retry_count < max_retries:
+        time.sleep(wait)
+        lro = self.client.run_test_case(request=RunTestCaseRequest(name=self.test_case.name))
+        while lro.running():
+          try:
+            result = lro.result().result
+            agent_response_difference = result.conversation_turns[0].virtual_agent_output.differences
+            test_case_fail = result.test_result != TestResult.PASSED
+            if agent_response_difference or test_case_fail:
+              raise DialogflowTestCaseFailure(f'Test "{self.test_case.display_name}" failed')
+            return
+          except google.api_core.exceptions.NotFound as e:
+            if str(e) == '404 com.google.apps.framework.request.NotFoundException: NLU model for flow \'00000000-0000-0000-0000-000000000000\' does not exist. Please try again after retraining the flow.':
+              retry_count += 1
+      raise RuntimeError(f'Retry count exceeded: {retry_count}')
+
 
 
 
 class WebhookSample(DialogflowSample):
 
-    _AGENT_DISPLAY_NAME = 'Webhook Agent 20'
+    _AGENT_DISPLAY_NAME = 'Webhook Agent 21'
     _WEBHOOK_DISPLAY_NAME = 'Webhook 1'
     _WEBHOOK_URI = 'https://us-central1-df-terraform-dev04cc.cloudfunctions.net/wh-df-terraform-dev04cc'
     _INTENT_DISPLAY_NAME = 'go-to-example-page'
@@ -385,18 +409,21 @@ class WebhookSample(DialogflowSample):
 
       self.test_case_delegators = []
       for ti, input_text in enumerate(self._INTENT_TRAINING_PHRASES_TEXT):
-        test_case_display_name = f'Test Case {ti}'
-        test_response_text = [self._PAGE_ENTRY_FULFILLMENT_TEXT, f'Webhook received: {input_text} (Tag: {self._PAGE_WEBHOOK_ENTRY_TAG})']
-
-        self.test_case_delegators.append(
-          TestCaseDelegator(self,
-            display_name=test_case_display_name,
-            input_text=input_text,
-            expected_response_text=test_response_text,
-            page_delegator=self.page_delegator,
-            intent_delegator=self.intent_delegator,
-          )
+        expected_response_text = [self._PAGE_ENTRY_FULFILLMENT_TEXT, f'Webhook received: {input_text} (Tag: {self._PAGE_WEBHOOK_ENTRY_TAG})']
+        self.add_test_case(f'Test Case {ti}', input_text, expected_response_text)
+      # self.add_test_case(f'Test Case XFAIL', 'FAIL', 'FAIL', expected_exception=DialogflowTestCaseFailure)
+    
+    def add_test_case(self, test_case_display_name, input_text, expected_response_text, expected_exception=None):
+      self.test_case_delegators.append(
+        TestCaseDelegator(self,
+          display_name=test_case_display_name,
+          input_text=input_text,
+          expected_response_text=expected_response_text,
+          page_delegator=self.page_delegator,
+          intent_delegator=self.intent_delegator,
+          expected_exception=expected_exception,
         )
+      )
 
     def initialize(self):
       self.agent_delegator.initialize()
@@ -411,30 +438,10 @@ class WebhookSample(DialogflowSample):
       for test_case_delegator in self.test_case_delegators:
         test_case_delegator.initialize()
 
-    def run_test_case(self, test_case_delegator, wait=10, max_retries=3):
-
-      retry_count = 0
-      result = None
-      while retry_count < max_retries:
-        time.sleep(wait)
-        lro = test_case_delegator.client.run_test_case(request=RunTestCaseRequest(name=test_case_delegator.test_case.name))
-        while lro.running():
-          try:
-            return lro.result().result
-          except google.api_core.exceptions.NotFound as e:
-            if str(e) == '404 com.google.apps.framework.request.NotFoundException: NLU model for flow \'00000000-0000-0000-0000-000000000000\' does not exist. Please try again after retraining the flow.':
-              retry_count += 1
-      if result:
-        return result
-      else:
-        raise RuntimeError(f'Retry count exceeded: {retry_count}')
-
 
 if __name__ == "__main__":
     sample = WebhookSample(quota_project_id='df-terraform-dev04cc')
     sample.initialize()
     for test_case_delegator in sample.test_case_delegators:
-        result = sample.run_test_case(test_case_delegator)
-        assert not result.conversation_turns[0].virtual_agent_output.differences
-        assert result.test_result == TestResult.PASSED
-        print(f'Test "{test_case_delegator.test_case.display_name}" succeeded!')
+        test_case_delegator.run_test_case()
+
