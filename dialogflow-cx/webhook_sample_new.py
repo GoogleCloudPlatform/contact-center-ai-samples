@@ -305,7 +305,7 @@ class TestCaseDelegator(ClientDelegator):
     def __init__(self, controller: DialogflowSample, **kwargs) -> None:
         self._is_webhook_enabled = kwargs.pop('is_webhook_enabled', True)
         self._input_text = kwargs.pop('input_text')
-        self._response_text = kwargs.pop('response_text')
+        self._expected_response_text = kwargs.pop('expected_response_text')
         self.page_delegator = kwargs.pop('page_delegator')
         self.intent_delegator = kwargs.pop('intent_delegator')
         self._test_case = None
@@ -320,7 +320,7 @@ class TestCaseDelegator(ClientDelegator):
     def initialize(self):
         text_responses = [ResponseMessage.Text(
             text=text
-        ) for text in self._response_text]
+        ) for text in self._expected_response_text]
         virtual_agent_output = ConversationTurn.VirtualAgentOutput(
             current_page=self.page_delegator.page,
             triggered_intent=self.intent_delegator.intent,
@@ -361,7 +361,7 @@ class TestCaseDelegator(ClientDelegator):
 
 class WebhookSample(DialogflowSample):
 
-    _AGENT_DISPLAY_NAME = 'Webhook Agent 19'
+    _AGENT_DISPLAY_NAME = 'Webhook Agent 20'
     _WEBHOOK_DISPLAY_NAME = 'Webhook 1'
     _WEBHOOK_URI = 'https://us-central1-df-terraform-dev04cc.cloudfunctions.net/wh-df-terraform-dev04cc'
     _INTENT_DISPLAY_NAME = 'go-to-example-page'
@@ -369,9 +369,6 @@ class WebhookSample(DialogflowSample):
     _PAGE_DISPLAY_NAME = 'Main Page'
     _PAGE_ENTRY_FULFILLMENT_TEXT=f'Entering {_PAGE_DISPLAY_NAME}'
     _PAGE_WEBHOOK_ENTRY_TAG = 'enter_main_page'
-    _TEST_CASE_DISPLAY_NAME = 'Test Case 5'
-    # _TEST_RESPONSE_TEXT = ['ERROR']
-    _TEST_RESPONSE_TEXT = [_PAGE_ENTRY_FULFILLMENT_TEXT, f'Webhook received: {_INTENT_TRAINING_PHRASES_TEXT[0]} (Tag: {_PAGE_WEBHOOK_ENTRY_TAG})']
 
     def __init__(self, quota_project_id=None):
       self.auth_delegator = AuthDelegator(self, quota_project_id=quota_project_id)
@@ -385,13 +382,21 @@ class WebhookSample(DialogflowSample):
           tag=self._PAGE_WEBHOOK_ENTRY_TAG,
           )
       self.flow_delegator = FlowDelegator(self)
-      self.test_case_delegator = TestCaseDelegator(self, 
-          display_name=self._TEST_CASE_DISPLAY_NAME, 
-          input_text=self._INTENT_TRAINING_PHRASES_TEXT[0],
-          response_text=self._TEST_RESPONSE_TEXT,
-          page_delegator=self.page_delegator,
-          intent_delegator=self.intent_delegator,
-      )
+
+      self.test_case_delegators = []
+      for ti, input_text in enumerate(self._INTENT_TRAINING_PHRASES_TEXT):
+        test_case_display_name = f'Test Case {ti}'
+        test_response_text = [self._PAGE_ENTRY_FULFILLMENT_TEXT, f'Webhook received: {input_text} (Tag: {self._PAGE_WEBHOOK_ENTRY_TAG})']
+
+        self.test_case_delegators.append(
+          TestCaseDelegator(self,
+            display_name=test_case_display_name,
+            input_text=input_text,
+            expected_response_text=test_response_text,
+            page_delegator=self.page_delegator,
+            intent_delegator=self.intent_delegator,
+          )
+        )
 
     def initialize(self):
       self.agent_delegator.initialize()
@@ -403,22 +408,22 @@ class WebhookSample(DialogflowSample):
           self.intent_delegator.intent.name,
           self.page_delegator.page.name
       )
-      self.test_case_delegator.initialize()
+      for test_case_delegator in self.test_case_delegators:
+        test_case_delegator.initialize()
 
-    def run(self, wait=10, max_retries=3):
+    def run_test_case(self, test_case_delegator, wait=10, max_retries=3):
 
       retry_count = 0
       result = None
       while retry_count < max_retries:
         time.sleep(wait)
-        lro = self.test_case_delegator.client.run_test_case(request=RunTestCaseRequest(name=self.test_case_delegator.test_case.name))
+        lro = test_case_delegator.client.run_test_case(request=RunTestCaseRequest(name=test_case_delegator.test_case.name))
         while lro.running():
           try:
             return lro.result().result
           except google.api_core.exceptions.NotFound as e:
             if str(e) == '404 com.google.apps.framework.request.NotFoundException: NLU model for flow \'00000000-0000-0000-0000-000000000000\' does not exist. Please try again after retraining the flow.':
               retry_count += 1
-
       if result:
         return result
       else:
@@ -428,6 +433,8 @@ class WebhookSample(DialogflowSample):
 if __name__ == "__main__":
     sample = WebhookSample(quota_project_id='df-terraform-dev04cc')
     sample.initialize()
-    result = sample.run()
-    assert not result.conversation_turns[0].virtual_agent_output.differences
-    assert result.test_result == TestResult.PASSED
+    for test_case_delegator in sample.test_case_delegators:
+        result = sample.run_test_case(test_case_delegator)
+        assert not result.conversation_turns[0].virtual_agent_output.differences
+        assert result.test_result == TestResult.PASSED
+        print(f'Test "{test_case_delegator.test_case.display_name}" succeeded!')
