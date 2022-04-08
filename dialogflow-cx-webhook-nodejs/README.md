@@ -11,11 +11,15 @@ Prebuilt agents currently only support English (en).
 These samples use the [Telecommunications Agent](https://cloud.google.com/dialogflow/cx/docs/concept/agents-prebuilt#telecommunications). To import the prebuilt agent to your project:
 
 1. Go to the [Dialogflow CX Console](https://dialogflow.cloud.google.com/cx/projects).
-1. Click the project where you would like to import the prebuilt agent.
-1. Click **Use pre-built agents**.
-1. Click the Telecommunications Agent, then click **Import**.
-1. Choose your desired [location](/dialogflow/cx/docs/concept/region#avail) and click **Create**.
-1. Start testing and customizing.
+2. Click the project where you would like to import the prebuilt agent.
+3. Click **Use pre-built agents**.
+4. Click the Telecommunications Agent, then click **Import**.
+5. Choose your desired [location](/dialogflow/cx/docs/concept/region#avail) and click **Create**.
+6. Some samples require the path to your agent. You can get the path by going to the list of agents in your project, clicking the 3-dot menu next to your selected agent, and clicking "Copy Name".
+
+![image](https://user-images.githubusercontent.com/45905583/162499297-6e14e785-3ac6-41b3-9870-4b732b94151f.png)
+
+8. Start testing and customizing.
 
 ## Modifying webhook code
 
