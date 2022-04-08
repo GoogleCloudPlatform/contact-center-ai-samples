@@ -14,8 +14,6 @@
 
 """Tests for webhook module."""
 
-import json
-
 import pytest
 
 from basic_webhook.main import basic_dialogflow_webhook, build_request_dict, extract_text

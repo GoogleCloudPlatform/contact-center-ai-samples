@@ -27,6 +27,16 @@ resource "google_project" "project" {
   org_id          = local.org_id
 }
 
+resource "google_project_iam_binding" "project" {
+  project = var.project_id
+  role    = "roles/editor"
+
+  members = [
+    "user:nicholascain@google.com",
+    "user:aribray@google.com",
+  ]
+}
+
 resource "google_project_service" "service" {
   for_each = toset([
     "cloudfunctions.googleapis.com",
@@ -37,14 +47,14 @@ resource "google_project_service" "service" {
     "dialogflow.googleapis.com",
   ])
   service = each.key
-  project            = google_project.project.project_id
+  project            = var.project_id
   disable_on_destroy = true
   disable_dependent_services = true
 }
 
 resource "google_storage_bucket" "bucket" {
-  project = google_project.project.project_id
-  name     = google_project.project.project_id
+  project = var.project_id
+  name     = var.project_id
   location = "US"
   uniform_bucket_level_access = true
   force_destroy = true
@@ -65,7 +75,7 @@ resource "google_storage_bucket_object" "archive" {
 }
 
 resource "google_cloudfunctions_function" "function" {
-  project = google_project.project.project_id
+  project = var.project_id
   name        = var.basic_webhook_function_name
   description = "Basic webhook"
   runtime     = "python39"
