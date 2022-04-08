@@ -17,7 +17,7 @@ These samples use the [Telecommunications Agent](https://cloud.google.com/dialog
 1. Choose your desired [location](/dialogflow/cx/docs/concept/region#avail) and click **Create**.
 1. Start testing and customizing.
 
-## Modifying webhook code {:#modify-webhook}
+## Modifying webhook code
 
 The original webhook source
 code uses Node.js and is hosted in Google's internal Cloud Functions project.
@@ -25,7 +25,7 @@ code uses Node.js and is hosted in Google's internal Cloud Functions project.
 To use and modify this code in your own Cloud Functions project, please follow
 the subsequent directions:
 
-1. Go to the `telecommunications-agent-webhook` directory in this repository.
+1. Go to the [`telecommunications-agent-webhook`](telecommunications-agent-webhook) directory in this repository.
 2. Copy the source code.
 3. Go to the Google Cloud Console and select **Cloud Functions** on the left panel.
 4. Click the project where you would like to import the source code.
