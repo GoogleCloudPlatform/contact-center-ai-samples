@@ -6,7 +6,10 @@ Welcome to the Google Cloud [Contact Center AI](https://cloud.google.com/solutio
 
 ## Overview
 
-The repository contains samples and [Community Samples](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/community) that demonstrate how to analyze, classify and search documents using Google Cloud Document AI.
+The repository contains samples, tutorials, and demos that demonstrate how to use Google Cloud Conversational AI services, including:
+* [Contact Center AI](https://cloud.google.com/solutions/contact-center)
+* [Dialogflow](https://cloud.google.com/dialogflow)
+* [Speech APIs](https://cloud.google.com/speech-to-text)
 
 ## Samples
 
