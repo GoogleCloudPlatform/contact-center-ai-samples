@@ -19,7 +19,7 @@ import pytest
 from typing import Mapping
 from unittest import mock
 
-from webhook_sample import DialogflowController
+# from webhook_sample import DialogflowController
 from google.auth import credentials as ga_credentials
 from google.auth.environment_vars import PROJECT
 
@@ -56,14 +56,14 @@ def mock_credentials():
   del credentials
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def mock_settings_env_vars(mock_project_id_env):
   with mock.patch.dict(os.environ, {PROJECT: mock_project_id_env}):
     yield
 
 
-@pytest.fixture(scope='function')
-def controller(project_id) -> DialogflowController:
-  dfc = DialogflowController(project_id=project_id)
-  yield dfc
-  del dfc
+# @pytest.fixture(scope='function')
+# def controller(project_id) -> DialogflowController:
+#   dfc = DialogflowController(project_id=project_id)
+#   yield dfc
+#   del dfc

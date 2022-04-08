@@ -116,7 +116,6 @@ class AuthDelegator:
 
     def __init__(self, controller: DialogflowSample, quota_project_id=None, **kwargs):
         self.controller = controller
-        print(quota_project_id)
         self.credentials, self.project_id = google.auth.default(quota_project_id=quota_project_id)
         self.location = kwargs.get('location', self._DEFAULT_LOCATION)
 
@@ -292,7 +291,7 @@ class FlowDelegator(ClientDelegator):
 
     def append_transition_route(self, intent_name, target_page_name, flow_name=None):
         if not flow_name:
-            flow_name = sample.start_flow
+            flow_name = self.controller.start_flow
 
         flow = self.client.get_flow(name=flow_name)
         flow.transition_routes.append(TransitionRoute(
@@ -387,17 +386,27 @@ class WebhookSample(DialogflowSample):
 
     _AGENT_DISPLAY_NAME = 'Webhook Agent 21'
     _WEBHOOK_DISPLAY_NAME = 'Webhook 1'
-    _WEBHOOK_URI = 'https://us-central1-df-terraform-dev04cc.cloudfunctions.net/wh-df-terraform-dev04cc'
     _INTENT_DISPLAY_NAME = 'go-to-example-page'
     _INTENT_TRAINING_PHRASES_TEXT = ['trigger intent', 'trigger the intent']
     _PAGE_DISPLAY_NAME = 'Main Page'
     _PAGE_ENTRY_FULFILLMENT_TEXT=f'Entering {_PAGE_DISPLAY_NAME}'
     _PAGE_WEBHOOK_ENTRY_TAG = 'enter_main_page'
 
-    def __init__(self, quota_project_id=None):
+    TEST_CASES = {
+      'Test Case 0': {
+        'input_text': _INTENT_TRAINING_PHRASES_TEXT[0],
+        'expected_response_text':  [_PAGE_ENTRY_FULFILLMENT_TEXT, f'Webhook received: {_INTENT_TRAINING_PHRASES_TEXT[0]} (Tag: {_PAGE_WEBHOOK_ENTRY_TAG})'],
+        'expected_exception': None},
+      'Test Case XFAIL': {
+        'input_text': 'FAIL',
+        'expected_response_text':  ['FAIL'],
+        'expected_exception': DialogflowTestCaseFailure},
+    }
+
+    def __init__(self, quota_project_id=None, webhook_uri=None):
       self.auth_delegator = AuthDelegator(self, quota_project_id=quota_project_id)
       self.agent_delegator = AgentDelegator(self, display_name=self._AGENT_DISPLAY_NAME)
-      self.webhook_delegator = WebhookDelegator(self, display_name=self._WEBHOOK_DISPLAY_NAME, uri=self._WEBHOOK_URI)
+      self.webhook_delegator = WebhookDelegator(self, display_name=self._WEBHOOK_DISPLAY_NAME, uri=webhook_uri)
       self.intent_delegator = IntentDelegator(self, display_name=self._INTENT_DISPLAY_NAME)
       self.page_delegator = FulfillmentPageDelegator(self, 
           display_name=self._PAGE_DISPLAY_NAME, 
@@ -407,23 +416,16 @@ class WebhookSample(DialogflowSample):
           )
       self.flow_delegator = FlowDelegator(self)
 
-      self.test_case_delegators = []
-      for ti, input_text in enumerate(self._INTENT_TRAINING_PHRASES_TEXT):
-        expected_response_text = [self._PAGE_ENTRY_FULFILLMENT_TEXT, f'Webhook received: {input_text} (Tag: {self._PAGE_WEBHOOK_ENTRY_TAG})']
-        self.add_test_case(f'Test Case {ti}', input_text, expected_response_text)
-      # self.add_test_case(f'Test Case XFAIL', 'FAIL', 'FAIL', expected_exception=DialogflowTestCaseFailure)
-    
-    def add_test_case(self, test_case_display_name, input_text, expected_response_text, expected_exception=None):
-      self.test_case_delegators.append(
-        TestCaseDelegator(self,
-          display_name=test_case_display_name,
-          input_text=input_text,
-          expected_response_text=expected_response_text,
+      self.test_case_delegators = {}
+      for display_name, test_config in self.TEST_CASES.items():
+        self.test_case_delegators[display_name] = TestCaseDelegator(self,
+          display_name=display_name,
           page_delegator=self.page_delegator,
           intent_delegator=self.intent_delegator,
-          expected_exception=expected_exception,
+          input_text=test_config['input_text'],
+          expected_response_text=test_config['expected_response_text'],
+          expected_exception=test_config['expected_exception'],
         )
-      )
 
     def initialize(self):
       self.agent_delegator.initialize()
@@ -435,13 +437,13 @@ class WebhookSample(DialogflowSample):
           self.intent_delegator.intent.name,
           self.page_delegator.page.name
       )
-      for test_case_delegator in self.test_case_delegators:
+      for test_case_delegator in self.test_case_delegators.values():
         test_case_delegator.initialize()
 
 
 if __name__ == "__main__":
     sample = WebhookSample(quota_project_id='df-terraform-dev04cc')
     sample.initialize()
-    for test_case_delegator in sample.test_case_delegators:
+    for test_case_delegator in sample.test_case_delegators.values():
         test_case_delegator.run_test_case()
 

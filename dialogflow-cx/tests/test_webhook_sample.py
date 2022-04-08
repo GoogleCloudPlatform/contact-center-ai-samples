@@ -20,70 +20,121 @@ from google.cloud.dialogflowcx_v3.types import agent as gcdc_agent
 from google.cloud.dialogflowcx_v3 import Agent
 import google.auth
 import pytest
+import os
 from google.cloud.dialogflowcx_v3.services.agents import AgentsClient
 from google.auth import credentials as ga_credentials
 from grpc._channel import _UnaryUnaryMultiCallable
 
-from webhook_sample import DialogflowController, _DEFAULT_ATTRIBUTES
+from webhook_sample import WebhookSample
+
+'''
+export TERRAFORM_PROJECT_ID=df-terraform-dev04cc
+'''
 
 
-def test_dialogflow_controller_init_default():
-    """Test for the Setup class' init method"""
-    # Act:
-    dfc = DialogflowController()
+@pytest.fixture(scope='function')
+def quota_project_id():
+  return os.environ["TERRAFORM_PROJECT_ID"]
+
+
+@pytest.fixture(scope='function')
+def webhook_uri():
+  project_id = os.environ["TERRAFORM_PROJECT_ID"]
+  return f'https://us-central1-{project_id}.cloudfunctions.net/wh-{project_id}'
+
+
+@pytest.fixture(scope='function')
+def webhook_sample(quota_project_id, webhook_uri):
+  sample = WebhookSample(
+    quota_project_id=quota_project_id,
+    webhook_uri=webhook_uri,
+  )
+  sample.initialize()
+  yield sample
+  del sample
+
+
+@pytest.mark.parametrize("test_case_display_name", WebhookSample.TEST_CASES)
+def test_indirect(test_case_display_name, webhook_sample):
+  test_case_delegator = webhook_sample.test_case_delegators[test_case_display_name]
+  if test_case_delegator.expected_exception:
+    with pytest.raises(test_case_delegator.expected_exception) as e_info:
+      test_case_delegator.run_test_case()
+  else:
+    test_case_delegator.run_test_case()
+
+
+
+
+
+  #, WebhookSample.TESTS)
+    # assert len(fixt) == 3
+
+    # sample = WebhookSample(quota_project_id='df-terraform-dev04cc')
+    # sample.initialize()
+    # for test_case_delegator in sample.test_case_delegators:
+    #     test_case_delegator.run_test_case()
+
+# from webhook_sample import DialogflowController, _DEFAULT_ATTRIBUTES
+
+
+# def test_dialogflow_controller_init_default():
+#     """Test for the Setup class' init method"""
+#     # Act:
+#     dfc = DialogflowController()
     
-    # Assert:
-    for key, val in _DEFAULT_ATTRIBUTES.items():
-      assert getattr(dfc, key) == val
+#     # Assert:
+#     for key, val in _DEFAULT_ATTRIBUTES.items():
+#       assert getattr(dfc, key) == val
 
 
-def test_dialogflow_controller_init_override_project_id(project_id):
-    """Test for the Setup class' init method"""
-    # Act:
-    dfc = DialogflowController(project_id=project_id)
+# def test_dialogflow_controller_init_override_project_id(project_id):
+#     """Test for the Setup class' init method"""
+#     # Act:
+#     dfc = DialogflowController(project_id=project_id)
     
-    # Assert:
-    dfc.project_id == project_id
+#     # Assert:
+#     dfc.project_id == project_id
 
 
-def test_dialogflow_controller_auth_default(controller, mock_project_id_env, mocker, mock_credentials):
-  # Arrange:
-  assert controller.credentials!=mock_project_id_env
-  assert controller.project_id!=mock_project_id_env
-  mocker.patch('google.auth.default', return_value=(mock_credentials, google.auth.default()[1]) )
+# def test_dialogflow_controller_auth_default(controller, mock_project_id_env, mocker, mock_credentials):
+#   # Arrange:
+#   assert controller.credentials!=mock_project_id_env
+#   assert controller.project_id!=mock_project_id_env
+#   mocker.patch('google.auth.default', return_value=(mock_credentials, google.auth.default()[1]) )
 
-  # Act:
-  controller.auth_default()
+#   # Act:
+#   controller.auth_default()
 
-  # Assert:
-  assert controller.project_id==mock_project_id_env
-  assert controller.credentials==mock_credentials
-
-
-def test_dialogflow_controller_create_agent(controller):
-  # Act:
-  with mock.patch.object(_UnaryUnaryMultiCallable, "__call__") as call:
-      controller.create_agent()
-
-  # Assert:
-  assert len(call.mock_calls) == 1
-  _, args, _ = call.mock_calls[0]
-  assert args[0].parent == controller.agent_parent
+#   # Assert:
+#   assert controller.project_id==mock_project_id_env
+#   assert controller.credentials==mock_credentials
 
 
-def test_dialogflow_controller_create_webhook(controller):
-  # Arrange:
-  controller._agent = Agent(name='MOCK_AGENT_NAME')
-  # .name = 
+# def test_dialogflow_controller_create_agent(controller):
+#   # Act:
+#   with mock.patch.object(_UnaryUnaryMultiCallable, "__call__") as call:
+#       controller.create_agent()
 
-  # Act:
-  with mock.patch.object(_UnaryUnaryMultiCallable, "__call__") as call:
-      controller.create_webhook()
+#   # Assert:
+#   assert len(call.mock_calls) == 1
+#   _, args, _ = call.mock_calls[0]
+#   assert args[0].parent == controller.agent_parent
 
-  # Assert:
-  assert len(call.mock_calls) == 1
-  _, args, _ = call.mock_calls[0]
-  assert args[0].parent == controller.agent.name
+
+# def test_dialogflow_controller_create_webhook(controller):
+#   # Arrange:
+#   controller._agent = Agent(name='MOCK_AGENT_NAME')
+#   # .name = 
+
+#   # Act:
+#   with mock.patch.object(_UnaryUnaryMultiCallable, "__call__") as call:
+#       controller.create_webhook()
+
+#   # Assert:
+#   assert len(call.mock_calls) == 1
+#   _, args, _ = call.mock_calls[0]
+#   assert args[0].parent == controller.agent.name
 
 
 
