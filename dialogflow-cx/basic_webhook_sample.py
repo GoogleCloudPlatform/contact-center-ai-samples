@@ -124,7 +124,20 @@ class AuthDelegator:
         if not quota_project_id:
           quota_project_id = project_id 
         self.quota_project_id = quota_project_id
-        self.credentials, _ = google.auth.default(quota_project_id=self.quota_project_id)
+
+        import os
+        from google.auth import identity_pool
+        _SVC_ACCOUNT_FILE = os.environ['SVC_ACCOUNT_FILE']
+        with open(_SVC_ACCOUNT_FILE, 'r', encoding="utf8") as f:
+            svc_account_file_data = f.read()
+            svc_account_config_json = json.loads(svc_account_file_data)
+            self.credentials = identity_pool.Credentials.from_info(svc_account_config_json)
+
+        # from google.oauth2 import service_account
+        # import os
+        # self.credentials = service_account.Credentials.from_service_account_file(os.environ['SVC_ACCOUNT_FILE'])
+
+        # self.credentials, _ = google.auth.default(quota_project_id=self.quota_project_id)
         self.location = kwargs.get('location', self._DEFAULT_LOCATION)
 
 

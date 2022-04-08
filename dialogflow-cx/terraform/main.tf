@@ -45,6 +45,10 @@ resource "google_project_service" "service" {
     "eventarc.googleapis.com",
     "run.googleapis.com",
     "dialogflow.googleapis.com",
+    "iam.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "iamcredentials.googleapis.com",
+    "sts.googleapis.com",
   ])
   service = each.key
   project            = var.project_id
@@ -103,4 +107,33 @@ resource "google_cloudfunctions_function_iam_member" "invoker" {
   role   = "roles/cloudfunctions.invoker"
   member = "serviceAccount:${google_service_account.sa.display_name}@${google_cloudfunctions_function.function.project}.iam.gserviceaccount.com"
   depends_on = [google_service_account.sa]
+}
+
+resource "google_service_account" "oidc_sa" {
+  project    = var.project_id
+  account_id = "oidc-sa"
+}
+
+resource "google_project_iam_member" "project" {
+  project = var.project_id
+  role    = "roles/dialogflow.admin"
+  member  = "serviceAccount:${google_service_account.oidc_sa.email}"
+}
+
+module "github-actions-runners" {
+  source  = "terraform-google-modules/github-actions-runners/google"
+  version = "3.0.0"
+}
+
+module "gh_oidc" {
+  source      = "./.terraform/modules/github-actions-runners/modules/gh-oidc"
+  project_id  = var.project_id
+  pool_id     = "gh-pool"
+  provider_id = "gh-provider"
+  sa_mapping = {
+    (google_service_account.oidc_sa.account_id) = {
+      sa_name   = google_service_account.oidc_sa.name
+      attribute = "attribute.repository/nicain/contact-center-ai-samples"
+    }
+  }
 }

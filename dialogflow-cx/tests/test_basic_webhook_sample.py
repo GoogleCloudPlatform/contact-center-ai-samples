@@ -14,8 +14,6 @@
 
 """Dialogflow CX webhook sample unit tests."""
 
-import mock
-import backoff
 import uuid
 
 from google.cloud.dialogflowcx_v3.types import agent as gcdc_agent

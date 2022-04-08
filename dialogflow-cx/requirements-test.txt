@@ -1,2 +1,2 @@
 pytest==7.1.1
-flaky==3.7.0
+pytest-rerunfailures==10.2
