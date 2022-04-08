@@ -28,7 +28,7 @@ jobs:
           pip install pylint
       - name: Analyze code with pylint
         run: |
-          pylint $(git ls-files "*.py")
+          pytest
   unit:
     needs: ['linting']
     if: ${{ needs.linting.result == 'success' }}
