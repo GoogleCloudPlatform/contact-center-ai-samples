@@ -28,8 +28,11 @@ the subsequent directions:
 1. Go to the [`telecommunications-agent-webhook`](telecommunications-agent-webhook) directory in this repository.
 2. Copy the source code.
 3. Go to the Google Cloud Console and select **Cloud Functions** on the left panel.
-4. Click the project where you would like to import the source code.
-5. Click **Create Function**.
+
+![prebuilt-agents-cloud-functions](https://user-images.githubusercontent.com/45905583/162498119-2192e18f-562a-47bf-97b8-5b813180f380.png)
+
+5. Click the project where you would like to import the source code.
+6. Click **Create Function**.
    For further instructions, take a look at
    the [Create a Cloud Function](/functions/docs/create-deploy-nodejs#create_a_function)
    documentation.
