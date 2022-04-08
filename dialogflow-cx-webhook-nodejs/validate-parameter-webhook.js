@@ -24,11 +24,9 @@ function main(destination, webhookUrl) {
     const webhookUrl = 'your-webhook-trigger-url';
   */
 
-    // Webhook will verify if cruise destination port is covered.
+    // Webhook will verify if cruise destination port is covered. You can find the webhook logic in lines 118-149 in the Prebuilt Telecommunications Agent `index.js`.
     // Sample list of covered cruise ports.
     // ['mexico', 'canada', 'anguilla']
-
-  // Create sessions client?
 
   const webhookRequest = {
     fulfillmentInfo: {

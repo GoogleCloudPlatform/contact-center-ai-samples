@@ -17,21 +17,6 @@ These samples use the [Telecommunications Agent](https://cloud.google.com/dialog
 1. Choose your desired [location](/dialogflow/cx/docs/concept/region#avail) and click **Create**.
 1. Start testing and customizing.
 
-<!-- [comment]: <> (TODO: may not need this section) -->
-<!-- ## Customize the imported prebuilt agent {:#customize}
-
-1. [Test the agent](/dialogflow/cx/docs/concept/console#simulator)
-   using the simulator to understand what it can help users accomplish.
-1. Click the **Manage** tab in the left pane and then **Test Cases** to see coverage
-   and example scripts. For more information, see the
-   [Test cases](/dialogflow/cx/docs/concept/test-case) documentation.
-1. [Delete any flows](/dialogflow/cx/docs/concept/flow#delete) that are
-   irrelevant to your use case.
-1. Edit agent dialogue and [custom entities](/dialogflow/cx/docs/concept/entity-custom)
-   to meet your business needs.
-1. If there is [webhook source code](/dialogflow/cx/docs/concept/webhook),
-   see [Modifying webhook code](#modify-webhook). -->
-
 ## Modifying webhook code {:#modify-webhook}
 
 The original webhook source
@@ -56,4 +41,3 @@ the subsequent directions:
 9. Replace that Trigger URL in your agent by going to **Manage > Webhooks**
    and selecting the webhook to paste the new URL into. Paste the Trigger URL
    into the field labeled Webhook URL. Click **Save**.
-<!-- 10. Using the [Webhooks](/dialogflow/cx/docs/concept/webhook) documentation, test your fulfillment. -->
