@@ -4,7 +4,7 @@
  * @param {!express:Request} req HTTP request context.
  * @param {!express:Response} res HTTP response context.
  */
-const helpers = require('./helpers.js');
+const helpers = require('./helpers');
 
 exports.cxPrebuiltAgentsTelecom = (req, res) => {
   console.log('Cloud Function:', 'Invoked cloud function from Dialogflow');
@@ -133,21 +133,19 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
           parameter_state = 'INVALID';
         }
 
-        res
-          .status(200)
-          .send({
-            pageInfo: {
-              formInfo: {
-                parameterInfo: [
-                  {
-                    displayName: 'destination',
-                    state: parameter_state,
-                  }
-                ]
-              }
+        res.status(200).send({
+          pageInfo: {
+            formInfo: {
+              parameterInfo: [
+                {
+                  displayName: 'destination',
+                  state: parameter_state,
+                },
+              ],
             },
-            sessionInfo: {parameters: {port_is_covered: port_is_covered}},
-          });
+          },
+          sessionInfo: {parameters: {port_is_covered: port_is_covered}},
+        });
         break;
 
       // BEGIN internationalCoverage
