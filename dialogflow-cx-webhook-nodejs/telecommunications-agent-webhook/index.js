@@ -115,7 +115,7 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
         });
         break;
 
-      // BEGIN cruisePlanCoverage ANCHOR[id=validate-parameters]
+      // BEGIN cruisePlanCoverage
       case 'cruisePlanCoverage':
         console.log(tag + ' was triggered.');
 
