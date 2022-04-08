@@ -14,9 +14,13 @@
 
 """main.py creates a sample webhook handler for Dialogflow CX"""
 
+'''
+export TERRAFORM_BASIC_WEBHOOK_FUNCTION_NAME=basic_dialogflow_webhook
+'''
+
 import json
 
-def dialogflow_webhook(request):
+def basic_dialogflow_webhook(request):
     '''main handles a Dialogflow CX webhook request'''
     request_dict = request.get_json()
     tag = request_dict['fulfillmentInfo']['tag']

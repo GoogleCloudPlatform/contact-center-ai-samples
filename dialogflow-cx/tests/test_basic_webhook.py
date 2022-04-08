@@ -16,10 +16,10 @@
 
 import json
 
-from webhook.main import dialogflow_webhook
+from basic_webhook.main import basic_dialogflow_webhook
 
 
-def test_dialogflow_webhook(mocked_request):
+def test_basic_dialogflow_webhook(mocked_request):
 
   # Arrange:
   mock_tag = 'MOCK_TAG'
@@ -30,7 +30,7 @@ def test_dialogflow_webhook(mocked_request):
   mocked_request.payload = request_payload
 
   # Act:
-  response_json = dialogflow_webhook(mocked_request)
+  response_json = basic_dialogflow_webhook(mocked_request)
   response = json.loads(response_json)
 
   # Assert:

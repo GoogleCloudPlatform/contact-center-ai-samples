@@ -15,6 +15,8 @@
 """Dialogflow CX webhook sample unit tests."""
 
 import mock
+import backoff
+import uuid
 
 from google.cloud.dialogflowcx_v3.types import agent as gcdc_agent
 from google.cloud.dialogflowcx_v3 import Agent
@@ -25,28 +27,36 @@ from google.cloud.dialogflowcx_v3.services.agents import AgentsClient
 from google.auth import credentials as ga_credentials
 from grpc._channel import _UnaryUnaryMultiCallable
 
-from webhook_sample import WebhookSample
+from basic_webhook_sample import WebhookSample
+from basic_webhook import main as basic_webhook_main
 
 '''
-export TERRAFORM_PROJECT_ID=df-terraform-dev04cc
+export TERRAFORM_PROJECT_ID=df-terraform-dev-1113
 '''
 
 
 @pytest.fixture(scope='function')
-def quota_project_id():
+def project_id():
   return os.environ["TERRAFORM_PROJECT_ID"]
 
 
 @pytest.fixture(scope='function')
-def webhook_uri():
-  project_id = os.environ["TERRAFORM_PROJECT_ID"]
-  return f'https://us-central1-{project_id}.cloudfunctions.net/wh-{project_id}'
+def webhook_uri(project_id):
+  webhook_name = basic_webhook_main.basic_dialogflow_webhook.__name__
+
+  return f'https://us-central1-{project_id}.cloudfunctions.net/{webhook_name}'
+
+
+@pytest.fixture(scope='session')
+def pytest_session_uuid():
+  return uuid.uuid4()
 
 
 @pytest.fixture(scope='function')
-def webhook_sample(quota_project_id, webhook_uri):
+def webhook_sample(project_id, webhook_uri, pytest_session_uuid):
   sample = WebhookSample(
-    quota_project_id=quota_project_id,
+    agent_display_name = f'Webhook Agent (test session {pytest_session_uuid})',
+    project_id=project_id,
     webhook_uri=webhook_uri,
   )
   sample.initialize()
@@ -54,6 +64,7 @@ def webhook_sample(quota_project_id, webhook_uri):
   del sample
 
 
+@pytest.mark.flaky(max_runs=2, reruns_delay=2)
 @pytest.mark.parametrize("test_case_display_name", WebhookSample.TEST_CASES)
 def test_indirect(test_case_display_name, webhook_sample):
   test_case_delegator = webhook_sample.test_case_delegators[test_case_display_name]
@@ -61,7 +72,9 @@ def test_indirect(test_case_display_name, webhook_sample):
     with pytest.raises(test_case_delegator.expected_exception) as e_info:
       test_case_delegator.run_test_case()
   else:
-    test_case_delegator.run_test_case()
+    test_case_delegator.run_test_case(wait=10)
+
+
 
 
 

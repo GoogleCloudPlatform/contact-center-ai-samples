@@ -2,3 +2,9 @@
 .DS_Store
 .vscode
 .gcloudignore
+
+terraform/.terraform.lock.hcl
+terraform/.terraform/
+terraform/application_default_credentials.json
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup

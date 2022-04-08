@@ -1,5 +1,18 @@
+variable "project_id" {
+  description = "Required uuid for a test build; links apply and destroy"
+  type        = string
+}
+
+variable "basic_webhook_function_name" {
+  description = "Name of webhook function"
+  type        = string
+}
+
+resource "random_id" "id" {
+  byte_length = 8
+}
+
 locals {
-  project_name = "df-terraform-dev"
 	root_dir = abspath("./")
   archive_path = abspath("./tmp/function-${random_id.id.hex}.zip")
   billing_account = "0145C0-557C58-C970F3"
@@ -7,14 +20,9 @@ locals {
   region = "us-central1"
 }
 
-resource "random_id" "id" {
-  byte_length = 2
-  prefix      = local.project_name
-}
-
 resource "google_project" "project" {
-  name            = random_id.id.hex
-  project_id      = random_id.id.hex
+  name            = var.project_id
+  project_id      = var.project_id
   billing_account = local.billing_account
   org_id          = local.org_id
 }
@@ -36,7 +44,7 @@ resource "google_project_service" "service" {
 
 resource "google_storage_bucket" "bucket" {
   project = google_project.project.project_id
-  name     = "temp-${random_id.id.hex}"
+  name     = google_project.project.project_id
   location = "US"
   uniform_bucket_level_access = true
   force_destroy = true
@@ -45,7 +53,7 @@ resource "google_storage_bucket" "bucket" {
 
 data "archive_file" "source" {
   type        = "zip"
-  source_dir  = abspath("./webhook")
+  source_dir  = abspath("./basic_webhook")
   output_path = local.archive_path
 }
 
@@ -58,15 +66,15 @@ resource "google_storage_bucket_object" "archive" {
 
 resource "google_cloudfunctions_function" "function" {
   project = google_project.project.project_id
-  name        = "wh-${random_id.id.hex}"
-  description = "Webhook"
+  name        = var.basic_webhook_function_name
+  description = "Basic webhook"
   runtime     = "python39"
   available_memory_mb   = 128
   source_archive_bucket = google_storage_bucket.bucket.name
   source_archive_object = google_storage_bucket_object.archive.name
   trigger_http          = true
   timeout               = 60
-  entry_point           = "dialogflow_webhook"
+  entry_point           = var.basic_webhook_function_name
   region = "us-central1"
   depends_on = [google_project_service.service, google_storage_bucket_object.archive]
 }
