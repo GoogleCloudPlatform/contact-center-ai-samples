@@ -20,6 +20,7 @@ export TERRAFORM_BASIC_WEBHOOK_FUNCTION_NAME=basic_dialogflow_webhook
 
 import json
 
+
 def basic_dialogflow_webhook(request):
     '''main handles a Dialogflow CX webhook request'''
     request_dict = request.get_json()
@@ -35,3 +36,15 @@ def basic_dialogflow_webhook(request):
             }]
         }
     })
+
+def build_request_dict(tag, text):
+  request_mapping = {'fulfillmentInfo':{}}
+  request_mapping['fulfillmentInfo']['tag'] = tag
+  request_mapping['text'] = text
+  return request_mapping
+
+
+def extract_text(response_json: str, message_index=0):
+  response = json.loads(response_json)
+  messages = response['fulfillment_response']['messages']
+  return messages[message_index]['text']['text'][0]

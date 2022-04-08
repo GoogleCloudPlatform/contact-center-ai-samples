@@ -1,4 +1,5 @@
 import time
+import json
 
 from google.cloud.dialogflowcx import AgentsClient, Agent, ListAgentsRequest, GetAgentRequest
 from google.cloud.dialogflowcx import Webhook, WebhooksClient, ListWebhooksRequest, GetWebhookRequest
@@ -9,6 +10,9 @@ from google.cloud.dialogflowcx import TestCasesClient, TestCase, TestConfig, Con
 
 import google.auth
 import google.api_core.exceptions
+
+import basic_webhook.main as wh
+from utilities import RequestMock
 
 
 class DialogflowTestCaseFailure(Exception):
@@ -384,6 +388,15 @@ class TestCaseDelegator(ClientDelegator):
       raise RuntimeError(f'Retry count exceeded: {retry_count}')
 
 
+def get_expected_return(tag, input_text):
+    return wh.extract_text(
+        wh.basic_dialogflow_webhook(
+            RequestMock(payload=wh.build_request_dict(tag, input_text))
+        )
+    )
+
+
+
 class WebhookSample(DialogflowSample):
 
     _WEBHOOK_DISPLAY_NAME = 'Webhook 1'
@@ -396,11 +409,11 @@ class WebhookSample(DialogflowSample):
     TEST_CASES = {
       'Test Case 0': {
         'input_text': _INTENT_TRAINING_PHRASES_TEXT[0],
-        'expected_response_text':  [_PAGE_ENTRY_FULFILLMENT_TEXT, f'Webhook received: {_INTENT_TRAINING_PHRASES_TEXT[0]} (Tag: {_PAGE_WEBHOOK_ENTRY_TAG})'],
+        'expected_response_text': [_PAGE_ENTRY_FULFILLMENT_TEXT, get_expected_return(_PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[0])],
         'expected_exception': None},
       'Test Case 1': {
         'input_text': _INTENT_TRAINING_PHRASES_TEXT[1],
-        'expected_response_text':  [_PAGE_ENTRY_FULFILLMENT_TEXT, f'Webhook received: {_INTENT_TRAINING_PHRASES_TEXT[1]} (Tag: {_PAGE_WEBHOOK_ENTRY_TAG})'],
+        'expected_response_text': [_PAGE_ENTRY_FULFILLMENT_TEXT, get_expected_return(_PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[1])],
         'expected_exception': None},
       'Test Case XFAIL': {
         'input_text': 'FAIL',

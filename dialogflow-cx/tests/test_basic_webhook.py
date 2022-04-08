@@ -16,26 +16,21 @@
 
 import json
 
-from basic_webhook.main import basic_dialogflow_webhook
+import pytest
+
+from basic_webhook.main import basic_dialogflow_webhook, build_request_dict, extract_text
 
 
+@pytest.mark.hermetic
 def test_basic_dialogflow_webhook(mocked_request):
 
   # Arrange:
   mock_tag = 'MOCK_TAG'
   mock_text = 'MOCK_TEXT'
-  request_payload = {'fulfillmentInfo':{}}
-  request_payload['fulfillmentInfo']['tag'] = mock_tag
-  request_payload['text'] = mock_text
-  mocked_request.payload = request_payload
+  mocked_request.payload = build_request_dict(mock_tag, mock_text)
 
   # Act:
   response_json = basic_dialogflow_webhook(mocked_request)
-  response = json.loads(response_json)
 
   # Assert:
-  messages = response['fulfillment_response']['messages']
-  assert len(messages) == 1
-  message = messages[0]['text']
-  assert message['allow_playback_interruption'] == False
-  assert message['text'][0] == f'Webhook received: {mock_text} (Tag: {mock_tag})'
+  assert extract_text(response_json) == f'Webhook received: {mock_text} (Tag: {mock_tag})'

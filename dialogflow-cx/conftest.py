@@ -13,23 +13,15 @@
 # limitations under the License.
 
 """Module providing fixtures for the entire test directory."""
-from dataclasses import dataclass, field
 import os
 import pytest
-from typing import Mapping
+
 from unittest import mock
+from utilities import RequestMock
 
 # from webhook_sample import DialogflowController
 from google.auth import credentials as ga_credentials
 from google.auth.environment_vars import PROJECT
-
-
-@dataclass
-class RequestMock:
-  payload: Mapping[str, Mapping[str, str]] = field(default_factory=dict)
-
-  def get_json(self) -> Mapping:
-    return self.payload
 
 
 @pytest.fixture(scope='function')

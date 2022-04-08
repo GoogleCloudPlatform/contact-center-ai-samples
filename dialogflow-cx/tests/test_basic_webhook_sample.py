@@ -64,6 +64,7 @@ def webhook_sample(project_id, webhook_uri, pytest_session_uuid):
   del sample
 
 
+@pytest.mark.integration
 @pytest.mark.flaky(max_runs=2, reruns_delay=2)
 @pytest.mark.parametrize("test_case_display_name", WebhookSample.TEST_CASES)
 def test_indirect(test_case_display_name, webhook_sample):
