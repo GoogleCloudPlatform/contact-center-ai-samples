@@ -24,9 +24,9 @@ function main(destination, webhookUrl) {
     const webhookUrl = 'your-webhook-trigger-url';
   */
 
-    // Webhook will verify if cruise destination port is covered. You can find the webhook logic in lines 118-149 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
-    // Sample list of covered cruise ports.
-    // ['mexico', 'canada', 'anguilla']
+  // Webhook will verify if cruise destination port is covered. You can find the webhook logic in lines 118-149 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
+  // Sample list of covered cruise ports.
+  // ['mexico', 'canada', 'anguilla']
 
   const webhookRequest = {
     fulfillmentInfo: {
@@ -43,28 +43,35 @@ function main(destination, webhookUrl) {
     await axios({
       method: 'POST',
       url: webhookUrl,
-      data:
-        webhookRequest,
-    }).then(res => {
-      const fulfillmentResponseMessage =
-        res.data.sessionInfo.parameters.port_is_covered;
-      const parameterInfoState =
-        res.data.pageInfo.formInfo.parameterInfo[0].state;
+      data: webhookRequest,
+    })
+      .then(res => {
+        const fulfillmentResponseMessage =
+          res.data.sessionInfo.parameters.port_is_covered;
+        const parameterInfoState =
+          res.data.pageInfo.formInfo.parameterInfo[0].state;
 
-      console.log('Fulfillment Response:');
-      console.log(fulfillmentResponseMessage, '\n'); // 'true' or 'false'
+        console.log('Fulfillment Response:');
+        console.log(fulfillmentResponseMessage, '\n'); // 'true' or 'false'
 
-      console.log('Parameter Status:');
-      console.log(parameterInfoState, '\n'); // Parameter state: 'VALID' or 'INVALID'
-    }).catch(err => {
-      if (err.response) {
-        console.log("Client was given an error response\n", err.response.data);
-      } else if (err.request) {
-        console.log("Client never received an error response\n", err.request.data);
-      } else {
-        console.log(err.message);
-      }
-    });
+        console.log('Parameter Status:');
+        console.log(parameterInfoState, '\n'); // Parameter state: 'VALID' or 'INVALID'
+      })
+      .catch(err => {
+        if (err.response) {
+          console.log(
+            'Client was given an error response\n',
+            err.response.data
+          );
+        } else if (err.request) {
+          console.log(
+            'Client never received an error response\n',
+            err.request.data
+          );
+        } else {
+          console.log(err.message);
+        }
+      });
   }
   // [END dialogflow_v3beta1_webhook_validate_form_parameters_async]
 
