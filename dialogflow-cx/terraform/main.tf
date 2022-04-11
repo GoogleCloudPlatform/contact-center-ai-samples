@@ -8,23 +8,17 @@ variable "basic_webhook_function_name" {
   type        = string
 }
 
-resource "random_id" "id" {
-  byte_length = 8
+variable "build_uuid" {
+  description = "Required uuid for a test build; links apply and destroy"
+  type        = string
 }
 
 locals {
 	root_dir = abspath("./")
-  archive_path = abspath("./tmp/function-${random_id.id.hex}.zip")
+  archive_path = abspath("./tmp/function-${var.build_uuid}.zip")
   billing_account = "0145C0-557C58-C970F3"
   org_id = "298490623289"
   region = "us-central1"
-}
-
-resource "google_project" "project" {
-  name            = var.project_id
-  project_id      = var.project_id
-  billing_account = local.billing_account
-  org_id          = local.org_id
 }
 
 resource "google_project_iam_binding" "project" {
@@ -58,7 +52,7 @@ resource "google_project_service" "service" {
 
 resource "google_storage_bucket" "bucket" {
   project = var.project_id
-  name     = var.project_id
+  name     = "ccai-samples-df-tf-${var.build_uuid}"
   location = "US"
   uniform_bucket_level_access = true
   force_destroy = true
@@ -94,8 +88,8 @@ resource "google_cloudfunctions_function" "function" {
 }
 
 resource "google_service_account" "sa" {
-  account_id   = "sa-${random_id.id.hex}"
-  display_name = "sa-${random_id.id.hex}"
+  account_id   = "sa-${var.build_uuid}"
+  display_name = "sa-${var.build_uuid}"
   project      = google_cloudfunctions_function.function.project
 }
 
@@ -111,7 +105,7 @@ resource "google_cloudfunctions_function_iam_member" "invoker" {
 
 resource "google_service_account" "oidc_sa" {
   project    = var.project_id
-  account_id = "oidc-sa"
+  account_id = "oidc-sa-df"
 }
 
 resource "google_project_iam_member" "project" {
@@ -128,8 +122,8 @@ module "github-actions-runners" {
 module "gh_oidc" {
   source      = "./.terraform/modules/github-actions-runners/modules/gh-oidc"
   project_id  = var.project_id
-  pool_id     = "gh-pool"
-  provider_id = "gh-provider"
+  pool_id     = "gh-pool-df"
+  provider_id = "gh-provider-df"
   sa_mapping = {
     (google_service_account.oidc_sa.account_id) = {
       sa_name   = google_service_account.oidc_sa.name
