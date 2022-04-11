@@ -16,25 +16,25 @@
 
 const axios = require('axios');
 
-function main(destination, webhookUrl) {
+function main(phoneNumber, webhookUrl) {
   // [START dialogflow_v3beta1_webhook_validate_form_parameters_async]
   /*
     TODO(developer): Uncomment these variables before running the sample.
-    const destination = 'your-cruise-destination';
+    const phoneNumber = 'your-phone-line';
     const webhookUrl = 'your-webhook-trigger-url';
   */
 
-  // Webhook will verify if cruise destination port is covered. You can find the webhook logic in lines 118-149 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
-  // Sample list of covered cruise ports.
-  // ['mexico', 'canada', 'anguilla']
+  // Webhook will verify if phone number is valid. You can find the webhook logic in lines 70-117 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
+  // List of covered phone lines.
+  // ['5555555555','5105105100','1231231234','9999999999]
 
   const webhookRequest = {
     fulfillmentInfo: {
-      tag: 'cruisePlanCoverage',
+      tag: 'validatePhoneLine',
     },
     sessionInfo: {
       parameters: {
-        destination: destination,
+        phone_number: phoneNumber,
       },
     },
   };
@@ -46,8 +46,9 @@ function main(destination, webhookUrl) {
       data: webhookRequest,
     })
       .then(res => {
+        console.log("response body", res.data);
         const fulfillmentResponseMessage =
-          res.data.sessionInfo.parameters.port_is_covered;
+          res.data.sessionInfo.parameters.phone_line_verified;
         const parameterInfoState =
           res.data.pageInfo.formInfo.parameterInfo[0].state;
 

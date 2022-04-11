@@ -74,6 +74,7 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
         let phone_line_verified;
         let line_index;
         let domestic_coverage;
+        let parameter_state;
         const covered_lines = [
           '5555555555',
           '5105105100',
@@ -94,8 +95,10 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
         // Only 9999 will fail;
         if (line_index === 3) {
           phone_line_verified = 'false';
+          parameter_state = 'INVALID';
         } else {
           phone_line_verified = 'true';
+          parameter_state = 'VALID';
         }
 
         // Only 1234 will have domestic coverage.
@@ -106,6 +109,16 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
         }
 
         res.status(200).send({
+          pageInfo: {
+            formInfo: {
+              parameterInfo: [
+                {
+                  displayName: 'phone_number',
+                  state: parameter_state,
+                },
+              ],
+            },
+          },
           sessionInfo: {
             parameters: {
               phone_line_verified: phone_line_verified,

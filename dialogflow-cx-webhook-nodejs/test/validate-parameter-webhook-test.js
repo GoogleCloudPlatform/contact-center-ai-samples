@@ -24,17 +24,17 @@ describe('validate parameter', async () => {
   const webhookUrl = process.env.WEBHOOK_URL;
 
   it('should validate form parameter', async () => {
-    const destination = 'mexico';
+    const phoneNumber = '5105105100';
 
-    const output = exec(`${cmd} ${destination} ${webhookUrl}`);
+    const output = exec(`${cmd} ${phoneNumber} ${webhookUrl}`);
     console.log('valid-output', output);
     assert.include(output, 'VALID');
   });
 
   it('should invalidate form parameter', async () => {
-    const destination = 'morocco';
+    const phoneNumber = '9999999999';
 
-    const output = exec(`${cmd} ${destination} ${webhookUrl}`);
+    const output = exec(`${cmd} ${phoneNumber} ${webhookUrl}`);
     console.log('invalid-output', output);
     assert.include(output, 'INVALID');
   });
