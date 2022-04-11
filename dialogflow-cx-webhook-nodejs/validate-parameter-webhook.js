@@ -46,7 +46,7 @@ function main(phoneNumber, webhookUrl) {
       data: webhookRequest,
     })
       .then(res => {
-        console.log("response body", res.data);
+        console.log('response body', res.data);
         const fulfillmentResponseMessage =
           res.data.sessionInfo.parameters.phone_line_verified;
         const parameterInfoState =
