@@ -40,11 +40,11 @@ the subsequent directions:
    For further instructions, take a look at
    the [Create a Cloud Function](/functions/docs/create-deploy-nodejs#create_a_function)
    documentation.
-6. Under the **Source code** section, select **Inline Editor** and paste the
+7. Under the **Source code** section, select **Inline Editor** and paste the
    copied source code.
-7. Click **Source** and then **Edit** to change the logic based on your
+8. Click **Source** and then **Edit** to change the logic based on your
    business rules. Once finished, click **Deploy**.
-8. Click **Trigger** and copy the **Trigger URL**.
-9. Replace that Trigger URL in your agent by going to **Manage > Webhooks**
-   and selecting the webhook to paste the new URL into. Paste the Trigger URL
-   into the field labeled Webhook URL. Click **Save**.
+9. Click **Trigger** and copy the **Trigger URL**.
+10. Replace that Trigger URL in your agent by going to **Manage > Webhooks**
+    and selecting the webhook to paste the new URL into. Paste the Trigger URL
+    into the field labeled Webhook URL. Click **Save**.
