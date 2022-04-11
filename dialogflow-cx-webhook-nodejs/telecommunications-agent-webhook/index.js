@@ -8,26 +8,26 @@ const helpers = require('./helpers');
 
 exports.cxPrebuiltAgentsTelecom = (req, res) => {
   console.log('Cloud Function:', 'Invoked cloud function from Dialogflow');
-  let tag = req.body.fulfillmentInfo.tag;
+  const tag = req.body.fulfillmentInfo.tag;
 
-  if (!!tag) {
+  if (tag) {
     switch (tag) {
       //BEGIN detectCustomerAnomaly
-      case 'detectCustomerAnomaly':
+      case 'detectCustomerAnomaly': {
         console.log(tag + ' was triggered.');
-        let phone_number = req.body.sessionInfo.parameters.phone_number;
-        let bill_month = req.body.sessionInfo.parameters.bill_state;
-        let parameters = req.body.sessionInfo.parameters;
+        const phone_number = req.body.sessionInfo.parameters.phone_number;
+        const bill_month = req.body.sessionInfo.parameters.bill_state;
+        const parameters = req.body.sessionInfo.parameters;
         let bill_amount;
         let product_line;
         let anomaly_detect = 'false';
         let purchase = 'The Godfather';
         let purchase_amount = 9.99;
         let total_bill_amount = 64.33;
-        let bill_without_purchase = 54.34;
-        let updated_parameters = {};
+        const bill_without_purchase = 54.34;
+        const updated_parameters = {};
 
-        let [month_name, first_of_month, last_month_name] =
+        const [month_name, first_of_month, last_month_name] =
           helpers.get_date_details(bill_month);
         console.log(month_name, first_of_month, last_month_name);
 
@@ -36,7 +36,7 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
         // December, December 1st, November
 
         // Only 999999 will have anomaly detection
-        if (phone_number.toString() == '999999') {
+        if (phone_number.toString() === '999999') {
           anomaly_detect = 'true';
           product_line = 'phone';
           purchase = 'device protection';
@@ -66,15 +66,15 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
           },
         });
         break;
-
+      }
       // BEGIN validatePhoneLine
-      case 'validatePhoneLine':
+      case 'validatePhoneLine': {
         console.log(tag + ' was triggered.');
-        let phone = req.body.sessionInfo.parameters.phone_number;
+        const phone = req.body.sessionInfo.parameters.phone_number;
         let phone_line_verified;
         let line_index;
         let domestic_coverage;
-        let covered_lines = [
+        const covered_lines = [
           '5555555555',
           '5105105100',
           '1231231234',
@@ -114,16 +114,16 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
           },
         });
         break;
-
+      }
       // BEGIN cruisePlanCoverage
-      case 'cruisePlanCoverage':
+      case 'cruisePlanCoverage': {
         console.log(tag + ' was triggered.');
 
-        let port = req.body.sessionInfo.parameters.destination;
+        const port = req.body.sessionInfo.parameters.destination;
         let port_is_covered;
         let parameter_state;
         // Sample list of covered cruise ports.
-        let covered_ports = ['mexico', 'canada', 'anguilla'];
+        const covered_ports = ['mexico', 'canada', 'anguilla'];
 
         if (covered_ports.includes(port.toLowerCase())) {
           port_is_covered = 'true';
@@ -147,14 +147,14 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
           sessionInfo: {parameters: {port_is_covered: port_is_covered}},
         });
         break;
-
+      }
       // BEGIN internationalCoverage
-      case 'internationalCoverage':
+      case 'internationalCoverage': {
         console.log(tag + ' was triggered.');
-        let destination = req.body.sessionInfo.parameters.destination;
+        const destination = req.body.sessionInfo.parameters.destination;
         let coverage;
         // Sample list of covered international monthly destinations.
-        let covered_by_monthly = [
+        const covered_by_monthly = [
           'anguilla',
           'australia',
           'brazil',
@@ -169,7 +169,7 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
           'singapore',
         ];
         // Sample list of covered international daily destinations.
-        let covered_by_daily = [
+        const covered_by_daily = [
           'anguilla',
           'australia',
           'brazil',
@@ -206,11 +206,11 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
 
         res.status(200).send({sessionInfo: {parameters: {coverage: coverage}}});
         break;
-
+      }
       // BEGIN cheapestPlan
-      case 'cheapestPlan':
+      case 'cheapestPlan': {
         console.log(tag + ' was triggered.');
-        let trip_duration = req.body.sessionInfo.parameters.trip_duration;
+        const trip_duration = req.body.sessionInfo.parameters.trip_duration;
         let monthly_cost;
         let daily_cost;
         let suggested_plan;
@@ -254,11 +254,12 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
           },
         });
         break;
-
-      default:
+      }
+      default: {
         console.log('default case called');
         res.status(200).end();
         break;
+      }
     }
   }
 };
