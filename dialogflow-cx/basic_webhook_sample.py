@@ -1,4 +1,5 @@
 import time
+import os
 import json
 
 from google.cloud.dialogflowcx import AgentsClient, Agent, ListAgentsRequest, GetAgentRequest
@@ -9,6 +10,9 @@ from google.cloud.dialogflowcx import FlowsClient, TransitionRoute
 from google.cloud.dialogflowcx import TestCasesClient, TestCase, TestConfig, ConversationTurn, QueryInput, TextInput, ListTestCasesRequest, GetTestCaseRequest, RunTestCaseRequest, TestResult
 
 import google.auth
+
+from google.auth import identity_pool
+from google.oauth2 import service_account
 import google.api_core.exceptions
 
 import basic_webhook.main as wh
@@ -114,31 +118,57 @@ class AgentDelegator(ClientDelegator):
       return self.agent.start_flow
 
 
+def get_credentials(quota_project_id=None):
+
+    credentials_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+    with open(credentials_path, 'r', encoding="utf8") as f:
+        credentials_data = f.read()
+        credentials_dict = json.loads(credentials_data)
+
+    if 'client_email' in credentials_dict:
+        return service_account.Credentials.from_service_account_file(credentials_path)
+
+    if 'audience' in credentials_dict:
+        return identity_pool.Credentials.from_info(credentials_dict)
+
+    return google.auth.default(quota_project_id=quota_project_id)[0]
+
+
 class AuthDelegator:
 
     _DEFAULT_LOCATION = 'global'
 
-    def __init__(self, controller: DialogflowSample, project_id=None, quota_project_id=None, **kwargs):
+    def __init__(self, controller: DialogflowSample, project_id=None, quota_project_id=None, credentials=None, **kwargs):
+        self.location = kwargs.get('location', self._DEFAULT_LOCATION)
         self.project_id = project_id
         self.controller = controller
         if not quota_project_id:
           quota_project_id = project_id 
         self.quota_project_id = quota_project_id
+        self.credentials = credentials if credentials else get_credentials(quota_project_id=quota_project_id)
 
-        import os
-        from google.auth import identity_pool
-        _SVC_ACCOUNT_FILE = os.environ['SVC_ACCOUNT_FILE']
-        with open(_SVC_ACCOUNT_FILE, 'r', encoding="utf8") as f:
-            svc_account_file_data = f.read()
-            svc_account_config_json = json.loads(svc_account_file_data)
-            self.credentials = identity_pool.Credentials.from_info(svc_account_config_json)
+            # _SVC_ACCOUNT_FILE = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+            # if _SVC_ACCOUNT_FILE:
+            #     credentials = service_account.Credentials.from_service_account_file(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
 
-        # from google.oauth2 import service_account
+            # import json
+            # _SVC_ACCOUNT_FILE = os.environ['SVC_ACCOUNT_FILE']
+            # with open(_SVC_ACCOUNT_FILE, 'r', encoding="utf8") as f:
+            #     svc_account_file_data = f.read()
+            #     svc_account_config_json = json.loads(svc_account_file_data)
+            #     credentials = identity_pool.Credentials.from_info(svc_account_config_json)
+
+
+        
+
+
+
+        
         # import os
-        # self.credentials = service_account.Credentials.from_service_account_file(os.environ['SVC_ACCOUNT_FILE'])
+        
 
         # self.credentials, _ = google.auth.default(quota_project_id=self.quota_project_id)
-        self.location = kwargs.get('location', self._DEFAULT_LOCATION)
+        
 
 
 class WebhookDelegator(ClientDelegator):
@@ -401,13 +431,12 @@ class TestCaseDelegator(ClientDelegator):
       raise RuntimeError(f'Retry count exceeded: {retry_count}')
 
 
-def get_expected_return(tag, input_text):
+def get_expected_response(tag, input_text):
     return wh.extract_text(
-        wh.basic_dialogflow_webhook(
+        wh.basic_webhook(
             RequestMock(payload=wh.build_request_dict(tag, input_text))
         )
     )
-
 
 
 class WebhookSample(DialogflowSample):
@@ -422,11 +451,11 @@ class WebhookSample(DialogflowSample):
     TEST_CASES = {
       'Test Case 0': {
         'input_text': _INTENT_TRAINING_PHRASES_TEXT[0],
-        'expected_response_text': [_PAGE_ENTRY_FULFILLMENT_TEXT, get_expected_return(_PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[0])],
+        'expected_response_text': [_PAGE_ENTRY_FULFILLMENT_TEXT, get_expected_response(_PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[0])],
         'expected_exception': None},
       'Test Case 1': {
         'input_text': _INTENT_TRAINING_PHRASES_TEXT[1],
-        'expected_response_text': [_PAGE_ENTRY_FULFILLMENT_TEXT, get_expected_return(_PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[1])],
+        'expected_response_text': [_PAGE_ENTRY_FULFILLMENT_TEXT, get_expected_response(_PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[1])],
         'expected_exception': None},
       'Test Case XFAIL': {
         'input_text': 'FAIL',
@@ -435,7 +464,7 @@ class WebhookSample(DialogflowSample):
     }
 
     def __init__(self, project_id=None, quota_project_id=None, webhook_uri=None, agent_display_name=None):
-      self.auth_delegator = AuthDelegator(self, project_id=project_id, quota_project_id=quota_project_id)
+      self.auth_delegator = AuthDelegator(self, project_id=project_id, quota_project_id=quota_project_id, credentials=None)
       self.agent_delegator = AgentDelegator(self, display_name=agent_display_name)
       self.webhook_delegator = WebhookDelegator(self, display_name=self._WEBHOOK_DISPLAY_NAME, uri=webhook_uri)
       self.intent_delegator = IntentDelegator(self, display_name=self._INTENT_DISPLAY_NAME)
@@ -478,6 +507,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Setup Dialogflow CX basic webhook sample')
     parser.add_argument(
+        '--agent-display-name',
+        help='Display name of the Dialogflow CX agent',
+        required=True)
+    parser.add_argument(
         '--webhook-uri',
         help='Webhook URL for the Dialogflow CX to use. Format: https://<region>-<project_id>.cloudfunctions.net/<webhook_name>',
         required=True)
@@ -489,13 +522,12 @@ if __name__ == "__main__":
         '--quota_project-id',
         help='Quota project, if different from project-id',
         default=None)
-    parser.add_argument(
-        '--agent-display-name',
-        help='Display name of the Dialogflow CX agent',
-        required=True)
 
     sample = WebhookSample(**vars(parser.parse_args()))
     sample.initialize()
     for test_case_delegator in sample.test_case_delegators.values():
-        test_case_delegator.run_test_case()
+        if test_case_delegator.expected_exception:
+            continue
+        else:
+            test_case_delegator.run_test_case()
 

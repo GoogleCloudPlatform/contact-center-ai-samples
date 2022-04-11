@@ -16,11 +16,11 @@
 
 import pytest
 
-from basic_webhook.main import basic_dialogflow_webhook, build_request_dict, extract_text
+from basic_webhook.main import basic_webhook, build_request_dict, extract_text
 
 
 @pytest.mark.hermetic
-def test_basic_dialogflow_webhook(mocked_request):
+def test_basic_webhook(mocked_request):
 
   # Arrange:
   mock_tag = 'MOCK_TAG'
@@ -28,7 +28,7 @@ def test_basic_dialogflow_webhook(mocked_request):
   mocked_request.payload = build_request_dict(mock_tag, mock_text)
 
   # Act:
-  response_json = basic_dialogflow_webhook(mocked_request)
+  response_json = basic_webhook(mocked_request)
 
   # Assert:
   assert extract_text(response_json) == f'Webhook received: {mock_text} (Tag: {mock_tag})'

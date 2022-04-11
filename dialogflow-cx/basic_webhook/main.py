@@ -15,13 +15,13 @@
 """main.py creates a sample webhook handler for Dialogflow CX"""
 
 '''
-export TERRAFORM_BASIC_WEBHOOK_FUNCTION_NAME=basic_dialogflow_webhook
+export TERRAFORM_BASIC_WEBHOOK_FUNCTION_NAME=basic_webhook
 '''
 
 import json
 
 
-def basic_dialogflow_webhook(request):
+def basic_webhook(request):
     '''main handles a Dialogflow CX webhook request'''
     request_dict = request.get_json()
     tag = request_dict["fulfillmentInfo"]["tag"]
@@ -41,14 +41,29 @@ def basic_dialogflow_webhook(request):
         }
     )
 
+
+def get_webhook_entrypoint():
+    return basic_webhook.__name__
+
+
+def get_webhook_name(build_uuid):
+    entry_point = get_webhook_entrypoint()
+    return f'{entry_point}_{build_uuid}'
+
+
+def get_webhook_uri(project_id, build_uuid, region='us-central1'):
+    webhook_name = get_webhook_name(build_uuid)
+    return f'https://{region}-{project_id}.cloudfunctions.net/{webhook_name}'
+
+
 def build_request_dict(tag, text):
-  request_mapping = {'fulfillmentInfo':{}}
-  request_mapping['fulfillmentInfo']['tag'] = tag
-  request_mapping['text'] = text
-  return request_mapping
+    request_mapping = {'fulfillmentInfo':{}}
+    request_mapping['fulfillmentInfo']['tag'] = tag
+    request_mapping['text'] = text
+    return request_mapping
 
 
 def extract_text(response_json: str, message_index=0):
-  response = json.loads(response_json)
-  messages = response['fulfillment_response']['messages']
-  return messages[message_index]['text']['text'][0]
+    response = json.loads(response_json)
+    messages = response['fulfillment_response']['messages']
+    return messages[message_index]['text']['text'][0]

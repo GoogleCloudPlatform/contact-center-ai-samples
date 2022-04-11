@@ -26,7 +26,7 @@ from google.auth import credentials as ga_credentials
 from grpc._channel import _UnaryUnaryMultiCallable
 
 from basic_webhook_sample import WebhookSample
-from basic_webhook import main as basic_webhook_main
+from basic_webhook.main import get_webhook_uri
 
 '''
 export TERRAFORM_PROJECT_ID=df-terraform-dev-1113
@@ -39,10 +39,13 @@ def project_id():
 
 
 @pytest.fixture(scope='function')
-def webhook_uri(project_id):
-  webhook_name = basic_webhook_main.basic_dialogflow_webhook.__name__
+def build_uuid():
+  return os.environ["TERRAFORM_BUILD_UUID"]
 
-  return f'https://us-central1-{project_id}.cloudfunctions.net/{webhook_name}'
+
+@pytest.fixture(scope='function')
+def webhook_uri(project_id, build_uuid):
+  return get_webhook_uri(project_id, build_uuid)
 
 
 @pytest.fixture(scope='session')
