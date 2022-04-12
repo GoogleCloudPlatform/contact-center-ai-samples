@@ -41,7 +41,7 @@ function main(phoneNumber, billMonth, webhookUrl) {
     },
   };
 
-  console.log("Webhook request", webhookRequest);
+  console.log('Webhook request', webhookRequest);
 
   async function configureSessionParameters() {
     await axios({
@@ -52,8 +52,7 @@ function main(phoneNumber, billMonth, webhookUrl) {
       .then(res => {
         console.log('response body', res.data);
         // The WebhookResponse will return new parameters created by the webhook logic.
-        const updatedParameters =
-          res.data.sessionInfo.parameters;
+        const updatedParameters = res.data.sessionInfo.parameters;
 
         console.log('Created purchase_amount parameter:');
         console.log(updatedParameters.purchase_amount, '\n'); // 'true' or 'false'
