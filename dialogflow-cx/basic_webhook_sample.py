@@ -15,7 +15,7 @@ from google.auth import identity_pool
 from google.oauth2 import service_account
 import google.api_core.exceptions
 
-import basic_webhook.main as wh
+import webhook.main as wh
 from utilities import RequestMock
 
 
@@ -459,20 +459,20 @@ class TestCaseDelegator(ClientDelegator):
 
 def get_expected_response(tag, input_text):
     return wh.extract_text(
-        wh.basic_webhook(
-            RequestMock(payload=wh.build_request_dict(tag, input_text))
+        wh.webhook_fcn(
+            RequestMock(payload=wh.build_request_dict_basic(tag, input_text))
         )
     )
 
 
-class WebhookSample(DialogflowSample):
+class BasicWebhookSample(DialogflowSample):
 
     _WEBHOOK_DISPLAY_NAME = 'Webhook 1'
     _INTENT_DISPLAY_NAME = 'go-to-example-page'
     _INTENT_TRAINING_PHRASES_TEXT = ['trigger intent', 'trigger the intent']
     _PAGE_DISPLAY_NAME = 'Main Page'
     _PAGE_ENTRY_FULFILLMENT_TEXT=f'Entering {_PAGE_DISPLAY_NAME}'
-    _PAGE_WEBHOOK_ENTRY_TAG = 'enter_main_page'
+    _PAGE_WEBHOOK_ENTRY_TAG = 'basic_webhook'
 
     TEST_CASES = {
       'Test Case 0': {
@@ -558,7 +558,7 @@ if __name__ == "__main__":
         help='Quota project, if different from project-id',
         default=None)
 
-    sample = WebhookSample(**vars(parser.parse_args()))
+    sample = BasicWebhookSample(**vars(parser.parse_args()))
     sample.initialize()
     sample.tear_down()
     # for test_case_delegator in sample.test_case_delegators.values():

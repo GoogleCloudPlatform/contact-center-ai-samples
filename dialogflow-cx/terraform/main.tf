@@ -3,12 +3,12 @@ variable "project_id" {
   type        = string
 }
 
-variable "basic_webhook_function_name" {
+variable "webhook_function_name" {
   description = "Name of webhook function"
   type        = string
 }
 
-variable "basic_webhook_function_entrypoint" {
+variable "webhook_function_entrypoint" {
   description = "Name of webhook function"
   type        = string
 }
@@ -23,7 +23,7 @@ locals {
 
 data "archive_file" "source" {
   type        = "zip"
-  source_dir  = abspath("./basic_webhook")
+  source_dir  = abspath("./webhook")
   output_path = local.archive_path
 }
 
@@ -36,7 +36,7 @@ resource "google_storage_bucket_object" "archive" {
 
 resource "google_cloudfunctions_function" "function" {
   project = var.project_id
-  name        = var.basic_webhook_function_name
+  name        = var.webhook_function_name
   description = "Basic webhook"
   runtime     = "python39"
   available_memory_mb   = 128
@@ -44,7 +44,7 @@ resource "google_cloudfunctions_function" "function" {
   source_archive_object = google_storage_bucket_object.archive.name
   trigger_http          = true
   timeout               = 60
-  entry_point           = var.basic_webhook_function_entrypoint
+  entry_point           = var.webhook_function_entrypoint
   region = "us-central1"
   depends_on = [google_storage_bucket_object.archive]
 }

@@ -15,7 +15,7 @@
 """main.py creates a sample webhook handler for Dialogflow CX"""
 
 '''
-export TERRAFORM_BASIC_WEBHOOK_FUNCTION_NAME=basic_webhook
+export TERRAFORM_WEBHOOK_FUNCTION_NAME=webhook
 '''
 
 import json
@@ -42,8 +42,17 @@ def basic_webhook(request):
     )
 
 
+def webhook_fcn(request):
+    request_dict = request.get_json()
+    tag = request_dict["fulfillmentInfo"]["tag"]
+    if tag == 'basic_webhook':
+        return basic_webhook(request)
+    else:
+        raise RuntimeError(f'Unrecognized tag: {tag}')
+
+
 def get_webhook_entrypoint():
-    return basic_webhook.__name__
+    return webhook_fcn.__name__
 
 
 def get_webhook_name(build_uuid):
@@ -56,7 +65,7 @@ def get_webhook_uri(project_id, build_uuid, region='us-central1'):
     return f'https://{region}-{project_id}.cloudfunctions.net/{webhook_name}'
 
 
-def build_request_dict(tag, text):
+def build_request_dict_basic(tag, text):
     request_mapping = {'fulfillmentInfo':{}}
     request_mapping['fulfillmentInfo']['tag'] = tag
     request_mapping['text'] = text

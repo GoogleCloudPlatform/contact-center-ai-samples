@@ -25,8 +25,8 @@ from google.cloud.dialogflowcx_v3.services.agents import AgentsClient
 from google.auth import credentials as ga_credentials
 from grpc._channel import _UnaryUnaryMultiCallable
 
-from basic_webhook_sample import WebhookSample
-from basic_webhook.main import get_webhook_uri
+from basic_webhook_sample import BasicWebhookSample
+from webhook.main import get_webhook_uri
 
 '''
 export TERRAFORM_PROJECT_ID=df-terraform-dev-1113
@@ -55,7 +55,7 @@ def pytest_session_uuid():
 
 @pytest.fixture(scope='session')
 def webhook_sample(project_id, webhook_uri, pytest_session_uuid):
-  sample = WebhookSample(
+  sample = BasicWebhookSample(
     agent_display_name = f'Webhook Agent (test session {pytest_session_uuid})',
     project_id=project_id,
     webhook_uri=webhook_uri,
@@ -68,7 +68,7 @@ def webhook_sample(project_id, webhook_uri, pytest_session_uuid):
 
 @pytest.mark.integration
 @pytest.mark.flaky(max_runs=3, reruns_delay=15)
-@pytest.mark.parametrize("test_case_display_name", WebhookSample.TEST_CASES)
+@pytest.mark.parametrize("test_case_display_name", BasicWebhookSample.TEST_CASES)
 def test_indirect(test_case_display_name, webhook_sample):
   test_case_delegator = webhook_sample.test_case_delegators[test_case_display_name]
   if test_case_delegator.expected_exception:
