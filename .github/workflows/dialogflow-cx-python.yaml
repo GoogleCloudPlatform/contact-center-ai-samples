@@ -41,10 +41,10 @@ jobs:
       - id: 'basic_sample'
         name: Get Webhook Env Vars
         run: |
-          export WEBHOOK_NAME=`python -c "from basic_webhook.main import get_webhook_name; print(get_webhook_name(\"${TERRAFORM_BUILD_UUID?}\"))"`
-          export WEBHOOK_ENTRYPOINT=`python -c "from basic_webhook.main import get_webhook_entrypoint; print(get_webhook_entrypoint())"`
-          echo "::set-output name=webhook-name::$WEBHOOK_NAME"
-          echo "::set-output name=webhook-entrypoint::$WEBHOOK_ENTRYPOINT"
+          export TERRAFORM_BASIC_WEBHOOK_FUNCTION_NAME=`python -c "from basic_webhook.main import get_webhook_name; print(get_webhook_name(\"${TERRAFORM_BUILD_UUID?}\"))"`
+          export TERRAFORM_BASIC_WEBHOOK_FUNCTION_ENTRYPOINT=`python -c "from basic_webhook.main import get_webhook_entrypoint; print(get_webhook_entrypoint())"`
+          echo "::set-output name=webhook-name::$TERRAFORM_BASIC_WEBHOOK_FUNCTION_NAME"
+          echo "::set-output name=webhook-entrypoint::$TERRAFORM_BASIC_WEBHOOK_FUNCTION_ENTRYPOINT"
         env:
           TERRAFORM_PROJECT_ID: df-terraform-dev
           TERRAFORM_BUILD_UUID: ${{ steps.build_id.outputs.id }}
@@ -103,53 +103,53 @@ jobs:
           TERRAFORM_PROJECT_ID: df-terraform-dev
           TERRAFORM_BUILD_UUID: ${{ steps.build_id.outputs.id }}
           GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
-  # teardown_terraform:
-  #   needs: [setup_terraform, integration_tests]
-  #   if: ${{ always() }}
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       working-directory: ./dialogflow-cx
-  #   permissions:
-  #     contents: 'read'
-  #     id-token: 'write'
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - id: 'auth'
-  #       name: 'Authenticate to GCP'
-  #       uses: 'google-github-actions/auth@v0'
-  #       with:
-  #           create_credentials_file: 'true'
-  #           workload_identity_provider: 'projects/792212140555/locations/global/workloadIdentityPools/gh-pool-df-3/providers/gh-provider-df-3'
-  #           service_account: 'oidc-sa-df-3@df-terraform-dev.iam.gserviceaccount.com'
-  #     - name: Dowload UUID
-  #       uses: actions/download-artifact@v1
-  #       with:
-  #         name: shared
-  #     - name: UUID to env
-  #       id: build_id
-  #       run: |-
-  #         echo `cat ../shared/uuid.txt`
-  #     - id: 'basic_sample'
-  #       name: Get Webhook Env Vars
-  #       run: |-
-  #         export WEBHOOK_NAME=`python -c "from basic_webhook.main import get_webhook_name; print(get_webhook_name(\"${TERRAFORM_BUILD_UUID?}\"))"`
-  #         export WEBHOOK_ENTRYPOINT=`python -c "from basic_webhook.main import get_webhook_entrypoint; print(get_webhook_entrypoint())"`
-  #         echo "::set-output name=webhook-name::$WEBHOOK_NAME"
-  #         echo "::set-output name=webhook-entrypoint::$WEBHOOK_ENTRYPOINT"
-  #       env:
-  #         TERRAFORM_PROJECT_ID: df-terraform-dev
-  #         TERRAFORM_BUILD_UUID: ${{ steps.build_id.outputs.id }}
-  #     - name: Terraform Init/Destroy
-  #       run: |-
-  #         cp "${{ steps.auth.outputs.credentials_file_path }}" terraform/application_default_credentials.json
-  #         cp -r basic_webhook terraform
-  #         docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v $(pwd)/terraform:/app -v $(pwd)/basic_webhook:/app/basic_webhook hashicorp/terraform:1.1.7 init
-  #         docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v $(pwd)/terraform:/app -v $(pwd)/basic_webhook:/app/basic_webhook hashicorp/terraform:1.1.7 destroy --auto-approve -var project_id=${TERRAFORM_PROJECT_ID?} -var basic_webhook_function_name=${TERRAFORM_BASIC_WEBHOOK_FUNCTION_NAME?} -var basic_webhook_function_entrypoint=${TERRAFORM_BASIC_WEBHOOK_FUNCTION_ENTRYPOINT?}
-  #       env:
-  #         TERRAFORM_PROJECT_ID: df-terraform-dev
-  #         TERRAFORM_BASIC_WEBHOOK_FUNCTION_NAME: ${{ steps.basic_sample.outputs.webhook-name }}
-  #         TERRAFORM_BASIC_WEBHOOK_FUNCTION_ENTRYPOINT: ${{ steps.basic_sample.outputs.webhook-entrypoint }}
+  teardown_terraform:
+    needs: [setup_terraform, integration_tests]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./dialogflow-cx
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+      - uses: actions/checkout@v3
+      - id: 'auth'
+        name: 'Authenticate to GCP'
+        uses: 'google-github-actions/auth@v0'
+        with:
+            create_credentials_file: 'true'
+            workload_identity_provider: 'projects/792212140555/locations/global/workloadIdentityPools/gh-pool-df-3/providers/gh-provider-df-3'
+            service_account: 'oidc-sa-df-3@df-terraform-dev.iam.gserviceaccount.com'
+      - name: Dowload UUID
+        uses: actions/download-artifact@v1
+        with:
+          name: shared
+      - name: UUID to env
+        id: build_id
+        run: |-
+          echo `cat ../shared/uuid.txt`
+      - id: 'basic_sample'
+        name: Get Webhook Env Vars
+        run: |-
+          export WEBHOOK_NAME=`python -c "from basic_webhook.main import get_webhook_name; print(get_webhook_name(\"${TERRAFORM_BUILD_UUID?}\"))"`
+          export WEBHOOK_ENTRYPOINT=`python -c "from basic_webhook.main import get_webhook_entrypoint; print(get_webhook_entrypoint())"`
+          echo "::set-output name=webhook-name::$WEBHOOK_NAME"
+          echo "::set-output name=webhook-entrypoint::$WEBHOOK_ENTRYPOINT"
+        env:
+          TERRAFORM_PROJECT_ID: df-terraform-dev
+          TERRAFORM_BUILD_UUID: ${{ steps.build_id.outputs.id }}
+      - name: Terraform Init/Destroy
+        run: |-
+          cp "${{ steps.auth.outputs.credentials_file_path }}" terraform/application_default_credentials.json
+          cp -r basic_webhook terraform
+          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v $(pwd)/terraform:/app -v $(pwd)/basic_webhook:/app/basic_webhook hashicorp/terraform:1.1.7 init
+          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v $(pwd)/terraform:/app -v $(pwd)/basic_webhook:/app/basic_webhook hashicorp/terraform:1.1.7 destroy --auto-approve -var project_id=${TERRAFORM_PROJECT_ID?} -var basic_webhook_function_name=${TERRAFORM_BASIC_WEBHOOK_FUNCTION_NAME?} -var basic_webhook_function_entrypoint=${TERRAFORM_BASIC_WEBHOOK_FUNCTION_ENTRYPOINT?}
+        env:
+          TERRAFORM_PROJECT_ID: df-terraform-dev
+          TERRAFORM_BASIC_WEBHOOK_FUNCTION_NAME: ${{ steps.basic_sample.outputs.webhook-name }}
+          TERRAFORM_BASIC_WEBHOOK_FUNCTION_ENTRYPOINT: ${{ steps.basic_sample.outputs.webhook-entrypoint }}
 
 
 
