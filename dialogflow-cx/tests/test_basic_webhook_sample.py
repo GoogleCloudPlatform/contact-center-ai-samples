@@ -33,17 +33,17 @@ export TERRAFORM_PROJECT_ID=df-terraform-dev-1113
 '''
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def project_id():
   return os.environ["TERRAFORM_PROJECT_ID"]
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def build_uuid():
   return os.environ["TERRAFORM_BUILD_UUID"]
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def webhook_uri(project_id, build_uuid):
   return get_webhook_uri(project_id, build_uuid)
 
@@ -53,7 +53,7 @@ def pytest_session_uuid():
   return uuid.uuid4()
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def webhook_sample(project_id, webhook_uri, pytest_session_uuid):
   sample = WebhookSample(
     agent_display_name = f'Webhook Agent (test session {pytest_session_uuid})',
@@ -62,6 +62,7 @@ def webhook_sample(project_id, webhook_uri, pytest_session_uuid):
   )
   sample.initialize()
   yield sample
+  sample.tear_down()
   del sample
 
 

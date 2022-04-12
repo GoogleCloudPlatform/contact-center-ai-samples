@@ -527,7 +527,7 @@ class WebhookSample(DialogflowSample):
         test_case_delegator.initialize()
 
     def tear_down(self):
-        for test_case_delegator in sample.test_case_delegators.values():
+        for test_case_delegator in self.test_case_delegators.values():
             test_case_delegator.tear_down()
         self.page_delegator.tear_down()
         self.start_flow_delegator.tear_down()
