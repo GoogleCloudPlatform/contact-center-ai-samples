@@ -2,12 +2,12 @@ import time
 import os
 import json
 
-from google.cloud.dialogflowcx import AgentsClient, Agent, ListAgentsRequest, GetAgentRequest
-from google.cloud.dialogflowcx import Webhook, WebhooksClient, ListWebhooksRequest, GetWebhookRequest
-from google.cloud.dialogflowcx import Intent, IntentsClient, ListIntentsRequest, GetIntentRequest
-from google.cloud.dialogflowcx import Page, PagesClient, ListPagesRequest, GetPageRequest, Fulfillment, ResponseMessage
+from google.cloud.dialogflowcx import AgentsClient, Agent, ListAgentsRequest, GetAgentRequest, DeleteAgentRequest
+from google.cloud.dialogflowcx import Webhook, WebhooksClient, ListWebhooksRequest, GetWebhookRequest, DeleteWebhookRequest
+from google.cloud.dialogflowcx import Intent, IntentsClient, ListIntentsRequest, GetIntentRequest, DeleteIntentRequest
+from google.cloud.dialogflowcx import Page, PagesClient, ListPagesRequest, GetPageRequest, Fulfillment, ResponseMessage, DeletePageRequest
 from google.cloud.dialogflowcx import FlowsClient, TransitionRoute
-from google.cloud.dialogflowcx import TestCasesClient, TestCase, TestConfig, ConversationTurn, QueryInput, TextInput, ListTestCasesRequest, GetTestCaseRequest, RunTestCaseRequest, TestResult
+from google.cloud.dialogflowcx import TestCasesClient, TestCase, TestConfig, ConversationTurn, QueryInput, TextInput, ListTestCasesRequest, GetTestCaseRequest, RunTestCaseRequest, TestResult, BatchDeleteTestCasesRequest
 
 import google.auth
 
@@ -103,6 +103,13 @@ class AgentDelegator(ClientDelegator):
               self._agent = self.client.get_agent(request=request)
               break
 
+    def tear_down(self):
+        request = DeleteAgentRequest(name=self.agent.name)
+        try: 
+            self.client.delete_agent(request=request)
+        except google.api_core.exceptions.NotFound:
+            pass
+
     @property
     def parent(self):
         return f'projects/{self.controller.project_id}/locations/{self.controller.location}'
@@ -147,29 +154,6 @@ class AuthDelegator:
         self.quota_project_id = quota_project_id
         self.credentials = credentials if credentials else get_credentials(quota_project_id=quota_project_id)
 
-            # _SVC_ACCOUNT_FILE = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
-            # if _SVC_ACCOUNT_FILE:
-            #     credentials = service_account.Credentials.from_service_account_file(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
-
-            # import json
-            # _SVC_ACCOUNT_FILE = os.environ['SVC_ACCOUNT_FILE']
-            # with open(_SVC_ACCOUNT_FILE, 'r', encoding="utf8") as f:
-            #     svc_account_file_data = f.read()
-            #     svc_account_config_json = json.loads(svc_account_file_data)
-            #     credentials = identity_pool.Credentials.from_info(svc_account_config_json)
-
-
-        
-
-
-
-        
-        # import os
-        
-
-        # self.credentials, _ = google.auth.default(quota_project_id=self.quota_project_id)
-        
-
 
 class WebhookDelegator(ClientDelegator):
 
@@ -178,7 +162,6 @@ class WebhookDelegator(ClientDelegator):
     def __init__(self, controller: DialogflowSample, **kwargs) -> None:
         self._uri = kwargs.pop('uri')
         super().__init__(controller, **kwargs)
-
 
     @property
     def webhook(self):
@@ -210,6 +193,13 @@ class WebhookDelegator(ClientDelegator):
               )
               self._webhook = self.client.get_webhook(request=request)
               break
+
+    def tear_down(self):
+        request = DeleteWebhookRequest(name=self.webhook.name)
+        try: 
+            self.client.delete_webhook(request=request)
+        except google.api_core.exceptions.NotFound:
+            pass
 
 
 class IntentDelegator(ClientDelegator):
@@ -260,6 +250,13 @@ class IntentDelegator(ClientDelegator):
               self._intent = self.client.get_intent(request=request)
               return
 
+    def tear_down(self):
+        request = DeleteIntentRequest(name=self.intent.name)
+        try: 
+            self.client.delete_intent(request=request)
+        except google.api_core.exceptions.NotFound:
+            pass
+
 
 class PageDelegator(ClientDelegator):
 
@@ -308,6 +305,13 @@ class PageDelegator(ClientDelegator):
             self._page = self.client.get_page(request=request)
             return
 
+    def tear_down(self, force=True):
+        request = DeletePageRequest(name=self.page.name, force=force)
+        try: 
+            self.client.delete_page(request=request)
+        except google.api_core.exceptions.NotFound:
+            pass
+
 
 class FulfillmentPageDelegator(PageDelegator):
 
@@ -333,23 +337,35 @@ class FulfillmentPageDelegator(PageDelegator):
         super().initialize()
 
 
-class FlowDelegator(ClientDelegator):
+class StartFlowDelegator(ClientDelegator):
 
     _CLIENT_CLASS = FlowsClient
 
     def __init__(self, controller: DialogflowSample, **kwargs) -> None:
         super().__init__(controller)
+        self._flow = None
 
-    def append_transition_route(self, intent_name, target_page_name, flow_name=None):
-        if not flow_name:
-            flow_name = self.controller.start_flow
 
-        flow = self.client.get_flow(name=flow_name)
-        flow.transition_routes.append(TransitionRoute(
+    @property
+    def flow(self):
+        if not self._flow:
+            raise RuntimeError('Flow not yet created')
+        return self._flow
+
+    def initialize(self):
+        flow_name = self.controller.start_flow
+        self._flow = self.client.get_flow(name=flow_name) 
+
+    def append_transition_route(self, intent_name, target_page_name):
+        self.flow.transition_routes.append(TransitionRoute(
             intent=intent_name,
             target_page=target_page_name,
         ))
-        self.client.update_flow(flow=flow)
+        self.client.update_flow(flow=self.flow)
+
+    def tear_down(self):
+        self.flow.transition_routes = self.flow.transition_routes[:1]
+        self.client.update_flow(flow=self.flow)
 
 
 class TestCaseDelegator(ClientDelegator):
@@ -410,6 +426,16 @@ class TestCaseDelegator(ClientDelegator):
               )
               self._test_case = self.client.get_test_case(request=request)
               return
+
+    def tear_down(self):
+        request = BatchDeleteTestCasesRequest(
+            parent=self.parent,
+            names=[self.test_case.name],
+        )
+        try:
+            self.client.batch_delete_test_cases(request=request)
+        except google.api_core.exceptions.NotFound:
+            pass
 
     def run_test_case(self, wait=10, max_retries=3):
       retry_count = 0
@@ -474,7 +500,7 @@ class WebhookSample(DialogflowSample):
           webhook_delegator=self.webhook_delegator,
           tag=self._PAGE_WEBHOOK_ENTRY_TAG,
           )
-      self.flow_delegator = FlowDelegator(self)
+      self.start_flow_delegator = StartFlowDelegator(self)
 
       self.test_case_delegators = {}
       for display_name, test_config in self.TEST_CASES.items():
@@ -492,13 +518,22 @@ class WebhookSample(DialogflowSample):
       self.webhook_delegator.initialize()
       self.intent_delegator.initialize(self._INTENT_TRAINING_PHRASES_TEXT)
       self.page_delegator.initialize()
-      self.flow_delegator.initialize()
-      self.flow_delegator.append_transition_route(
+      self.start_flow_delegator.initialize()
+      self.start_flow_delegator.append_transition_route(
           self.intent_delegator.intent.name,
           self.page_delegator.page.name
       )
       for test_case_delegator in self.test_case_delegators.values():
         test_case_delegator.initialize()
+
+    def tear_down(self):
+        for test_case_delegator in sample.test_case_delegators.values():
+            test_case_delegator.tear_down()
+        self.page_delegator.tear_down()
+        self.start_flow_delegator.tear_down()
+        self.intent_delegator.tear_down()
+        self.webhook_delegator.tear_down()
+        self.agent_delegator.tear_down()
 
 
 if __name__ == "__main__":
@@ -525,9 +560,10 @@ if __name__ == "__main__":
 
     sample = WebhookSample(**vars(parser.parse_args()))
     sample.initialize()
-    for test_case_delegator in sample.test_case_delegators.values():
-        if test_case_delegator.expected_exception:
-            continue
-        else:
-            test_case_delegator.run_test_case()
+    sample.tear_down()
+    # for test_case_delegator in sample.test_case_delegators.values():
+    #     if test_case_delegator.expected_exception:
+    #         continue
+    #     else:
+    #         test_case_delegator.run_test_case()
 
