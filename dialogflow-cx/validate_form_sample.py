@@ -8,12 +8,14 @@ from google.cloud.dialogflowcx import Intent, IntentsClient, ListIntentsRequest,
 from google.cloud.dialogflowcx import Page, PagesClient, ListPagesRequest, GetPageRequest, Fulfillment, ResponseMessage, DeletePageRequest
 from google.cloud.dialogflowcx import FlowsClient, TransitionRoute
 from google.cloud.dialogflowcx import TestCasesClient, TestCase, TestConfig, ConversationTurn, QueryInput, TextInput, ListTestCasesRequest, GetTestCaseRequest, RunTestCaseRequest, TestResult, BatchDeleteTestCasesRequest
+from google.cloud.dialogflowcx import Fulfillment, Form
 
 import google.auth
 
 from google.auth import identity_pool
 from google.oauth2 import service_account
 import google.api_core.exceptions
+from numpy import require
 
 import webhook.main as wh
 from utilities import RequestMock
@@ -312,12 +314,34 @@ class PageDelegator(ClientDelegator):
         except google.api_core.exceptions.NotFound:
             pass
 
+    def append_transition_route(self, target_page, intent_name=None, condition=None, trigger_fulfillment=None):
+        transition_route = TransitionRoute(
+            condition=condition,
+            trigger_fulfillment=trigger_fulfillment,
+            intent=intent_name,
+            target_page=target_page,
+        )
+        self.page.transition_routes.append(transition_route)
+        self.client.update_page(page=self.page)
+
+    def add_parameter(self, display_name, entity_type, fill_behavior, default_value=None, redact=False, is_list=False, required=True):
+        parameter = Form.Parameter(
+            display_name=display_name,
+            entity_type=entity_type,
+            fill_behavior=fill_behavior,
+            default_value=default_value,
+            redact=redact,
+            is_list=is_list,
+            required=required,
+        )
+        self.page.form.parameters.append(parameter)
+
 
 class FulfillmentPageDelegator(PageDelegator):
 
     def __init__(self, controller: DialogflowSample, **kwargs) -> None:
         self._entry_fulfillment_text = kwargs.pop('entry_fulfillment_text')
-        self._webhook_delegator = kwargs.pop('webhook_delegator')
+        self._webhook_delegator = kwargs.pop('webhook_delegator', None)
         self._tag = kwargs.pop('tag', None)
         super().__init__(controller, **kwargs)
 
@@ -356,16 +380,20 @@ class StartFlowDelegator(ClientDelegator):
         flow_name = self.controller.start_flow
         self._flow = self.client.get_flow(name=flow_name) 
 
-    def append_transition_route(self, intent_name, target_page_name):
+    def append_transition_route(self, target_page, intent):
         self.flow.transition_routes.append(TransitionRoute(
-            intent=intent_name,
-            target_page=target_page_name,
+            intent=intent,
+            target_page=target_page,
         ))
         self.client.update_flow(flow=self.flow)
 
     def tear_down(self):
         self.flow.transition_routes = self.flow.transition_routes[:1]
         self.client.update_flow(flow=self.flow)
+
+    @property
+    def start_page_name(self):
+        return f'{self.flow.name}/pages/START_PAGE'
 
 
 class TestCaseDelegator(ClientDelegator):
@@ -467,27 +495,27 @@ def get_expected_response(tag, input_text):
 
 class BasicWebhookSample(DialogflowSample):
 
-    _WEBHOOK_DISPLAY_NAME = 'Webhook 1'
+    _WEBHOOK_DISPLAY_NAME = 'Validate form'
     _INTENT_DISPLAY_NAME = 'go-to-example-page'
     _INTENT_TRAINING_PHRASES_TEXT = ['trigger intent', 'trigger the intent']
     _PAGE_DISPLAY_NAME = 'Main Page'
     _PAGE_ENTRY_FULFILLMENT_TEXT=f'Entering {_PAGE_DISPLAY_NAME}'
-    _PAGE_WEBHOOK_ENTRY_TAG = 'basic_webhook'
+    _PAGE_WEBHOOK_ENTRY_TAG = 'echo_webhook'
 
-    TEST_CASES = {
-      'Test Case 0': {
-        'input_text': _INTENT_TRAINING_PHRASES_TEXT[0],
-        'expected_response_text': [_PAGE_ENTRY_FULFILLMENT_TEXT, get_expected_response(_PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[0])],
-        'expected_exception': None},
-      'Test Case 1': {
-        'input_text': _INTENT_TRAINING_PHRASES_TEXT[1],
-        'expected_response_text': [_PAGE_ENTRY_FULFILLMENT_TEXT, get_expected_response(_PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[1])],
-        'expected_exception': None},
-      'Test Case XFAIL': {
-        'input_text': 'FAIL',
-        'expected_response_text':  ['FAIL'],
-        'expected_exception': DialogflowTestCaseFailure},
-    }
+    # TEST_CASES = {
+    #   'Test Case 0': {
+    #     'input_text': _INTENT_TRAINING_PHRASES_TEXT[0],
+    #     'expected_response_text': [_PAGE_ENTRY_FULFILLMENT_TEXT, get_expected_response(_PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[0])],
+    #     'expected_exception': None},
+    #   'Test Case 1': {
+    #     'input_text': _INTENT_TRAINING_PHRASES_TEXT[1],
+    #     'expected_response_text': [_PAGE_ENTRY_FULFILLMENT_TEXT, get_expected_response(_PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[1])],
+    #     'expected_exception': None},
+    #   'Test Case XFAIL': {
+    #     'input_text': 'FAIL',
+    #     'expected_response_text':  ['FAIL'],
+    #     'expected_exception': DialogflowTestCaseFailure},
+    # }
 
     def __init__(self, project_id=None, quota_project_id=None, webhook_uri=None, agent_display_name=None):
       self.auth_delegator = AuthDelegator(self, project_id=project_id, quota_project_id=quota_project_id, credentials=None)
@@ -497,34 +525,48 @@ class BasicWebhookSample(DialogflowSample):
       self.page_delegator = FulfillmentPageDelegator(self, 
           display_name=self._PAGE_DISPLAY_NAME, 
           entry_fulfillment_text=self._PAGE_ENTRY_FULFILLMENT_TEXT,
-          webhook_delegator=self.webhook_delegator,
-          tag=self._PAGE_WEBHOOK_ENTRY_TAG,
           )
       self.start_flow_delegator = StartFlowDelegator(self)
 
-      self.test_case_delegators = {}
-      for display_name, test_config in self.TEST_CASES.items():
-        self.test_case_delegators[display_name] = TestCaseDelegator(self,
-          display_name=display_name,
-          page_delegator=self.page_delegator,
-          intent_delegator=self.intent_delegator,
-          input_text=test_config['input_text'],
-          expected_response_text=test_config['expected_response_text'],
-          expected_exception=test_config['expected_exception'],
-        )
+    #   self.test_case_delegators = {}
+    #   for display_name, test_config in self.TEST_CASES.items():
+    #     self.test_case_delegators[display_name] = TestCaseDelegator(self,
+    #       display_name=display_name,
+    #       page_delegator=self.page_delegator,
+    #       intent_delegator=self.intent_delegator,
+    #       input_text=test_config['input_text'],
+    #       expected_response_text=test_config['expected_response_text'],
+    #       expected_exception=test_config['expected_exception'],
+    #     )
 
     def initialize(self):
-      self.agent_delegator.initialize()
-      self.webhook_delegator.initialize()
-      self.intent_delegator.initialize(self._INTENT_TRAINING_PHRASES_TEXT)
-      self.page_delegator.initialize()
-      self.start_flow_delegator.initialize()
-      self.start_flow_delegator.append_transition_route(
-          self.intent_delegator.intent.name,
-          self.page_delegator.page.name
-      )
-      for test_case_delegator in self.test_case_delegators.values():
-        test_case_delegator.initialize()
+        self.agent_delegator.initialize()
+        self.webhook_delegator.initialize()
+        self.intent_delegator.initialize(self._INTENT_TRAINING_PHRASES_TEXT)
+        self.page_delegator.initialize()
+        self.start_flow_delegator.initialize()
+        self.start_flow_delegator.append_transition_route(
+            target_page=self.page_delegator.page.name,
+            intent=self.intent_delegator.intent.name,
+        )
+
+
+        self.page_delegator.add_parameter(
+            display_name="age",
+            required=True,
+            entity_type="projects/-/locations/-/agents/-/entityTypes/sys.any",
+            fill_behavior=Form.Parameter.FillBehavior(initial_prompt_fulfillment=Fulfillment(messages=[ResponseMessage(text=ResponseMessage.Text(text=['What is your age?']))])),
+            default_value=None,
+            redact=False,
+            is_list=False,
+        )
+        self.page_delegator.append_transition_route(
+            target_page=self.start_flow_delegator.start_page_name,
+            condition="$page.params.status = FINAL", 
+            trigger_fulfillment=Fulfillment(webhook=self.webhook_delegator.webhook.name, tag='echo_webhook', messages=[ResponseMessage(text=ResponseMessage.Text(text=['Form Filled']))]),
+        )
+    #   for test_case_delegator in self.test_case_delegators.values():
+    #     test_case_delegator.initialize()
 
     def tear_down(self):
         for test_case_delegator in self.test_case_delegators.values():
@@ -560,10 +602,9 @@ if __name__ == "__main__":
 
     sample = BasicWebhookSample(**vars(parser.parse_args()))
     sample.initialize()
-    for test_case_delegator in sample.test_case_delegators.values():
-        if test_case_delegator.expected_exception:
-            continue
-        else:
-            test_case_delegator.run_test_case()
-    sample.tear_down()
-
+    # for test_case_delegator in sample.test_case_delegators.values():
+    #     if test_case_delegator.expected_exception:
+    #         continue
+    #     else:
+    #         test_case_delegator.run_test_case()
+    # sample.tear_down()

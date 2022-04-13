@@ -42,10 +42,31 @@ def basic_webhook(request):
     )
 
 
+def echo_webhook(request):
+    request_dict = request.get_json()
+    print(request_dict)
+    request_json = json.dumps(request_dict)
+    return json.dumps(
+        {
+            "fulfillment_response": {
+                "messages": [
+                    {
+                        "text": {
+                            "text": [request_json],
+                        }
+                    }
+                ]
+            }
+        }
+    )
+
+
 def webhook_fcn(request):
     request_dict = request.get_json()
     tag = request_dict["fulfillmentInfo"]["tag"]
-    if tag == 'basic_webhook':
+    if tag == 'echo_webhook':
+        return echo_webhook(request)
+    elif tag == 'basic_webhook':
         return basic_webhook(request)
     else:
         raise RuntimeError(f'Unrecognized tag: {tag}')
