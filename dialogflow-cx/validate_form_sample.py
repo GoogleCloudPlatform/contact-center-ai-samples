@@ -15,7 +15,6 @@ import google.auth
 from google.auth import identity_pool
 from google.oauth2 import service_account
 import google.api_core.exceptions
-from numpy import require
 
 import webhook.main as wh
 from utilities import RequestMock

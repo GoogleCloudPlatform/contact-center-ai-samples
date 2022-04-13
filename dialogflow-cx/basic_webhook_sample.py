@@ -8,6 +8,7 @@ from google.cloud.dialogflowcx import Intent, IntentsClient, ListIntentsRequest,
 from google.cloud.dialogflowcx import Page, PagesClient, ListPagesRequest, GetPageRequest, Fulfillment, ResponseMessage, DeletePageRequest
 from google.cloud.dialogflowcx import FlowsClient, TransitionRoute
 from google.cloud.dialogflowcx import TestCasesClient, TestCase, TestConfig, ConversationTurn, QueryInput, TextInput, ListTestCasesRequest, GetTestCaseRequest, RunTestCaseRequest, TestResult, BatchDeleteTestCasesRequest
+from google.cloud.dialogflowcx import Fulfillment, Form
 
 import google.auth
 
@@ -312,12 +313,34 @@ class PageDelegator(ClientDelegator):
         except google.api_core.exceptions.NotFound:
             pass
 
+    def append_transition_route(self, target_page, intent_name=None, condition=None, trigger_fulfillment=None):
+        transition_route = TransitionRoute(
+            condition=condition,
+            trigger_fulfillment=trigger_fulfillment,
+            intent=intent_name,
+            target_page=target_page,
+        )
+        self.page.transition_routes.append(transition_route)
+        self.client.update_page(page=self.page)
+
+    def add_parameter(self, display_name, entity_type, fill_behavior, default_value=None, redact=False, is_list=False, required=True):
+        parameter = Form.Parameter(
+            display_name=display_name,
+            entity_type=entity_type,
+            fill_behavior=fill_behavior,
+            default_value=default_value,
+            redact=redact,
+            is_list=is_list,
+            required=required,
+        )
+        self.page.form.parameters.append(parameter)
+
 
 class FulfillmentPageDelegator(PageDelegator):
 
     def __init__(self, controller: DialogflowSample, **kwargs) -> None:
         self._entry_fulfillment_text = kwargs.pop('entry_fulfillment_text')
-        self._webhook_delegator = kwargs.pop('webhook_delegator')
+        self._webhook_delegator = kwargs.pop('webhook_delegator', None)
         self._tag = kwargs.pop('tag', None)
         super().__init__(controller, **kwargs)
 
@@ -356,16 +379,20 @@ class StartFlowDelegator(ClientDelegator):
         flow_name = self.controller.start_flow
         self._flow = self.client.get_flow(name=flow_name) 
 
-    def append_transition_route(self, intent_name, target_page_name):
+    def append_transition_route(self, target_page, intent):
         self.flow.transition_routes.append(TransitionRoute(
-            intent=intent_name,
-            target_page=target_page_name,
+            intent=intent,
+            target_page=target_page,
         ))
         self.client.update_flow(flow=self.flow)
 
     def tear_down(self):
         self.flow.transition_routes = self.flow.transition_routes[:1]
         self.client.update_flow(flow=self.flow)
+
+    @property
+    def start_page_name(self):
+        return f'{self.flow.name}/pages/START_PAGE'
 
 
 class TestCaseDelegator(ClientDelegator):
