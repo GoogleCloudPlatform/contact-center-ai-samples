@@ -28,19 +28,15 @@ from grpc._channel import _UnaryUnaryMultiCallable
 from basic_webhook_sample import BasicWebhookSample
 from webhook.main import get_webhook_uri
 
-'''
-export TERRAFORM_PROJECT_ID=df-terraform-dev-1113
-'''
-
 
 @pytest.fixture(scope='session')
 def project_id():
-  return os.environ["TERRAFORM_PROJECT_ID"]
+  return os.environ["PROJECT_ID"]
 
 
 @pytest.fixture(scope='session')
 def build_uuid():
-  return os.environ["TERRAFORM_BUILD_UUID"]
+  return os.environ["BUILD_UUID"]
 
 
 @pytest.fixture(scope='session')

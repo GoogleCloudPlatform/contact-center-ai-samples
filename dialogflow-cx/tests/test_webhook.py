@@ -47,7 +47,7 @@ def test_validate_form(mocked_request, test_input, expected):
   request_mapping['fulfillmentInfo']['tag'] = 'validate_form'
   request_mapping['pageInfo'] = {}
   request_mapping['pageInfo']['formInfo'] = {}
-  request_mapping['pageInfo']['formInfo']['parameterInfo'] = [{'name': "age", "value": test_input}]
+  request_mapping['pageInfo']['formInfo']['parameterInfo'] = [{'displayName': "age", "value": test_input}]
   mocked_request.payload = request_mapping
 
   # Act:

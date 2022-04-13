@@ -24,12 +24,12 @@ from webhook.main import get_webhook_uri
 
 @pytest.fixture(scope='session')
 def project_id():
-  return os.environ["TERRAFORM_PROJECT_ID"]
+  return os.environ["PROJECT_ID"]
 
 
 @pytest.fixture(scope='session')
 def build_uuid():
-  return os.environ["TERRAFORM_BUILD_UUID"]
+  return os.environ["BUILD_UUID"]
 
 
 @pytest.fixture(scope='session')
@@ -55,7 +55,7 @@ def webhook_sample(project_id, webhook_uri, pytest_session_uuid):
   del sample
 
 
-@pytest.mark.wip
+@pytest.mark.integration
 @pytest.mark.flaky(max_runs=3, reruns_delay=15)
 @pytest.mark.parametrize("test_case_display_name", ValidateFormSample.TEST_CASES)
 def test_indirect(test_case_display_name, webhook_sample):

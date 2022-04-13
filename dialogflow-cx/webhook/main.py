@@ -14,10 +14,6 @@
 
 """main.py creates a sample webhook handler for Dialogflow CX"""
 
-'''
-export TERRAFORM_WEBHOOK_FUNCTION_NAME=webhook
-'''
-
 import json
 
 
@@ -66,7 +62,7 @@ def validate_form(request):
 
     parameter_dict = {}
     for parameter_info in parameter_info_list:
-        key = parameter_info['name']
+        key = parameter_info['displayName']
         parameter_dict[key] = parameter_info['value']
 
     if parameter_dict['age'] < 0:

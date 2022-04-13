@@ -19,13 +19,17 @@ class ValidateFormSample(sb.DialogflowSample):
     _INTENT_TRAINING_PHRASES_TEXT = ['trigger intent', 'trigger the intent']
     _PAGE_DISPLAY_NAME = 'Main Page'
     _PAGE_ENTRY_FULFILLMENT_TEXT=f'Entering {_PAGE_DISPLAY_NAME}'
-    _PAGE_WEBHOOK_ENTRY_TAG = 'echo_webhook'
+    _PAGE_WEBHOOK_ENTRY_TAG = 'validate_form'
 
     TEST_CASES = {
       'Test Case 0': {
-        'input_text': ['trigger_intent', '14'],
-        'expected_response_text': [[_PAGE_ENTRY_FULFILLMENT_TEXT, "What is your age?"], ['Form Filled']],
+        'input_text': ['trigger_intent', '21'],
+        'expected_response_text': [[_PAGE_ENTRY_FULFILLMENT_TEXT, "What is your age?"], ['Form Filled', 'Valid age']],
         'expected_exception': None},
+      'Test Case 1': {
+        'input_text': ['trigger_intent', '-1'],
+        'expected_response_text': [[_PAGE_ENTRY_FULFILLMENT_TEXT, "What is your age?"], ['Form Filled', 'Age -1 not valid (must be positive)']],
+        'expected_exception': sb.DialogflowTestCaseFailure},
     }
 
     def __init__(self, project_id=None, quota_project_id=None, webhook_uri=None, agent_display_name=None):
@@ -86,7 +90,7 @@ class ValidateFormSample(sb.DialogflowSample):
             condition="$page.params.status = FINAL", 
             trigger_fulfillment=build_fulfillment(
                 webhook=self.webhook_delegator.webhook.name,
-                tag='echo_webhook',
+                tag=self._PAGE_WEBHOOK_ENTRY_TAG,
                 text=['Form Filled'],
             )
         )
