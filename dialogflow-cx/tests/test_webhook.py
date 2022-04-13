@@ -32,3 +32,28 @@ def test_basic_webhook(mocked_request):
 
   # Assert:
   assert extract_text(response_json) == f'Webhook received: {mock_text} (Tag: {mock_tag})'
+
+
+@pytest.mark.hermetic
+@pytest.mark.parametrize("test_input,expected", [
+  (1, "Valid age"),
+  (-1, "Age -1 not valid (must be positive)"),
+])
+def test_validate_form(mocked_request, test_input, expected):
+
+  # Arrange:
+  request_mapping = {}
+  request_mapping['fulfillmentInfo'] = {}
+  request_mapping['fulfillmentInfo']['tag'] = 'validate_form'
+  request_mapping['pageInfo'] = {}
+  request_mapping['pageInfo']['formInfo'] = {}
+  request_mapping['pageInfo']['formInfo']['parameterInfo'] = [{'name': "age", "value": test_input}]
+  mocked_request.payload = request_mapping
+
+  # Act:
+  response_json = webhook_fcn(mocked_request)
+
+  # Assert:
+  assert extract_text(response_json) == expected
+
+

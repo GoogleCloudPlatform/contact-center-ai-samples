@@ -44,7 +44,6 @@ def basic_webhook(request):
 
 def echo_webhook(request):
     request_dict = request.get_json()
-    print(request_dict)
     request_json = json.dumps(request_dict)
     return json.dumps(
         {
@@ -61,6 +60,45 @@ def echo_webhook(request):
     )
 
 
+def validate_form(request):
+    request_dict = request.get_json()
+    parameter_info_list = request_dict['pageInfo']['formInfo']['parameterInfo']
+
+    parameter_dict = {}
+    for parameter_info in parameter_info_list:
+        key = parameter_info['name']
+        parameter_dict[key] = parameter_info['value']
+
+    if parameter_dict['age'] < 0:
+        return json.dumps(
+            {
+                "fulfillment_response": {
+                    "messages": [
+                        {
+                            "text": {
+                                "text": [f'Age {parameter_dict["age"]} not valid (must be positive)'],
+                            }
+                        }
+                    ]
+                }
+            }
+        )
+    else:
+        return json.dumps(
+            {
+                "fulfillment_response": {
+                    "messages": [
+                        {
+                            "text": {
+                                "text": ['Valid age'],
+                            }
+                        }
+                    ]
+                }
+            }
+        )
+
+
 def webhook_fcn(request):
     request_dict = request.get_json()
     tag = request_dict["fulfillmentInfo"]["tag"]
@@ -68,6 +106,8 @@ def webhook_fcn(request):
         return echo_webhook(request)
     elif tag == 'basic_webhook':
         return basic_webhook(request)
+    elif tag == 'validate_form':
+        return validate_form(request)
     else:
         raise RuntimeError(f'Unrecognized tag: {tag}')
 
