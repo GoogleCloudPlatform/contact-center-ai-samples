@@ -61,6 +61,15 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
         updated_parameters['first_month'] = first_of_month;
 
         res.status(200).send({
+          fulfillmentResponse: {
+            messages: [
+              {
+                text: {
+                  text: `Thanks! I'm going to pull up your ${bill_month} bill. The billing period began on ${updated_parameters['first_month']}.`,
+                },
+              },
+            ],
+          },
           sessionInfo: {
             parameters: updated_parameters,
           },
