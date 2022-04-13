@@ -152,3 +152,16 @@ data/
 # Misc.
 tmp/
 temp/
+
+.python-version
+.DS_Store
+.vscode
+.gcloudignore
+
+**/.terraform.lock.hcl
+**/.terraform/
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/application_default_credentials.json
+
+dialogflow-cx/terraform/webhook
