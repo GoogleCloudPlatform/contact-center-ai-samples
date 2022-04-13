@@ -313,11 +313,11 @@ class PageDelegator(ClientDelegator):
         except google.api_core.exceptions.NotFound:
             pass
 
-    def append_transition_route(self, target_page, intent_name=None, condition=None, trigger_fulfillment=None):
+    def append_transition_route(self, target_page, intent=None, condition=None, trigger_fulfillment=None):
         transition_route = TransitionRoute(
             condition=condition,
             trigger_fulfillment=trigger_fulfillment,
-            intent=intent_name,
+            intent=intent,
             target_page=target_page,
         )
         self.page.transition_routes.append(transition_route)
@@ -506,14 +506,14 @@ class BasicWebhookSample(DialogflowSample):
         'input_text': _INTENT_TRAINING_PHRASES_TEXT[0],
         'expected_response_text': [_PAGE_ENTRY_FULFILLMENT_TEXT, get_expected_response(_PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[0])],
         'expected_exception': None},
-      'Test Case 1': {
-        'input_text': _INTENT_TRAINING_PHRASES_TEXT[1],
-        'expected_response_text': [_PAGE_ENTRY_FULFILLMENT_TEXT, get_expected_response(_PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[1])],
-        'expected_exception': None},
-      'Test Case XFAIL': {
-        'input_text': 'FAIL',
-        'expected_response_text':  ['FAIL'],
-        'expected_exception': DialogflowTestCaseFailure},
+    #   'Test Case 1': {
+    #     'input_text': _INTENT_TRAINING_PHRASES_TEXT[1],
+    #     'expected_response_text': [_PAGE_ENTRY_FULFILLMENT_TEXT, get_expected_response(_PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[1])],
+    #     'expected_exception': None},
+    #   'Test Case XFAIL': {
+    #     'input_text': 'FAIL',
+    #     'expected_response_text':  ['FAIL'],
+    #     'expected_exception': DialogflowTestCaseFailure},
     }
 
     def __init__(self, project_id=None, quota_project_id=None, webhook_uri=None, agent_display_name=None):
@@ -547,8 +547,8 @@ class BasicWebhookSample(DialogflowSample):
       self.page_delegator.initialize()
       self.start_flow_delegator.initialize()
       self.start_flow_delegator.append_transition_route(
-          self.intent_delegator.intent.name,
-          self.page_delegator.page.name
+          target_page=self.page_delegator.page.name,
+          intent=self.intent_delegator.intent.name,
       )
       for test_case_delegator in self.test_case_delegators.values():
         test_case_delegator.initialize()
