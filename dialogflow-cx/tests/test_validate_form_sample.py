@@ -15,9 +15,9 @@
 """Dialogflow CX webhook sample unit tests."""
 
 import os
-import pytest
 import uuid
 
+import pytest
 from validate_form_sample import ValidateFormSample
 from webhook.main import get_webhook_uri
 
@@ -61,7 +61,7 @@ def webhook_sample(project_id, webhook_uri, pytest_session_uuid):
 def test_indirect(test_case_display_name, webhook_sample):
     test_case_delegator = webhook_sample.test_case_delegators[test_case_display_name]
     if test_case_delegator.expected_exception:
-        with pytest.raises(test_case_delegator.expected_exception) as e_info:
+        with pytest.raises(test_case_delegator.expected_exception):
             test_case_delegator.run_test_case()
     else:
         test_case_delegator.run_test_case(wait=10)

@@ -15,8 +15,7 @@
 """Tests for webhook module."""
 
 import pytest
-
-from webhook.main import webhook_fcn, build_request_dict_basic, extract_text
+from webhook.main import build_request_dict_basic, extract_text, webhook_fcn
 
 
 @pytest.mark.hermetic

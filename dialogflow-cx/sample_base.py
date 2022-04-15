@@ -1,58 +1,49 @@
-import time
-import os
 import json
+import os
+import time
 
+import google.api_core.exceptions
+import google.auth
+from google.auth import identity_pool
 from google.cloud.dialogflowcx import (
-    AgentsClient,
     Agent,
-    ListAgentsRequest,
-    GetAgentRequest,
+    AgentsClient,
+    BatchDeleteTestCasesRequest,
+    ConversationTurn,
     DeleteAgentRequest,
-)
-from google.cloud.dialogflowcx import (
-    Webhook,
-    WebhooksClient,
-    ListWebhooksRequest,
-    GetWebhookRequest,
+    DeleteIntentRequest,
+    DeletePageRequest,
     DeleteWebhookRequest,
-)
-from google.cloud.dialogflowcx import (
+    FlowsClient,
+    Form,
+    Fulfillment,
+    GetAgentRequest,
+    GetIntentRequest,
+    GetPageRequest,
+    GetTestCaseRequest,
+    GetWebhookRequest,
     Intent,
     IntentsClient,
+    ListAgentsRequest,
     ListIntentsRequest,
-    GetIntentRequest,
-    DeleteIntentRequest,
-)
-from google.cloud.dialogflowcx import (
+    ListPagesRequest,
+    ListTestCasesRequest,
+    ListWebhooksRequest,
     Page,
     PagesClient,
-    ListPagesRequest,
-    GetPageRequest,
-    Fulfillment,
-    ResponseMessage,
-    DeletePageRequest,
-)
-from google.cloud.dialogflowcx import FlowsClient, TransitionRoute
-from google.cloud.dialogflowcx import (
-    TestCasesClient,
-    TestCase,
-    TestConfig,
-    ConversationTurn,
     QueryInput,
-    TextInput,
-    ListTestCasesRequest,
-    GetTestCaseRequest,
+    ResponseMessage,
     RunTestCaseRequest,
+    TestCase,
+    TestCasesClient,
+    TestConfig,
     TestResult,
-    BatchDeleteTestCasesRequest,
+    TextInput,
+    TransitionRoute,
+    Webhook,
+    WebhooksClient,
 )
-from google.cloud.dialogflowcx import Fulfillment, Form
-
-import google.auth
-
-from google.auth import identity_pool
 from google.oauth2 import service_account
-import google.api_core.exceptions
 
 
 class DialogflowTestCaseFailure(Exception):
@@ -61,6 +52,20 @@ class DialogflowTestCaseFailure(Exception):
 
 class DialogflowSample:
     """Base class for samples"""
+
+    def set_auth_delegator(self, auth_delegator):
+        self._auth_delegator = auth_delegator
+
+    def set_agent_delegator(self, agent_delegator):
+        self._agent_delegator = agent_delegator
+
+    @property
+    def auth_delegator(self):
+        return self._auth_delegator
+
+    @property
+    def agent_delegator(self):
+        return self._agent_delegator
 
     @property
     def project_id(self):
@@ -77,7 +82,7 @@ class DialogflowSample:
 
 class ClientDelegator:
 
-    _CLIENT_CLASS = None  # Override in subclass
+    _CLIENT_CLASS = object  # Override in subclass
 
     def __init__(self, controller: DialogflowSample, client=None, display_name=None):
         self.controller = controller
@@ -575,9 +580,10 @@ class TestCaseDelegator(ClientDelegator):
                         )
                     return
                 except google.api_core.exceptions.NotFound as e:
-                    if (
-                        str(e)
-                        == "404 com.google.apps.framework.request.NotFoundException: NLU model for flow '00000000-0000-0000-0000-000000000000' does not exist. Please try again after retraining the flow."
+                    if str(e) == (
+                        "404 com.google.apps.framework.request.NotFoundException: "
+                        "NLU model for flow '00000000-0000-0000-0000-000000000000' does not exist. "
+                        "Please try again after retraining the flow."
                     ):
                         retry_count += 1
         raise RuntimeError(f"Retry count exceeded: {retry_count}")

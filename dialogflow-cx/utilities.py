@@ -1,5 +1,5 @@
-from typing import Mapping
 from dataclasses import dataclass, field
+from typing import Mapping
 
 
 @dataclass

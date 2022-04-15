@@ -14,15 +14,12 @@
 
 """Module providing fixtures for the entire test directory."""
 from typing import Generator
-import os
-import pytest
 
-from unittest import mock
-from utilities import RequestMock
+import pytest
 
 # from webhook_sample import DialogflowController
 from google.auth import credentials as ga_credentials
-from google.auth.environment_vars import PROJECT
+from utilities import RequestMock
 
 
 @pytest.fixture(scope="function")

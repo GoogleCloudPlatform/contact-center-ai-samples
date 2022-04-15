@@ -14,17 +14,10 @@
 
 """Dialogflow CX webhook sample unit tests."""
 
+import os
 import uuid
 
-from google.cloud.dialogflowcx_v3.types import agent as gcdc_agent
-from google.cloud.dialogflowcx_v3 import Agent
-import google.auth
 import pytest
-import os
-from google.cloud.dialogflowcx_v3.services.agents import AgentsClient
-from google.auth import credentials as ga_credentials
-from grpc._channel import _UnaryUnaryMultiCallable
-
 from basic_webhook_sample import BasicWebhookSample
 from webhook.main import get_webhook_uri
 
@@ -68,7 +61,7 @@ def webhook_sample(project_id, webhook_uri, pytest_session_uuid):
 def test_indirect(test_case_display_name, webhook_sample):
     test_case_delegator = webhook_sample.test_case_delegators[test_case_display_name]
     if test_case_delegator.expected_exception:
-        with pytest.raises(test_case_delegator.expected_exception) as e_info:
+        with pytest.raises(test_case_delegator.expected_exception):
             test_case_delegator.run_test_case()
     else:
         test_case_delegator.run_test_case(wait=10)

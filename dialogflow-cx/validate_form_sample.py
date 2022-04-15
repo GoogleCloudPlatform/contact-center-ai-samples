@@ -1,7 +1,5 @@
-from google.cloud.dialogflowcx import Fulfillment, Form, ResponseMessage, Page
-import webhook.main as wh
-from utilities import RequestMock
 import sample_base as sb
+from google.cloud.dialogflowcx import Form, Fulfillment, ResponseMessage
 
 
 def get_expected_response(tag, input_text):
@@ -51,13 +49,17 @@ class ValidateFormSample(sb.DialogflowSample):
         webhook_uri=None,
         agent_display_name=None,
     ):
-        self.auth_delegator = sb.AuthDelegator(
-            self,
-            project_id=project_id,
-            quota_project_id=quota_project_id,
-            credentials=None,
+        self.set_auth_delegator(
+            sb.AuthDelegator(
+                self,
+                project_id=project_id,
+                quota_project_id=quota_project_id,
+                credentials=None,
+            )
         )
-        self.agent_delegator = sb.AgentDelegator(self, display_name=agent_display_name)
+        self.set_agent_delegator(
+            sb.AgentDelegator(self, display_name=agent_display_name)
+        )
         self.webhook_delegator = sb.WebhookDelegator(
             self, display_name=self._WEBHOOK_DISPLAY_NAME, uri=webhook_uri
         )
@@ -152,7 +154,10 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--webhook-uri",
-        help="Webhook URL for the Dialogflow CX to use. Format: https://<region>-<project_id>.cloudfunctions.net/<webhook_name>",
+        help=(
+            "Webhook URL for the Dialogflow CX to use. "
+            "Format: https://<region>-<project_id>.cloudfunctions.net/<webhook_name>"
+        ),
         required=True,
     )
     parser.add_argument(
