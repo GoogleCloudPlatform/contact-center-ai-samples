@@ -22,46 +22,46 @@ from validate_form_sample import ValidateFormSample
 from webhook.main import get_webhook_uri
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def project_id():
-  return os.environ["PROJECT_ID"]
+    return os.environ["PROJECT_ID"]
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def build_uuid():
-  return os.environ["BUILD_UUID"]
+    return os.environ["BUILD_UUID"]
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def webhook_uri(project_id, build_uuid):
-  return get_webhook_uri(project_id, build_uuid)
+    return get_webhook_uri(project_id, build_uuid)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def pytest_session_uuid():
-  return uuid.uuid4()
+    return uuid.uuid4()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def webhook_sample(project_id, webhook_uri, pytest_session_uuid):
-  sample = ValidateFormSample(
-    agent_display_name = f'Webhook Agent (test session {pytest_session_uuid})',
-    project_id=project_id,
-    webhook_uri=webhook_uri,
-  )
-  sample.initialize()
-  yield sample
-  sample.tear_down()
-  del sample
+    sample = ValidateFormSample(
+        agent_display_name=f"Webhook Agent (test session {pytest_session_uuid})",
+        project_id=project_id,
+        webhook_uri=webhook_uri,
+    )
+    sample.initialize()
+    yield sample
+    sample.tear_down()
+    del sample
 
 
 @pytest.mark.integration
 @pytest.mark.flaky(max_runs=3, reruns_delay=15)
 @pytest.mark.parametrize("test_case_display_name", ValidateFormSample.TEST_CASES)
 def test_indirect(test_case_display_name, webhook_sample):
-  test_case_delegator = webhook_sample.test_case_delegators[test_case_display_name]
-  if test_case_delegator.expected_exception:
-    with pytest.raises(test_case_delegator.expected_exception) as e_info:
-      test_case_delegator.run_test_case()
-  else:
-    test_case_delegator.run_test_case(wait=10)
+    test_case_delegator = webhook_sample.test_case_delegators[test_case_display_name]
+    if test_case_delegator.expected_exception:
+        with pytest.raises(test_case_delegator.expected_exception) as e_info:
+            test_case_delegator.run_test_case()
+    else:
+        test_case_delegator.run_test_case(wait=10)

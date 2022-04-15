@@ -14,53 +14,61 @@ def get_expected_response(tag, input_text):
 
 class BasicWebhookSample(sb.DialogflowSample):
 
-    _WEBHOOK_DISPLAY_NAME = 'Webhook 1'
-    _INTENT_DISPLAY_NAME = 'go-to-example-page'
-    _INTENT_TRAINING_PHRASES_TEXT = ['trigger intent', 'trigger the intent']
-    _PAGE_DISPLAY_NAME = 'Main Page'
-    _PAGE_ENTRY_FULFILLMENT_TEXT = f'Entering {_PAGE_DISPLAY_NAME}'
-    _PAGE_WEBHOOK_ENTRY_TAG = 'basic_webhook'
+    _WEBHOOK_DISPLAY_NAME = "Webhook 1"
+    _INTENT_DISPLAY_NAME = "go-to-example-page"
+    _INTENT_TRAINING_PHRASES_TEXT = ["trigger intent", "trigger the intent"]
+    _PAGE_DISPLAY_NAME = "Main Page"
+    _PAGE_ENTRY_FULFILLMENT_TEXT = f"Entering {_PAGE_DISPLAY_NAME}"
+    _PAGE_WEBHOOK_ENTRY_TAG = "basic_webhook"
 
     TEST_CASES = {
-        'Test Case 0': {
-            'input_text': _INTENT_TRAINING_PHRASES_TEXT[0],
-            'expected_response_text': [
+        "Test Case 0": {
+            "input_text": _INTENT_TRAINING_PHRASES_TEXT[0],
+            "expected_response_text": [
                 _PAGE_ENTRY_FULFILLMENT_TEXT,
                 get_expected_response(
-                    _PAGE_WEBHOOK_ENTRY_TAG,
-                    _INTENT_TRAINING_PHRASES_TEXT[0])],
-            'expected_exception': None},
-        'Test Case 1': {
-            'input_text': _INTENT_TRAINING_PHRASES_TEXT[1],
-            'expected_response_text': [
+                    _PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[0]
+                ),
+            ],
+            "expected_exception": None,
+        },
+        "Test Case 1": {
+            "input_text": _INTENT_TRAINING_PHRASES_TEXT[1],
+            "expected_response_text": [
                 _PAGE_ENTRY_FULFILLMENT_TEXT,
                 get_expected_response(
-                    _PAGE_WEBHOOK_ENTRY_TAG,
-                    _INTENT_TRAINING_PHRASES_TEXT[1])],
-            'expected_exception': None},
-        'Test Case XFAIL': {
-            'input_text': 'FAIL',
-            'expected_response_text': ['FAIL'],
-            'expected_exception': sb.DialogflowTestCaseFailure},
+                    _PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[1]
+                ),
+            ],
+            "expected_exception": None,
+        },
+        "Test Case XFAIL": {
+            "input_text": "FAIL",
+            "expected_response_text": ["FAIL"],
+            "expected_exception": sb.DialogflowTestCaseFailure,
+        },
     }
 
     def __init__(
-            self,
-            project_id=None,
-            quota_project_id=None,
-            webhook_uri=None,
-            agent_display_name=None):
+        self,
+        project_id=None,
+        quota_project_id=None,
+        webhook_uri=None,
+        agent_display_name=None,
+    ):
         self.auth_delegator = sb.AuthDelegator(
             self,
             project_id=project_id,
             quota_project_id=quota_project_id,
-            credentials=None)
-        self.agent_delegator = sb.AgentDelegator(
-            self, display_name=agent_display_name)
+            credentials=None,
+        )
+        self.agent_delegator = sb.AgentDelegator(self, display_name=agent_display_name)
         self.webhook_delegator = sb.WebhookDelegator(
-            self, display_name=self._WEBHOOK_DISPLAY_NAME, uri=webhook_uri)
+            self, display_name=self._WEBHOOK_DISPLAY_NAME, uri=webhook_uri
+        )
         self.intent_delegator = sb.IntentDelegator(
-            self, display_name=self._INTENT_DISPLAY_NAME)
+            self, display_name=self._INTENT_DISPLAY_NAME
+        )
         self.page_delegator = sb.FulfillmentPageDelegator(
             self,
             display_name=self._PAGE_DISPLAY_NAME,
@@ -74,8 +82,8 @@ class BasicWebhookSample(sb.DialogflowSample):
         for display_name, test_config in self.TEST_CASES.items():
 
             curr_turn = sb.Turn(
-                test_config['input_text'],
-                test_config['expected_response_text'],
+                test_config["input_text"],
+                test_config["expected_response_text"],
                 self.page_delegator,
                 self.intent_delegator,
             )
@@ -86,7 +94,7 @@ class BasicWebhookSample(sb.DialogflowSample):
                 is_webhook_enabled=True,
                 display_name=display_name,
                 conversation_turns=conversation_turns,
-                expected_exception=test_config['expected_exception'],
+                expected_exception=test_config["expected_exception"],
             )
 
     def initialize(self):
@@ -115,24 +123,30 @@ class BasicWebhookSample(sb.DialogflowSample):
 if __name__ == "__main__":
 
     import argparse
+
     parser = argparse.ArgumentParser(
-        description='Setup Dialogflow CX basic webhook sample')
+        description="Setup Dialogflow CX basic webhook sample"
+    )
     parser.add_argument(
-        '--agent-display-name',
-        help='Display name of the Dialogflow CX agent',
-        required=True)
+        "--agent-display-name",
+        help="Display name of the Dialogflow CX agent",
+        required=True,
+    )
     parser.add_argument(
-        '--webhook-uri',
-        help='Webhook URL for the Dialogflow CX to use. Format: https://<region>-<project_id>.cloudfunctions.net/<webhook_name>',
-        required=True)
+        "--webhook-uri",
+        help="Webhook URL for the Dialogflow CX to use. Format: https://<region>-<project_id>.cloudfunctions.net/<webhook_name>",
+        required=True,
+    )
     parser.add_argument(
-        '--project-id',
-        help='Google Cloud project to create/use Dialogflow CX in',
-        required=True)
+        "--project-id",
+        help="Google Cloud project to create/use Dialogflow CX in",
+        required=True,
+    )
     parser.add_argument(
-        '--quota_project-id',
-        help='Quota project, if different from project-id',
-        default=None)
+        "--quota_project-id",
+        help="Quota project, if different from project-id",
+        default=None,
+    )
 
     sample = BasicWebhookSample(**vars(parser.parse_args()))
     sample.initialize()

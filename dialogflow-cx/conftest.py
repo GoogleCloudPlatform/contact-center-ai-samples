@@ -25,24 +25,24 @@ from google.auth import credentials as ga_credentials
 from google.auth.environment_vars import PROJECT
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mocked_request() -> Generator[RequestMock, None, None]:
     request = RequestMock()
     yield request
     del request
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def project_id() -> str:
     return "MOCK_PROJECT_ID_FIXTURE"
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def mock_project_id_env() -> str:
     return "MOCK_PROJECT_ID_ENV"
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mock_credentials() -> Generator[ga_credentials.Credentials, None, None]:
     credentials = ga_credentials.AnonymousCredentials()
     yield credentials
