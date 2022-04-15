@@ -521,7 +521,7 @@ class TestCaseDelegator(ClientDelegator):
     @property
     def test_case(self):
         if not self._test_case:
-            raise RuntimeError("Page not yet created")
+            raise RuntimeError("Test Case not yet created")
         return self._test_case
 
     def initialize(self):
@@ -573,6 +573,7 @@ class TestCaseDelegator(ClientDelegator):
                         conversation_turn.virtual_agent_output.differences
                         for conversation_turn in result.conversation_turns
                     ]
+                    print(agent_response_differences, result.test_result)
                     test_case_fail = result.test_result != TestResult.PASSED
                     if any(agent_response_differences) or test_case_fail:
                         raise DialogflowTestCaseFailure(
