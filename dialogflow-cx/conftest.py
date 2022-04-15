@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Module providing fixtures for the entire test directory."""
+from typing import Generator
 import os
 import pytest
 
@@ -25,33 +26,33 @@ from google.auth.environment_vars import PROJECT
 
 
 @pytest.fixture(scope='function')
-def mocked_request() -> RequestMock:
-  request = RequestMock()
-  yield request
-  del request
+def mocked_request() -> Generator[RequestMock, None, None]:
+    request = RequestMock()
+    yield request
+    del request
 
 
 @pytest.fixture(scope='session')
 def project_id() -> str:
-  return "MOCK_PROJECT_ID_FIXTURE"
+    return "MOCK_PROJECT_ID_FIXTURE"
 
 
 @pytest.fixture(scope='session')
-def mock_project_id_env():
-  return "MOCK_PROJECT_ID_ENV"
+def mock_project_id_env() -> str:
+    return "MOCK_PROJECT_ID_ENV"
 
 
 @pytest.fixture(scope='function')
-def mock_credentials():
-  credentials = ga_credentials.AnonymousCredentials()
-  yield credentials
-  del credentials
+def mock_credentials() -> Generator[ga_credentials.Credentials, None, None]:
+    credentials = ga_credentials.AnonymousCredentials()
+    yield credentials
+    del credentials
 
 
-@pytest.fixture()
-def mock_settings_env_vars(mock_project_id_env):
-  with mock.patch.dict(os.environ, {PROJECT: mock_project_id_env}):
-    yield
+# @pytest.fixture()
+# def mock_settings_env_vars(mock_project_id_env):
+#     with mock.patch.dict(os.environ, {PROJECT: mock_project_id_env}):
+#         yield
 
 
 # @pytest.fixture(scope='function')

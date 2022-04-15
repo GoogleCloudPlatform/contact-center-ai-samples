@@ -18,7 +18,7 @@ import google.api_core.exceptions
 
 
 class DialogflowTestCaseFailure(Exception):
-  """Exception to raise when a test case fails"""
+    """Exception to raise when a test case fails"""
 
 
 class DialogflowSample:
@@ -41,20 +41,27 @@ class ClientDelegator:
 
     _CLIENT_CLASS = None  # Override in subclass
 
-    def __init__(self, controller: DialogflowSample, client=None, display_name=None):
+    def __init__(
+            self,
+            controller: DialogflowSample,
+            client=None,
+            display_name=None):
         self.controller = controller
         self._client = client
         self._display_name = display_name
 
     @property
     def client_options(self):
-        return {"api_endpoint": f'{self.controller.location}-dialogflow.googleapis.com'}
+        return {
+            "api_endpoint": f'{self.controller.location}-dialogflow.googleapis.com'}
 
     @property
     def client(self):
-      if self._client is None: 
-        self._client = self._CLIENT_CLASS(client_options=self.client_options, credentials=self.controller.auth_delegator.credentials)
-      return self._client
+        if self._client is None:
+            self._client = self._CLIENT_CLASS(
+                client_options=self.client_options,
+                credentials=self.controller.auth_delegator.credentials)
+        return self._client
 
     @property
     def parent(self):
@@ -65,7 +72,7 @@ class ClientDelegator:
         return self._display_name
 
     def initialize(self):
-      pass
+        pass
 
 
 class AgentDelegator(ClientDelegator):
@@ -75,35 +82,36 @@ class AgentDelegator(ClientDelegator):
     _CLIENT_CLASS = AgentsClient
 
     def __init__(self, controller: DialogflowSample, **kwargs) -> None:
-      super().__init__(controller, **kwargs)
-      self.default_language_code = kwargs.get('default_language_code', self._DEFAULT_LANGUAGE_CODE)
-      self.time_zone = kwargs.get('time_zone', self._DEFAULT_TIME_ZONE)
+        super().__init__(controller, **kwargs)
+        self.default_language_code = kwargs.get(
+            'default_language_code', self._DEFAULT_LANGUAGE_CODE)
+        self.time_zone = kwargs.get('time_zone', self._DEFAULT_TIME_ZONE)
 
     def initialize(self):
         '''Initializes an agent to use for the sample.'''
         try:
-          agent = Agent(
-              display_name=self.display_name,
-              default_language_code=self.default_language_code,
-              time_zone=self.time_zone,
-          )
-          request = {"agent": agent, "parent": self.parent}
-          self._agent = self.client.create_agent(request=request)
+            agent = Agent(
+                display_name=self.display_name,
+                default_language_code=self.default_language_code,
+                time_zone=self.time_zone,
+            )
+            request = {"agent": agent, "parent": self.parent}
+            self._agent = self.client.create_agent(request=request)
         except google.api_core.exceptions.AlreadyExists:
-          request = ListAgentsRequest(
-            parent=self.parent,
-          )
-          for agent in self.client.list_agents(request=request):
-            if agent.display_name == self.display_name:
-              request = GetAgentRequest(
-                  name=agent.name,
-              )
-              self._agent = self.client.get_agent(request=request)
-              break
+            request = ListAgentsRequest(
+                parent=self.parent,
+            )
+            for agent in self.client.list_agents(request=request):
+                if agent.display_name == self.display_name:
+                    request = GetAgentRequest(
+                        name=agent.name,
+                    )
+                    self._agent = self.client.get_agent(request=request)
+                    break
 
     def tear_down(self):
         request = DeleteAgentRequest(name=self.agent.name)
-        try: 
+        try:
             self.client.delete_agent(request=request)
         except google.api_core.exceptions.NotFound:
             pass
@@ -120,7 +128,7 @@ class AgentDelegator(ClientDelegator):
 
     @property
     def start_flow(self):
-      return self.agent.start_flow
+        return self.agent.start_flow
 
 
 def get_credentials(quota_project_id=None):
@@ -131,7 +139,8 @@ def get_credentials(quota_project_id=None):
         credentials_dict = json.loads(credentials_data)
 
     if 'client_email' in credentials_dict:
-        return service_account.Credentials.from_service_account_file(credentials_path)
+        return service_account.Credentials.from_service_account_file(
+            credentials_path)
 
     if 'audience' in credentials_dict:
         return identity_pool.Credentials.from_info(credentials_dict)
@@ -143,14 +152,21 @@ class AuthDelegator:
 
     _DEFAULT_LOCATION = 'global'
 
-    def __init__(self, controller: DialogflowSample, project_id=None, quota_project_id=None, credentials=None, **kwargs):
+    def __init__(
+            self,
+            controller: DialogflowSample,
+            project_id=None,
+            quota_project_id=None,
+            credentials=None,
+            **kwargs):
         self.location = kwargs.get('location', self._DEFAULT_LOCATION)
         self.project_id = project_id
         self.controller = controller
         if not quota_project_id:
-          quota_project_id = project_id 
+            quota_project_id = project_id
         self.quota_project_id = quota_project_id
-        self.credentials = credentials if credentials else get_credentials(quota_project_id=quota_project_id)
+        self.credentials = credentials if credentials else get_credentials(
+            quota_project_id=quota_project_id)
 
 
 class WebhookDelegator(ClientDelegator):
@@ -176,25 +192,25 @@ class WebhookDelegator(ClientDelegator):
             }
         })
         try:
-          self._webhook = self.client.create_webhook(
-              parent=self.parent,
-              webhook=webhook,
-          )
+            self._webhook = self.client.create_webhook(
+                parent=self.parent,
+                webhook=webhook,
+            )
         except google.api_core.exceptions.AlreadyExists:
-          request = ListWebhooksRequest(
-            parent=self.parent,
-          )
-          for webhook in self.client.list_webhooks(request=request):
-            if webhook.display_name == self.display_name:
-              request = GetWebhookRequest(
-                  name=webhook.name,
-              )
-              self._webhook = self.client.get_webhook(request=request)
-              break
+            request = ListWebhooksRequest(
+                parent=self.parent,
+            )
+            for webhook in self.client.list_webhooks(request=request):
+                if webhook.display_name == self.display_name:
+                    request = GetWebhookRequest(
+                        name=webhook.name,
+                    )
+                    self._webhook = self.client.get_webhook(request=request)
+                    break
 
     def tear_down(self):
         request = DeleteWebhookRequest(name=self.webhook.name)
-        try: 
+        try:
             self.client.delete_webhook(request=request)
         except google.api_core.exceptions.NotFound:
             pass
@@ -218,39 +234,39 @@ class IntentDelegator(ClientDelegator):
 
         training_phrases = []
         for training_phrase_text in training_phrases_text:
-          training_phrase = Intent.TrainingPhrase({
-              'parts':[{
-                  'text': f'{training_phrase_text}'
-              }],
-              'id':'',
-              'repeat_count':1
-          })
-          training_phrases.append(training_phrase)
+            training_phrase = Intent.TrainingPhrase({
+                'parts': [{
+                    'text': f'{training_phrase_text}'
+                }],
+                'id': '',
+                'repeat_count': 1
+            })
+            training_phrases.append(training_phrase)
 
         intent = Intent({
-            'display_name':self.display_name,
-            'training_phrases':training_phrases,
+            'display_name': self.display_name,
+            'training_phrases': training_phrases,
         })
         try:
-          self._intent = self.client.create_intent(
-              parent=self.parent,
-              intent=intent,
-          )
+            self._intent = self.client.create_intent(
+                parent=self.parent,
+                intent=intent,
+            )
         except google.api_core.exceptions.AlreadyExists:
-          request = ListIntentsRequest(
-            parent=self.parent,
-          )
-          for intent in self.client.list_intents(request=request):
-            if intent.display_name == self.display_name:
-              request = GetIntentRequest(
-                  name=intent.name,
-              )
-              self._intent = self.client.get_intent(request=request)
-              return
+            request = ListIntentsRequest(
+                parent=self.parent,
+            )
+            for intent in self.client.list_intents(request=request):
+                if intent.display_name == self.display_name:
+                    request = GetIntentRequest(
+                        name=intent.name,
+                    )
+                    self._intent = self.client.get_intent(request=request)
+                    return
 
     def tear_down(self):
         request = DeleteIntentRequest(name=self.intent.name)
-        try: 
+        try:
             self.client.delete_intent(request=request)
         except google.api_core.exceptions.NotFound:
             pass
@@ -281,36 +297,41 @@ class PageDelegator(ClientDelegator):
 
     def initialize(self):
 
-      page = Page(
-          display_name=self.display_name,
-          entry_fulfillment=self.entry_fulfillment,
-      )
-      try:
-        self._page = self.client.create_page(
-            parent=self.controller.start_flow,
-            page=page,
+        page = Page(
+            display_name=self.display_name,
+            entry_fulfillment=self.entry_fulfillment,
         )
-      except google.api_core.exceptions.AlreadyExists:
-
-        request = ListPagesRequest(
-          parent=self.parent
-        )
-        for curr_page in self.client.list_pages(request=request):
-          if curr_page.display_name == self.display_name:
-            request = GetPageRequest(
-                name=curr_page.name,
+        try:
+            self._page = self.client.create_page(
+                parent=self.controller.start_flow,
+                page=page,
             )
-            self._page = self.client.get_page(request=request)
-            return
+        except google.api_core.exceptions.AlreadyExists:
+
+            request = ListPagesRequest(
+                parent=self.parent
+            )
+            for curr_page in self.client.list_pages(request=request):
+                if curr_page.display_name == self.display_name:
+                    request = GetPageRequest(
+                        name=curr_page.name,
+                    )
+                    self._page = self.client.get_page(request=request)
+                    return
 
     def tear_down(self, force=True):
         request = DeletePageRequest(name=self.page.name, force=force)
-        try: 
+        try:
             self.client.delete_page(request=request)
         except google.api_core.exceptions.NotFound:
             pass
 
-    def append_transition_route(self, target_page, intent=None, condition=None, trigger_fulfillment=None):
+    def append_transition_route(
+            self,
+            target_page,
+            intent=None,
+            condition=None,
+            trigger_fulfillment=None):
         transition_route = TransitionRoute(
             condition=condition,
             trigger_fulfillment=trigger_fulfillment,
@@ -320,7 +341,15 @@ class PageDelegator(ClientDelegator):
         self.page.transition_routes.append(transition_route)
         self.client.update_page(page=self.page)
 
-    def add_parameter(self, display_name, entity_type, fill_behavior, default_value=None, redact=False, is_list=False, required=True):
+    def add_parameter(
+            self,
+            display_name,
+            entity_type,
+            fill_behavior,
+            default_value=None,
+            redact=False,
+            is_list=False,
+            required=True):
         parameter = Form.Parameter(
             display_name=display_name,
             entity_type=entity_type,
@@ -375,7 +404,6 @@ class StartFlowDelegator(ClientDelegator):
         super().__init__(controller)
         self._flow = None
 
-
     @property
     def flow(self):
         if not self._flow:
@@ -384,7 +412,7 @@ class StartFlowDelegator(ClientDelegator):
 
     def initialize(self):
         flow_name = self.controller.start_flow
-        self._flow = self.client.get_flow(name=flow_name) 
+        self._flow = self.client.get_flow(name=flow_name)
 
     def append_transition_route(self, target_page, intent):
         self.flow.transition_routes.append(TransitionRoute(
@@ -404,36 +432,41 @@ class StartFlowDelegator(ClientDelegator):
 
 class Turn:
 
-  def __init__(self, user_input, agent_output, page_delegator, triggered_intent_delegator=None):
+    def __init__(
+            self,
+            user_input,
+            agent_output,
+            page_delegator,
+            triggered_intent_delegator=None):
 
-    self.user_input = user_input
-    self.triggered_intent_delegator = triggered_intent_delegator
-    self.page_delegator = page_delegator
-    self.agent_output = agent_output
+        self.user_input = user_input
+        self.triggered_intent_delegator = triggered_intent_delegator
+        self.page_delegator = page_delegator
+        self.agent_output = agent_output
 
-  def get_conversation_turn(self, is_webhook_enabled):
-    text_responses = [ResponseMessage.Text(
-        text=text
-    ) for text in self.agent_output]
-    if not self.triggered_intent_delegator:
-      triggered_intent = None
-    else:
-      triggered_intent = self.triggered_intent_delegator.intent
-    virtual_agent_output = ConversationTurn.VirtualAgentOutput(
-        current_page=self.page_delegator.page,
-        triggered_intent=triggered_intent,
-        text_responses=text_responses)
-    return ConversationTurn(
-        virtual_agent_output=virtual_agent_output,
-        user_input=ConversationTurn.UserInput(
-            is_webhook_enabled=is_webhook_enabled,
-            input=QueryInput(
-                text=TextInput(
-                  text=self.user_input,
+    def get_conversation_turn(self, is_webhook_enabled):
+        text_responses = [ResponseMessage.Text(
+            text=text
+        ) for text in self.agent_output]
+        if not self.triggered_intent_delegator:
+            triggered_intent = None
+        else:
+            triggered_intent = self.triggered_intent_delegator.intent
+        virtual_agent_output = ConversationTurn.VirtualAgentOutput(
+            current_page=self.page_delegator.page,
+            triggered_intent=triggered_intent,
+            text_responses=text_responses)
+        return ConversationTurn(
+            virtual_agent_output=virtual_agent_output,
+            user_input=ConversationTurn.UserInput(
+                is_webhook_enabled=is_webhook_enabled,
+                input=QueryInput(
+                    text=TextInput(
+                        text=self.user_input,
+                    )
                 )
             )
         )
-    )
 
 
 class TestCaseDelegator(ClientDelegator):
@@ -456,23 +489,27 @@ class TestCaseDelegator(ClientDelegator):
     def initialize(self):
 
         try:
-          self._test_case = self.client.create_test_case(
-              parent=self.controller.agent_delegator.agent.name,
-              test_case=TestCase(display_name=self.display_name,
-              test_case_conversation_turns=[t.get_conversation_turn(self._is_webhook_enabled) for t in self._conversation_turns],
-              test_config=TestConfig(flow=self.controller.start_flow))
-          )
+            self._test_case = self.client.create_test_case(
+                parent=self.controller.agent_delegator.agent.name,
+                test_case=TestCase(
+                    display_name=self.display_name,
+                    test_case_conversation_turns=[
+                        t.get_conversation_turn(
+                            self._is_webhook_enabled) for t in self._conversation_turns],
+                    test_config=TestConfig(
+                        flow=self.controller.start_flow)))
         except google.api_core.exceptions.AlreadyExists:
-          request = ListTestCasesRequest(
-            parent=self.parent
-          )
-          for curr_test_case in self.client.list_test_cases(request=request):
-            if curr_test_case.display_name == self.display_name:
-              request = GetTestCaseRequest(
-                  name=curr_test_case.name,
-              )
-              self._test_case = self.client.get_test_case(request=request)
-              return
+            request = ListTestCasesRequest(
+                parent=self.parent
+            )
+            for curr_test_case in self.client.list_test_cases(request=request):
+                if curr_test_case.display_name == self.display_name:
+                    request = GetTestCaseRequest(
+                        name=curr_test_case.name,
+                    )
+                    self._test_case = self.client.get_test_case(
+                        request=request)
+                    return
 
     def tear_down(self):
         request = BatchDeleteTestCasesRequest(
@@ -485,22 +522,24 @@ class TestCaseDelegator(ClientDelegator):
             pass
 
     def run_test_case(self, wait=10, max_retries=3):
-      retry_count = 0
-      result = None
-      while retry_count < max_retries:
-        time.sleep(wait)
-        lro = self.client.run_test_case(request=RunTestCaseRequest(name=self.test_case.name))
-        while lro.running():
-          try:
-            result = lro.result().result
-            agent_response_differences = [conversation_turn.virtual_agent_output.differences for conversation_turn in result.conversation_turns]
-            test_case_fail = result.test_result != TestResult.PASSED
-            if any(agent_response_differences) or test_case_fail:
-              raise DialogflowTestCaseFailure(f'Test "{self.test_case.display_name}" failed')
-            return
-          except google.api_core.exceptions.NotFound as e:
-            if str(e) == '404 com.google.apps.framework.request.NotFoundException: NLU model for flow \'00000000-0000-0000-0000-000000000000\' does not exist. Please try again after retraining the flow.':
-              retry_count += 1
-      raise RuntimeError(f'Retry count exceeded: {retry_count}')
-
-
+        retry_count = 0
+        result = None
+        while retry_count < max_retries:
+            time.sleep(wait)
+            lro = self.client.run_test_case(
+                request=RunTestCaseRequest(
+                    name=self.test_case.name))
+            while lro.running():
+                try:
+                    result = lro.result().result
+                    agent_response_differences = [
+                        conversation_turn.virtual_agent_output.differences for conversation_turn in result.conversation_turns]
+                    test_case_fail = result.test_result != TestResult.PASSED
+                    if any(agent_response_differences) or test_case_fail:
+                        raise DialogflowTestCaseFailure(
+                            f'Test "{self.test_case.display_name}" failed')
+                    return
+                except google.api_core.exceptions.NotFound as e:
+                    if str(e) == '404 com.google.apps.framework.request.NotFoundException: NLU model for flow \'00000000-0000-0000-0000-000000000000\' does not exist. Please try again after retraining the flow.':
+                        retry_count += 1
+        raise RuntimeError(f'Retry count exceeded: {retry_count}')
