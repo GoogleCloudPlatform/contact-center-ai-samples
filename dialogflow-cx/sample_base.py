@@ -153,6 +153,7 @@ class AgentDelegator(ClientDelegator):
         request = DeleteAgentRequest(name=self.agent.name)
         try:
             self.client.delete_agent(request=request)
+            self._agent = None
         except google.api_core.exceptions.NotFound:
             pass
 
@@ -255,6 +256,7 @@ class WebhookDelegator(ClientDelegator):
         request = DeleteWebhookRequest(name=self.webhook.name)
         try:
             self.client.delete_webhook(request=request)
+            self._webhook = None
         except google.api_core.exceptions.NotFound:
             pass
 
@@ -313,6 +315,7 @@ class IntentDelegator(ClientDelegator):
         request = DeleteIntentRequest(name=self.intent.name)
         try:
             self.client.delete_intent(request=request)
+            self._intent = None
         except google.api_core.exceptions.NotFound:
             pass
 
@@ -366,6 +369,7 @@ class PageDelegator(ClientDelegator):
         request = DeletePageRequest(name=self.page.name, force=force)
         try:
             self.client.delete_page(request=request)
+            self._page = None
         except google.api_core.exceptions.NotFound:
             pass
 
@@ -525,7 +529,6 @@ class TestCaseDelegator(ClientDelegator):
         return self._test_case
 
     def initialize(self):
-
         try:
             self._test_case = self.client.create_test_case(
                 parent=self.controller.agent_delegator.agent.name,
@@ -555,6 +558,7 @@ class TestCaseDelegator(ClientDelegator):
         )
         try:
             self.client.batch_delete_test_cases(request=request)
+            self._test_case = None
         except google.api_core.exceptions.NotFound:
             pass
 
@@ -573,7 +577,6 @@ class TestCaseDelegator(ClientDelegator):
                         conversation_turn.virtual_agent_output.differences
                         for conversation_turn in result.conversation_turns
                     ]
-                    print(agent_response_differences, result.test_result)
                     test_case_fail = result.test_result != TestResult.PASSED
                     if any(agent_response_differences) or test_case_fail:
                         raise DialogflowTestCaseFailure(
