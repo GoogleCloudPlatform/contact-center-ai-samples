@@ -1,4 +1,6 @@
 [MASTER]
+
+# Stricter linting when "errors-only" is commented out:
 # errors-only=
 
 # A comma-separated list of package or module names from where C extensions may
