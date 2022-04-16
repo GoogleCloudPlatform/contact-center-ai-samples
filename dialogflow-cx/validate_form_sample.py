@@ -1,3 +1,4 @@
+import dialogflow_sample as ds
 import sample_base as sb
 import test_case_delegator as tcd
 from google.cloud.dialogflowcx import Form, Fulfillment, ResponseMessage
@@ -15,7 +16,7 @@ def build_fulfillment(text=None, webhook=None, tag=None):
     )
 
 
-class ValidateFormSample(sb.DialogflowSample):
+class ValidateFormSample(ds.DialogflowSample):
 
     _WEBHOOK_DISPLAY_NAME = "Validate form"
     _INTENT_DISPLAY_NAME = "go-to-example-page"

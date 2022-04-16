@@ -1,3 +1,4 @@
+import dialogflow_sample as ds
 import sample_base as sb
 import test_case_delegator as tcd
 import webhook.main as wh
@@ -12,7 +13,7 @@ def get_expected_response(tag, input_text):
     )
 
 
-class BasicWebhookSample(sb.DialogflowSample):
+class BasicWebhookSample(ds.DialogflowSample):
 
     _WEBHOOK_DISPLAY_NAME = "Webhook 1"
     _INTENT_DISPLAY_NAME = "go-to-example-page"

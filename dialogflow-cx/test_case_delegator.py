@@ -1,5 +1,6 @@
 import time
 
+import dialogflow_sample as ds
 import google.api_core.exceptions
 import google.auth
 import sample_base as sb
@@ -23,7 +24,7 @@ class TestCaseDelegator(sb.ClientDelegator):
 
     _CLIENT_CLASS = TestCasesClient
 
-    def __init__(self, controller: sb.DialogflowSample, **kwargs) -> None:
+    def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         self._is_webhook_enabled = kwargs.pop("is_webhook_enabled", False)
         self._conversation_turns = kwargs.pop("conversation_turns")
         self.expected_exception = kwargs.pop("expected_exception", None)

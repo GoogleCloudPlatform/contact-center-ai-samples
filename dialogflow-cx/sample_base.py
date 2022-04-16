@@ -1,6 +1,7 @@
 import json
 import os
 
+import dialogflow_sample as ds
 import google.api_core.exceptions
 import google.auth
 from google.auth import identity_pool
@@ -37,41 +38,11 @@ from google.cloud.dialogflowcx import (
 from google.oauth2 import service_account
 
 
-class DialogflowSample:
-    """Base class for samples"""
-
-    def set_auth_delegator(self, auth_delegator):
-        self._auth_delegator = auth_delegator
-
-    def set_agent_delegator(self, agent_delegator):
-        self._agent_delegator = agent_delegator
-
-    @property
-    def auth_delegator(self):
-        return self._auth_delegator
-
-    @property
-    def agent_delegator(self):
-        return self._agent_delegator
-
-    @property
-    def project_id(self):
-        return self.auth_delegator.project_id
-
-    @property
-    def location(self):
-        return self.auth_delegator.location
-
-    @property
-    def start_flow(self):
-        return self.agent_delegator.start_flow
-
-
 class ClientDelegator:
 
     _CLIENT_CLASS = object  # Override in subclass
 
-    def __init__(self, controller: DialogflowSample, client=None, display_name=None):
+    def __init__(self, controller: ds.DialogflowSample, client=None, display_name=None):
         self.controller = controller
         self._client = client
         self._display_name = display_name
@@ -107,7 +78,7 @@ class AgentDelegator(ClientDelegator):
     _DEFAULT_TIME_ZONE = "America/Los_Angeles"
     _CLIENT_CLASS = AgentsClient
 
-    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+    def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         super().__init__(controller, **kwargs)
         self.default_language_code = kwargs.get(
             "default_language_code", self._DEFAULT_LANGUAGE_CODE
@@ -181,7 +152,7 @@ class AuthDelegator:
 
     def __init__(
         self,
-        controller: DialogflowSample,
+        controller: ds.DialogflowSample,
         project_id=None,
         quota_project_id=None,
         credentials=None,
@@ -204,7 +175,7 @@ class WebhookDelegator(ClientDelegator):
 
     _CLIENT_CLASS = WebhooksClient
 
-    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+    def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         self._uri = kwargs.pop("uri")
         super().__init__(controller, **kwargs)
 
@@ -252,7 +223,7 @@ class IntentDelegator(ClientDelegator):
 
     _CLIENT_CLASS = IntentsClient
 
-    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+    def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         super().__init__(controller, **kwargs)
 
     @property
@@ -311,7 +282,7 @@ class PageDelegator(ClientDelegator):
 
     _CLIENT_CLASS = PagesClient
 
-    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+    def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         self._page = None
         self._entry_fulfillment = None
         super().__init__(controller, **kwargs)
@@ -395,7 +366,7 @@ class PageDelegator(ClientDelegator):
 
 
 class StartPageDelegator(PageDelegator):
-    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+    def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         super().__init__(controller, **kwargs)
 
     @property
@@ -404,7 +375,7 @@ class StartPageDelegator(PageDelegator):
 
 
 class FulfillmentPageDelegator(PageDelegator):
-    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+    def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         self._entry_fulfillment_text = kwargs.pop("entry_fulfillment_text")
         self._webhook_delegator = kwargs.pop("webhook_delegator", None)
         self._tag = kwargs.pop("tag", None)
@@ -432,7 +403,7 @@ class StartFlowDelegator(ClientDelegator):
 
     _CLIENT_CLASS = FlowsClient
 
-    def __init__(self, controller: DialogflowSample, **kwargs) -> None:
+    def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         super().__init__(controller)
         self._flow = None
 
