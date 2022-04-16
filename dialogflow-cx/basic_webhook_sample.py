@@ -1,7 +1,13 @@
+import agent_delegator as agd
+import auth_delegator as ad
 import dialogflow_sample as ds
-import sample_base as sb
+import intent_delegator as idy
+import page_delegator as pd
+import start_flow_delegator as sfd
 import test_case_delegator as tcd
+import turn
 import webhook.main as wh
+import webhook_delegator as wd
 from utilities import RequestMock
 
 
@@ -58,7 +64,7 @@ class BasicWebhookSample(ds.DialogflowSample):
         agent_display_name=None,
     ):
         self.set_auth_delegator(
-            sb.AuthDelegator(
+            ad.AuthDelegator(
                 self,
                 project_id=project_id,
                 quota_project_id=quota_project_id,
@@ -66,27 +72,27 @@ class BasicWebhookSample(ds.DialogflowSample):
             )
         )
         self.set_agent_delegator(
-            sb.AgentDelegator(self, display_name=agent_display_name)
+            agd.AgentDelegator(self, display_name=agent_display_name)
         )
-        self.webhook_delegator = sb.WebhookDelegator(
+        self.webhook_delegator = wd.WebhookDelegator(
             self, display_name=self._WEBHOOK_DISPLAY_NAME, uri=webhook_uri
         )
-        self.intent_delegator = sb.IntentDelegator(
+        self.intent_delegator = idy.IntentDelegator(
             self, display_name=self._INTENT_DISPLAY_NAME
         )
-        self.page_delegator = sb.FulfillmentPageDelegator(
+        self.page_delegator = pd.FulfillmentPageDelegator(
             self,
             display_name=self._PAGE_DISPLAY_NAME,
             entry_fulfillment_text=self._PAGE_ENTRY_FULFILLMENT_TEXT,
             webhook_delegator=self.webhook_delegator,
             tag=self._PAGE_WEBHOOK_ENTRY_TAG,
         )
-        self.start_flow_delegator = sb.StartFlowDelegator(self)
+        self.start_flow_delegator = sfd.StartFlowDelegator(self)
 
         self.test_case_delegators = {}
         for display_name, test_config in self.TEST_CASES.items():
 
-            curr_turn = sb.Turn(
+            curr_turn = turn.Turn(
                 test_config["input_text"],
                 test_config["expected_response_text"],
                 self.page_delegator,

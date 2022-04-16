@@ -1,9 +1,9 @@
 import time
 
+import client_delegator as cd
 import dialogflow_sample as ds
 import google.api_core.exceptions
 import google.auth
-import sample_base as sb
 from google.cloud.dialogflowcx import (
     BatchDeleteTestCasesRequest,
     GetTestCaseRequest,
@@ -20,7 +20,7 @@ class DialogflowTestCaseFailure(Exception):
     """Exception to raise when a test case fails"""
 
 
-class TestCaseDelegator(sb.ClientDelegator):
+class TestCaseDelegator(cd.ClientDelegator):
 
     _CLIENT_CLASS = TestCasesClient
 
