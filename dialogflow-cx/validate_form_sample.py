@@ -1,4 +1,5 @@
 import sample_base as sb
+import test_case_delegator as tcd
 from google.cloud.dialogflowcx import Form, Fulfillment, ResponseMessage
 
 
@@ -38,7 +39,7 @@ class ValidateFormSample(sb.DialogflowSample):
                 [_PAGE_ENTRY_FULFILLMENT_TEXT, "What is your age?"],
                 ["Form Filled", "Age -1 not valid (must be positive)"],
             ],
-            "expected_exception": sb.DialogflowTestCaseFailure,
+            "expected_exception": tcd.DialogflowTestCaseFailure,
         },
     }
 
@@ -89,7 +90,7 @@ class ValidateFormSample(sb.DialogflowSample):
             )
             conversation_turns = [turn_0, turn_1]
 
-            self.test_case_delegators[display_name] = sb.TestCaseDelegator(
+            self.test_case_delegators[display_name] = tcd.TestCaseDelegator(
                 self,
                 is_webhook_enabled=True,
                 display_name=display_name,

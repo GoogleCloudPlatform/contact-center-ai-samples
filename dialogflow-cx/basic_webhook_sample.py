@@ -1,4 +1,5 @@
 import sample_base as sb
+import test_case_delegator as tcd
 import webhook.main as wh
 from utilities import RequestMock
 
@@ -44,7 +45,7 @@ class BasicWebhookSample(sb.DialogflowSample):
         "Test Case XFAIL": {
             "input_text": "FAIL",
             "expected_response_text": ["FAIL"],
-            "expected_exception": sb.DialogflowTestCaseFailure,
+            "expected_exception": tcd.DialogflowTestCaseFailure,
         },
     }
 
@@ -92,7 +93,7 @@ class BasicWebhookSample(sb.DialogflowSample):
             )
             conversation_turns = [curr_turn]
 
-            self.test_case_delegators[display_name] = sb.TestCaseDelegator(
+            self.test_case_delegators[display_name] = tcd.TestCaseDelegator(
                 self,
                 is_webhook_enabled=True,
                 display_name=display_name,

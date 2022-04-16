@@ -20,6 +20,7 @@ from contextlib import ExitStack
 
 import mock
 import pytest
+import test_case_delegator as tcd
 from basic_webhook_sample import BasicWebhookSample
 from common import patch_client
 from google.api_core.operation import Operation
@@ -36,7 +37,6 @@ from google.cloud.dialogflowcx import (
     TestRunDifference,
     Webhook,
 )
-from sample_base import DialogflowTestCaseFailure
 from webhook.main import get_webhook_uri
 
 
@@ -177,7 +177,7 @@ def test_basic_webhook_hermetic(differences, test_result, xfail):
         sample.initialize()
         for test_case_delegator in sample.test_case_delegators.values():
             if xfail:
-                with pytest.raises(DialogflowTestCaseFailure):
+                with pytest.raises(tcd.DialogflowTestCaseFailure):
                     test_case_delegator.run_test_case(wait=0)
             else:
                 test_case_delegator.run_test_case(wait=0)
