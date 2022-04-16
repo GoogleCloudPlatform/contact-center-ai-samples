@@ -16,20 +16,28 @@
 
 import os
 import uuid
-
-
-import mock
 from contextlib import ExitStack
 
-from google.cloud.dialogflowcx import Agent, Webhook, Intent, Page, Flow, TestCase, RunTestCaseResponse, TestCaseResult, TestResult, ConversationTurn, TestRunDifference
-
-from common import patch_client
-
+import mock
 import pytest
 from basic_webhook_sample import BasicWebhookSample
+from common import patch_client
+from google.api_core.operation import Operation
+from google.cloud.dialogflowcx import (
+    Agent,
+    ConversationTurn,
+    Flow,
+    Intent,
+    Page,
+    RunTestCaseResponse,
+    TestCase,
+    TestCaseResult,
+    TestResult,
+    TestRunDifference,
+    Webhook,
+)
 from sample_base import DialogflowTestCaseFailure
 from webhook.main import get_webhook_uri
-from google.api_core.operation import Operation
 
 
 @pytest.fixture(scope="session")
@@ -77,69 +85,95 @@ def test_basic_webhook_integration(test_case_display_name, webhook_sample):
         test_case_delegator.run_test_case(wait=10)
 
 
-
 @pytest.mark.hermetic
-@pytest.mark.parametrize("differences,test_result,xfail", (
-    ([TestRunDifference(description='XFAIL')], TestResult.FAILED, True),
-    ([TestRunDifference(description='XFAIL')], TestResult.PASSED, True),
-    ([], TestResult.FAILED, True),
-    ([], TestResult.PASSED, False),
-))
+@pytest.mark.parametrize(
+    "differences,test_result,xfail",
+    (
+        ([TestRunDifference(description="XFAIL")], TestResult.FAILED, True),
+        ([TestRunDifference(description="XFAIL")], TestResult.PASSED, True),
+        ([], TestResult.FAILED, True),
+        ([], TestResult.PASSED, False),
+    ),
+)
 def test_basic_webhook_hermetic(differences, test_result, xfail):
     sample = BasicWebhookSample(
-        agent_display_name=f"MOCK_AGENT_DISPLAY_NAME",
+        agent_display_name="MOCK_AGENT_DISPLAY_NAME",
         project_id=-1,
         webhook_uri="MOCK_WEBHOOK_URI",
     )
     sample.TEST_CASES = {
         "Test Case 0": {
-            "input_text": 'MOCK_INPUT_TEXT',
-            "expected_response_text": ['MOCK_EXPECTED_RESPONSE_TEXT'],
+            "input_text": "MOCK_INPUT_TEXT",
+            "expected_response_text": ["MOCK_EXPECTED_RESPONSE_TEXT"],
         },
     }
     with ExitStack() as stack:
-        patch_client(sample.agent_delegator.client, 'create_agent', stack,
-            return_value=Agent(name='MOCK_AGENT_NAME')
+        patch_client(
+            sample.agent_delegator.client,
+            "create_agent",
+            stack,
+            return_value=Agent(name="MOCK_AGENT_NAME"),
         )
-        patch_client(sample.webhook_delegator.client, 'create_webhook', stack,
-            return_value=Webhook(name='MOCK_WEBHOOK_NAME')
+        patch_client(
+            sample.webhook_delegator.client,
+            "create_webhook",
+            stack,
+            return_value=Webhook(name="MOCK_WEBHOOK_NAME"),
         )
-        patch_client(sample.intent_delegator.client, 'create_intent', stack,
-            return_value=Intent(name='MOCK_INTENT_NAME')
+        patch_client(
+            sample.intent_delegator.client,
+            "create_intent",
+            stack,
+            return_value=Intent(name="MOCK_INTENT_NAME"),
         )
-        patch_client(sample.page_delegator.client, 'create_page', stack,
-            return_value=Page(name='MOCK_PAGE_NAME')
+        patch_client(
+            sample.page_delegator.client,
+            "create_page",
+            stack,
+            return_value=Page(name="MOCK_PAGE_NAME"),
         )
-        patch_client(sample.start_flow_delegator.client, 'get_flow', stack,
-            return_value=Flow(name='MOCK_FLOW_NAME')
+        patch_client(
+            sample.start_flow_delegator.client,
+            "get_flow",
+            stack,
+            return_value=Flow(name="MOCK_FLOW_NAME"),
         )
-        patch_client(sample.start_flow_delegator.client, 'update_flow', stack)
-        patch_client(sample.page_delegator.client, 'delete_page', stack)
-        patch_client(sample.intent_delegator.client, 'delete_intent', stack)
-        patch_client(sample.webhook_delegator.client, 'delete_webhook', stack)
-        patch_client(sample.agent_delegator.client, 'delete_agent', stack)
+        patch_client(sample.start_flow_delegator.client, "update_flow", stack)
+        patch_client(sample.page_delegator.client, "delete_page", stack)
+        patch_client(sample.intent_delegator.client, "delete_intent", stack)
+        patch_client(sample.webhook_delegator.client, "delete_webhook", stack)
+        patch_client(sample.agent_delegator.client, "delete_agent", stack)
         for test_case_delegator in sample.test_case_delegators.values():
-            patch_client(test_case_delegator.client, 'create_test_case', stack, return_value=
-                TestCase(
-                    name='MOCK_TEST_CASE_NAME',
-                    display_name='MOCK_TEST_CASE_DISPLAY_NAME',
-                )
+            patch_client(
+                test_case_delegator.client,
+                "create_test_case",
+                stack,
+                return_value=TestCase(
+                    name="MOCK_TEST_CASE_NAME",
+                    display_name="MOCK_TEST_CASE_DISPLAY_NAME",
+                ),
             )
-            patch_client(test_case_delegator.client, 'batch_delete_test_cases', stack)
+            patch_client(test_case_delegator.client, "batch_delete_test_cases", stack)
+
             def result():
                 return RunTestCaseResponse(
                     result=TestCaseResult(
                         test_result=test_result,
                         conversation_turns=[
                             ConversationTurn(
-                                virtual_agent_output=ConversationTurn.VirtualAgentOutput(differences=differences)
+                                virtual_agent_output=ConversationTurn.VirtualAgentOutput(
+                                    differences=differences
+                                )
                             )
                         ],
                     )
                 )
+
             lro = mock.create_autospec(Operation, instance=True, spec_set=True)
             lro.result = result
-            patch_client(test_case_delegator.client, 'run_test_case', stack, return_value=lro)
+            patch_client(
+                test_case_delegator.client, "run_test_case", stack, return_value=lro
+            )
         sample.initialize()
         for test_case_delegator in sample.test_case_delegators.values():
             if xfail:
