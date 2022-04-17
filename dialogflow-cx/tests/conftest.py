@@ -13,13 +13,13 @@
 # limitations under the License.
 
 """Module providing fixtures for the entire test directory."""
+import os
+import uuid
 from typing import Generator
 
 import pytest
-
-# from webhook_sample import DialogflowController
-from google.auth import credentials as ga_credentials
 from utilities import RequestMock
+from webhook.main import get_webhook_uri
 
 
 @pytest.fixture(scope="function")
@@ -30,30 +30,20 @@ def mocked_request() -> Generator[RequestMock, None, None]:
 
 
 @pytest.fixture(scope="session")
-def project_id() -> str:
-    return "MOCK_PROJECT_ID_FIXTURE"
+def session_uuid():
+    return uuid.uuid4()
 
 
 @pytest.fixture(scope="session")
-def mock_project_id_env() -> str:
-    return "MOCK_PROJECT_ID_ENV"
+def project_id():
+    return os.environ["PROJECT_ID"]
 
 
-@pytest.fixture(scope="function")
-def mock_credentials() -> Generator[ga_credentials.Credentials, None, None]:
-    credentials = ga_credentials.AnonymousCredentials()
-    yield credentials
-    del credentials
+@pytest.fixture(scope="session")
+def build_uuid():
+    return os.environ["BUILD_UUID"]
 
 
-# @pytest.fixture()
-# def mock_settings_env_vars(mock_project_id_env):
-#     with mock.patch.dict(os.environ, {PROJECT: mock_project_id_env}):
-#         yield
-
-
-# @pytest.fixture(scope='function')
-# def controller(project_id) -> DialogflowController:
-#   dfc = DialogflowController(project_id=project_id)
-#   yield dfc
-#   del dfc
+@pytest.fixture(scope="session")
+def webhook_uri(project_id, build_uuid):
+    return get_webhook_uri(project_id, build_uuid)

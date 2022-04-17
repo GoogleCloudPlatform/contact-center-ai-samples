@@ -26,3 +26,8 @@ class DialogflowSample:
     @property
     def start_flow(self):
         return self.agent_delegator.start_flow
+
+    def run(self):
+        for test_case_delegator in self.test_case_delegators.values():
+            if not test_case_delegator.expected_exception:
+                test_case_delegator.run_test_case()

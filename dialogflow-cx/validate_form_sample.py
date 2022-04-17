@@ -181,9 +181,5 @@ if __name__ == "__main__":
 
     sample = ValidateFormSample(**vars(parser.parse_args()))
     sample.initialize()
-    for test_case_delegator in sample.test_case_delegators.values():
-        if test_case_delegator.expected_exception:
-            continue
-        else:
-            test_case_delegator.run_test_case()
+    sample.run()
     sample.tear_down()

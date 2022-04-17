@@ -1,7 +1,6 @@
 import client_delegator as cd
 import dialogflow_sample as ds
 import google.api_core.exceptions
-import google.auth
 from google.cloud.dialogflowcx import (
     DeletePageRequest,
     Form,

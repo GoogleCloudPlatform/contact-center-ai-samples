@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Owlbot code patching and code formatting configuration module."""
+
 import synthtool as s
-import synthtool.gcp as gcp
+from synthtool import gcp
 
 templated_files = gcp.CommonTemplates().py_library()
 
