@@ -1,3 +1,19 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Helper functions for creating and testing Dialogflow CX samples."""
+
 from contextlib import ExitStack
 from dataclasses import dataclass, field
 from typing import Mapping
@@ -23,13 +39,17 @@ from google.cloud.dialogflowcx import (
 
 @dataclass
 class RequestMock:
+    """Mocks a flask.Request interface for testing webhooks."""
+
     payload: Mapping[str, Mapping[str, str]] = field(default_factory=dict)
 
     def get_json(self) -> Mapping:
+        """Method for returning the payload via the get_json interface."""
         return self.payload
 
 
 def patch_client(client, method_name, stack, return_value=None):
+    """Patches the Dialogflow CX client object for hermetic testing."""
     stack.enter_context(
         mock.patch.object(
             client,
@@ -48,6 +68,7 @@ hermetic_test_cases = (
 
 
 def run_hermetic_test(sample, differences, test_result, xfail):
+    """Drives a hermetic sample test suite by mocking out client interactions."""
     sample.TEST_CASES = {
         "Test Case 0": {
             "input_text": "MOCK_INPUT_TEXT",
@@ -130,10 +151,3 @@ def run_hermetic_test(sample, differences, test_result, xfail):
             else:
                 test_case_delegator.run_test_case(wait=0)
         sample.tear_down()
-
-
-def yield_sample(sample):
-    sample.initialize()
-    yield sample
-    sample.tear_down()
-    del sample

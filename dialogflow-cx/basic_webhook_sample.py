@@ -1,3 +1,19 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Dialogflow CX Sample: Entry fullfillment with a webhook."""
+
 import agent_delegator as agd
 import auth_delegator as ad
 import dialogflow_sample as ds
@@ -12,6 +28,7 @@ from utilities import RequestMock
 
 
 def get_expected_response(tag, input_text):
+    """Gets the response expected from the webhook, for a given tag."""
     return wh.extract_text(
         wh.webhook_fcn(
             RequestMock(payload=wh.build_request_dict_basic(tag, input_text))
@@ -20,6 +37,7 @@ def get_expected_response(tag, input_text):
 
 
 class BasicWebhookSample(ds.DialogflowSample):
+    """Sets up a Dialogflow agent that uses a webhook to provide an entry fulfillment."""
 
     _WEBHOOK_DISPLAY_NAME = "Webhook 1"
     _INTENT_DISPLAY_NAME = "go-to-example-page"
@@ -109,6 +127,7 @@ class BasicWebhookSample(ds.DialogflowSample):
             )
 
     def initialize(self):
+        """Initializes the sample by communicating with the Dialogflow API."""
         self.agent_delegator.initialize()
         self.webhook_delegator.initialize()
         self.intent_delegator.initialize(self._INTENT_TRAINING_PHRASES_TEXT)
@@ -122,6 +141,7 @@ class BasicWebhookSample(ds.DialogflowSample):
             test_case_delegator.initialize()
 
     def tear_down(self):
+        """Deletes the sample components via the Dialogflow API."""
         for test_case_delegator in self.test_case_delegators.values():
             test_case_delegator.tear_down()
         self.page_delegator.tear_down()

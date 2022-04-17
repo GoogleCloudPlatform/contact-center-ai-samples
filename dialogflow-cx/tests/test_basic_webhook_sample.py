@@ -17,7 +17,7 @@
 
 import pytest
 from basic_webhook_sample import BasicWebhookSample
-from utilities import hermetic_test_cases, run_hermetic_test, yield_sample
+from utilities import hermetic_test_cases, run_hermetic_test
 
 
 @pytest.fixture(scope="session")
@@ -27,7 +27,10 @@ def webhook_sample(session_uuid, project_id, webhook_uri):
         project_id=project_id,
         webhook_uri=webhook_uri,
     )
-    yield_sample(sample)
+    sample.initialize()
+    yield sample
+    sample.tear_down()
+    del sample
 
 
 @pytest.mark.integration

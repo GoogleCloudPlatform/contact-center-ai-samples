@@ -1,3 +1,19 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Dialogflow CX Sample: Form validation with a webhook."""
+
 import agent_delegator as agd
 import auth_delegator as ad
 import dialogflow_sample as ds
@@ -10,11 +26,8 @@ import webhook_delegator as wd
 from google.cloud.dialogflowcx import Form, Fulfillment, ResponseMessage
 
 
-def get_expected_response(tag, input_text):
-    return "What is your age?"
-
-
 def build_fulfillment(text=None, webhook=None, tag=None):
+    """Helper method that provides a Fulfillment based on text, webhook and tag."""
     return Fulfillment(
         webhook=webhook,
         tag=tag,
@@ -23,6 +36,7 @@ def build_fulfillment(text=None, webhook=None, tag=None):
 
 
 class ValidateFormSample(ds.DialogflowSample):
+    """Sets up a Dialogflow agent that uses a webhook to validate a form parameter."""
 
     _WEBHOOK_DISPLAY_NAME = "Validate form"
     _INTENT_DISPLAY_NAME = "go-to-example-page"
@@ -30,12 +44,13 @@ class ValidateFormSample(ds.DialogflowSample):
     _PAGE_DISPLAY_NAME = "Main Page"
     _PAGE_ENTRY_FULFILLMENT_TEXT = f"Entering {_PAGE_DISPLAY_NAME}"
     _PAGE_WEBHOOK_ENTRY_TAG = "validate_form"
+    _PAGE_PROMPT = "What is your age?"
 
     TEST_CASES = {
         "Test Case 0": {
             "input_text": ["trigger_intent", "21"],
             "expected_response_text": [
-                [_PAGE_ENTRY_FULFILLMENT_TEXT, "What is your age?"],
+                [_PAGE_ENTRY_FULFILLMENT_TEXT, _PAGE_PROMPT],
                 ["Form Filled", "Valid age"],
             ],
             "expected_exception": None,
@@ -43,7 +58,7 @@ class ValidateFormSample(ds.DialogflowSample):
         "Test Case 1": {
             "input_text": ["trigger_intent", "-1"],
             "expected_response_text": [
-                [_PAGE_ENTRY_FULFILLMENT_TEXT, "What is your age?"],
+                [_PAGE_ENTRY_FULFILLMENT_TEXT, _PAGE_PROMPT],
                 ["Form Filled", "Age -1 not valid (must be positive)"],
             ],
             "expected_exception": tcd.DialogflowTestCaseFailure,
@@ -106,6 +121,7 @@ class ValidateFormSample(ds.DialogflowSample):
             )
 
     def initialize(self):
+        """Initializes the sample by communicating with the Dialogflow API."""
         self.agent_delegator.initialize()
         self.webhook_delegator.initialize()
         self.intent_delegator.initialize(self._INTENT_TRAINING_PHRASES_TEXT)
@@ -120,7 +136,7 @@ class ValidateFormSample(ds.DialogflowSample):
             required=True,
             entity_type="projects/-/locations/-/agents/-/entityTypes/sys.number",
             fill_behavior=Form.Parameter.FillBehavior(
-                initial_prompt_fulfillment=build_fulfillment(text=["What is your age?"])
+                initial_prompt_fulfillment=build_fulfillment(text=[self._PAGE_PROMPT])
             ),
             default_value=None,
             redact=False,
@@ -139,6 +155,7 @@ class ValidateFormSample(ds.DialogflowSample):
             test_case_delegator.initialize()
 
     def tear_down(self):
+        """Deletes the sample components via the Dialogflow API."""
         for test_case_delegator in self.test_case_delegators.values():
             test_case_delegator.tear_down()
         self.page_delegator.tear_down()

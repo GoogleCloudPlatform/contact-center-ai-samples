@@ -18,7 +18,7 @@ import json
 
 
 def basic_webhook(request):
-    """main handles a Dialogflow CX webhook request"""
+    """Handles a Dialogflow CX webhook request."""
     request_dict = request.get_json()
     tag = request_dict["fulfillmentInfo"]["tag"]
     user_query = request_dict["text"]
@@ -39,6 +39,7 @@ def basic_webhook(request):
 
 
 def echo_webhook(request):
+    """Echos the request that was received."""
     request_dict = request.get_json()
     request_json = json.dumps(request_dict)
     return json.dumps(
@@ -57,6 +58,7 @@ def echo_webhook(request):
 
 
 def validate_form(request):
+    """Validates that an age parameter from a form is sensible."""
     request_dict = request.get_json()
     parameter_info_list = request_dict["pageInfo"]["formInfo"]["parameterInfo"]
 
@@ -81,50 +83,53 @@ def validate_form(request):
                 }
             }
         )
-    else:
-        return json.dumps(
-            {
-                "fulfillment_response": {
-                    "messages": [
-                        {
-                            "text": {
-                                "text": ["Valid age"],
-                            }
+    return json.dumps(
+        {
+            "fulfillment_response": {
+                "messages": [
+                    {
+                        "text": {
+                            "text": ["Valid age"],
                         }
-                    ]
-                }
+                    }
+                ]
             }
-        )
+        }
+    )
 
 
 def webhook_fcn(request):
+    """Delegates a request to an appropriate function, based on tag."""
     request_dict = request.get_json()
     tag = request_dict["fulfillmentInfo"]["tag"]
     if tag == "echo_webhook":
         return echo_webhook(request)
-    elif tag == "basic_webhook":
+    if tag == "basic_webhook":
         return basic_webhook(request)
-    elif tag == "validate_form":
+    if tag == "validate_form":
         return validate_form(request)
-    else:
-        raise RuntimeError(f"Unrecognized tag: {tag}")
+    raise RuntimeError(f"Unrecognized tag: {tag}")
 
 
-def get_webhook_entrypoint():
+def get_webhook_entrypoint() -> str:
+    """Retursn the entrypoint for the main webhook delegator function."""
     return webhook_fcn.__name__
 
 
 def get_webhook_name(build_uuid):
+    """Builds a standardized webhook name for interaction with Cloud Functions."""
     entry_point = get_webhook_entrypoint()
     return f"{entry_point}_{build_uuid}"
 
 
 def get_webhook_uri(project_id, build_uuid, region="us-central1"):
+    """Returns the URI of the webhook deployed to Cloud Functions."""
     webhook_name = get_webhook_name(build_uuid)
     return f"https://{region}-{project_id}.cloudfunctions.net/{webhook_name}"
 
 
 def build_request_dict_basic(tag, text):
+    """Builds a dictionary matches the json structure of a Dialogflow request."""
     request_mapping = {"fulfillmentInfo": {}}
     request_mapping["fulfillmentInfo"]["tag"] = tag
     request_mapping["text"] = text
@@ -132,6 +137,7 @@ def build_request_dict_basic(tag, text):
 
 
 def extract_text(response_json: str, message_index=0):
+    """Extracts the text response from the json response of a Dialogflow webhook."""
     response = json.loads(response_json)
     messages = response["fulfillment_response"]["messages"]
     return messages[message_index]["text"]["text"][0]

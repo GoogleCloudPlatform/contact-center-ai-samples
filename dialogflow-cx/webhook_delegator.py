@@ -1,3 +1,19 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Dialogflow Webhooks API interactions."""
+
 import client_delegator as cd
 import dialogflow_sample as ds
 import google.api_core.exceptions
@@ -12,21 +28,24 @@ from google.cloud.dialogflowcx import (
 
 
 class WebhookDelegator(cd.ClientDelegator):
+    """Class for organizing interactions with the Dialogflow Webhooks API."""
 
     _CLIENT_CLASS = WebhooksClient
 
     def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         self._uri = kwargs.pop("uri")
+        self._webhook = None
         super().__init__(controller, **kwargs)
 
     @property
     def webhook(self):
+        """Webhook set in Dialogflow."""
         if not self._webhook:
             raise RuntimeError("Webhook not yet created")
         return self._webhook
 
     def initialize(self):
-        """Initializes an agent to use for the sample."""
+        """Initializes the webhook delegator."""
         webhook = Webhook(
             {
                 "display_name": self.display_name,
@@ -51,6 +70,7 @@ class WebhookDelegator(cd.ClientDelegator):
                     break
 
     def tear_down(self):
+        """Destroys the Dialogflow webhook."""
         request = DeleteWebhookRequest(name=self.webhook.name)
         try:
             self.client.delete_webhook(request=request)
