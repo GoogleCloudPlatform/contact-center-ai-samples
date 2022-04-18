@@ -50,7 +50,7 @@ to create a webhook for a
 1. Clone this repository and enter the folder containing the sample code:
    ```bash
    git clone https://github.com/GoogleCloudPlatform/contact-center-ai-samples.git
-   cd contact-center-ai-samples/dialogflow-cx-webhook-python
+   cd contact-center-ai-samples/dialogflow-cx
    ```
 1. Deploy the Cloud Function:
    Here `<REGION>` is the Google Cloud region of your function and

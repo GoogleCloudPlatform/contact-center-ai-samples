@@ -29,7 +29,7 @@ The repository contains samples, tutorials, and demos that demonstrate how to us
 
 ## Samples
 
-* [Dialogflow CX Webhook Python Sample](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx-webhook-python): This project uses Google Cloud Functions to create a webhook for a Dialogflow CX agent
+* [Dialogflow CX Webhook Python Sample](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx): This project uses Google Cloud Functions to create a webhook for a Dialogflow CX agent
 
 ## Contributing
 

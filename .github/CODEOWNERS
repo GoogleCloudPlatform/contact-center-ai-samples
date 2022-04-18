@@ -22,4 +22,4 @@
 *     @GoogleCloudPlatform/ml-apis
 
 # @nicain is the default owner for the Dialogflow CX webhook python sample
-/dialogflow-cx-webhook-python/ @nicain
+/dialogflow-cx/ @nicain
