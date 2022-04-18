@@ -143,7 +143,7 @@ def run_hermetic_test(sample, differences, test_result, xfail):
             patch_client(
                 test_case_delegator.client, "run_test_case", stack, return_value=lro
             )
-        sample.initialize()
+        sample.setup()
         for test_case_delegator in sample.test_case_delegators.values():
             if xfail:
                 with pytest.raises(tcd.DialogflowTestCaseFailure):

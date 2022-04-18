@@ -47,7 +47,7 @@ class IntentDelegator(cd.ClientDelegator):
             raise RuntimeError("Intent not yet created")
         return self._intent
 
-    def initialize(self):
+    def setup(self):
         """Initializes the intent delegator."""
         training_phrases = []
         for training_phrase_text in self.training_phrases:

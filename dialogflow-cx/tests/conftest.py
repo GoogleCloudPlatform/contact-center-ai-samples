@@ -65,7 +65,7 @@ def validate_form_webhook_sample(session_uuid, project_id, webhook_uri):
         quota_project_id=project_id,
         webhook_uri=webhook_uri,
     )
-    sample.initialize()
+    sample.setup()
     yield sample
     sample.tear_down()
     del sample
@@ -80,7 +80,7 @@ def basic_webhook_sample(session_uuid, project_id, webhook_uri):
         quota_project_id=project_id,
         webhook_uri=webhook_uri,
     )
-    sample.initialize()
+    sample.setup()
     yield sample
     sample.tear_down()
     del sample

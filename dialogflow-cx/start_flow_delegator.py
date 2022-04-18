@@ -35,7 +35,7 @@ class StartFlowDelegator(cd.ClientDelegator):
             raise RuntimeError("Flow not yet created")
         return self._flow
 
-    def initialize(self):
+    def setup(self):
         """Initializes the start flow delegator."""
         flow_name = self.controller.start_flow
         self._flow = self.client.get_flow(name=flow_name)

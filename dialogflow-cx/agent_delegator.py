@@ -43,7 +43,7 @@ class AgentDelegator(cd.ClientDelegator):
         )
         self.time_zone = kwargs.get("time_zone", self._DEFAULT_TIME_ZONE)
 
-    def initialize(self):
+    def setup(self):
         """Initializes the agent delegator."""
         try:
             agent = Agent(

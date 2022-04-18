@@ -44,7 +44,7 @@ class WebhookDelegator(cd.ClientDelegator):
             raise RuntimeError("Webhook not yet created")
         return self._webhook
 
-    def initialize(self):
+    def setup(self):
         """Initializes the webhook delegator."""
         webhook = Webhook(
             {

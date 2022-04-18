@@ -57,7 +57,7 @@ class PageDelegator(cd.ClientDelegator):
         """Accesses the entry fullfillment set for this page."""
         return self._entry_fulfillment
 
-    def initialize(self):
+    def setup(self):
         """Initializes the page delegator."""
         page = Page(
             display_name=self.display_name,
@@ -130,7 +130,7 @@ class FulfillmentPageDelegator(PageDelegator):
         self._tag = kwargs.pop("tag", None)
         super().__init__(controller, **kwargs)
 
-    def initialize(self):
+    def setup(self):
         """Initializes the fulfillment page delegator."""
         webhook_name = (
             self._webhook_delegator.webhook.name if self._webhook_delegator else None
@@ -146,4 +146,4 @@ class FulfillmentPageDelegator(PageDelegator):
                 "tag": self._tag,
             }
         )
-        super().initialize()
+        super().setup()

@@ -55,7 +55,7 @@ class TestCaseDelegator(cd.ClientDelegator):
             raise RuntimeError("Test Case not yet created")
         return self._test_case
 
-    def initialize(self):
+    def setup(self):
         """Initializes the test cases delegator."""
         try:
             self._test_case = self.client.create_test_case(

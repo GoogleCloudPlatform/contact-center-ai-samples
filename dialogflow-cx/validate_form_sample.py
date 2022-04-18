@@ -122,13 +122,13 @@ class ValidateFormSample(ds.DialogflowSample):
                 expected_exception=test_config["expected_exception"],
             )
 
-    def initialize(self):
+    def setup(self):
         """Initializes the sample by communicating with the Dialogflow API."""
-        self.agent_delegator.initialize()
-        self.webhook_delegator.initialize()
-        self.intent_delegator.initialize()
-        self.page_delegator.initialize()
-        self.start_flow_delegator.initialize()
+        self.agent_delegator.setup()
+        self.webhook_delegator.setup()
+        self.intent_delegator.setup()
+        self.page_delegator.setup()
+        self.start_flow_delegator.setup()
         self.start_flow_delegator.append_transition_route(
             target_page=self.page_delegator.page.name,
             intent=self.intent_delegator.intent.name,
@@ -154,7 +154,7 @@ class ValidateFormSample(ds.DialogflowSample):
             ),
         )
         for test_case_delegator in self.test_case_delegators.values():
-            test_case_delegator.initialize()
+            test_case_delegator.setup()
 
     def tear_down(self):
         """Deletes the sample components via the Dialogflow API."""
@@ -199,6 +199,6 @@ if __name__ == "__main__":
     )
 
     sample = ValidateFormSample(**vars(parser.parse_args()))
-    sample.initialize()
+    sample.setup()
     sample.run()
     sample.tear_down()
