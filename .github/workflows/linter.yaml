@@ -73,3 +73,4 @@ jobs:
           PYTHON_BLACK_CONFIG_FILE: pyproject.toml
           PYTHON_ISORT_CONFIG_FILE: pyproject.toml
           JSCPD_CONFIG_FILE: .jscpd.json
+          FILTER_REGEX_EXCLUDE: noxfile.py

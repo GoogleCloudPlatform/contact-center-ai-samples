@@ -96,7 +96,7 @@ module "gh_oidc" {
   sa_mapping = {
     (google_service_account.oidc_sa.account_id) = {
       sa_name   = google_service_account.oidc_sa.name
-      attribute = "attribute.repository/nicain/contact-center-ai-samples"
+      attribute = "attribute.repository/GoogleCloudPlatform/contact-center-ai-samples"
     }
   }
 }
