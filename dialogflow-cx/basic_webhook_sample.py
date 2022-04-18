@@ -82,6 +82,8 @@ class BasicWebhookSample(ds.DialogflowSample):
         agent_display_name=None,
     ):
         super().__init__()
+        if not quota_project_id:
+            quota_project_id = project_id
         self.set_auth_delegator(
             ad.AuthDelegator(
                 self,
@@ -181,7 +183,7 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument(
-        "--quota_project-id",
+        "--quota-project-id",
         help="Quota project, if different from project-id",
         default=None,
     )
