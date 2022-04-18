@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Module for the base class for API delegators for Dialogflow CX samples."""
+
 import dialogflow_sample as ds
 
 
 class ClientDelegator:
+    """Base class for API delegators for Dialogflow CX samples."""
 
     _CLIENT_CLASS = object  # Override in subclass
 
@@ -26,10 +29,12 @@ class ClientDelegator:
 
     @property
     def client_options(self):
+        """Accesses the client_options for the delegator."""
         return {"api_endpoint": f"{self.controller.location}-dialogflow.googleapis.com"}
 
     @property
     def client(self):
+        """Accesses the API client for the delegator."""
         if self._client is None:
             self._client = self._CLIENT_CLASS(
                 client_options=self.client_options,
@@ -39,11 +44,10 @@ class ClientDelegator:
 
     @property
     def parent(self):
+        """Accesses agent name, i.e. the parent for the most delegator components."""
         return self.controller.agent_delegator.agent.name
 
     @property
     def display_name(self):
+        """Accesses the display_name for the delegator."""
         return self._display_name
-
-    def initialize(self):
-        pass

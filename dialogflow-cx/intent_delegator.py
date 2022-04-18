@@ -84,6 +84,7 @@ class IntentDelegator(cd.ClientDelegator):
                     return
 
     def tear_down(self):
+        """Destroys the Dialogflow intent."""
         request = DeleteIntentRequest(name=self.intent.name)
         try:
             self.client.delete_intent(request=request)

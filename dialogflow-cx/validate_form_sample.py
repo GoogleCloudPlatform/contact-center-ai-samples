@@ -72,6 +72,7 @@ class ValidateFormSample(ds.DialogflowSample):
         webhook_uri=None,
         agent_display_name=None,
     ):
+        super().__init__()
         self.set_auth_delegator(
             ad.AuthDelegator(
                 self,
