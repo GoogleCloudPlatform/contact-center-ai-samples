@@ -15,6 +15,11 @@
 """Module for the base class for all Dialogflow CX samples."""
 
 
+from typing import Dict
+
+import client_delegator as cd
+
+
 class DialogflowSample:
     """Base class for samples."""
 
@@ -22,7 +27,7 @@ class DialogflowSample:
         self._agent_delegator = None
         self._auth_delegator = None
         self._credentials = None
-        self.test_case_delegators = None
+        self._test_case_delegators: Dict[str, cd.ClientDelegator] = {}
 
     def set_auth_delegator(self, auth_delegator):
         """Sets the AuthDelegator for the sample."""
@@ -35,6 +40,10 @@ class DialogflowSample:
     def set_credentials(self, credentials):
         """Sets the AgentDelegator for the sample."""
         self._credentials = credentials
+
+    def add_test_case_delegator(self, name, test_case_delegators):
+        """Sets the test_case_delegators for the sample."""
+        self._test_case_delegators[name] = test_case_delegators
 
     @property
     def auth_delegator(self):
@@ -65,6 +74,11 @@ class DialogflowSample:
     def start_flow(self):
         """Accesses the start_flow for the sample."""
         return self.agent_delegator.start_flow
+
+    @property
+    def test_case_delegators(self):
+        """Accesses the test_case_delegators for the sample."""
+        return self._test_case_delegators
 
     def run(self):
         """Runs the sample test cases that are not intended to fail."""

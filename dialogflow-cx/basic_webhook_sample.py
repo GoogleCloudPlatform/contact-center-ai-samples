@@ -109,7 +109,6 @@ class BasicWebhookSample(ds.DialogflowSample):
         )
         self.start_flow_delegator = sfd.StartFlowDelegator(self)
 
-        self.test_case_delegators = {}
         for display_name, test_config in self.TEST_CASES.items():
 
             curr_turn = turn.Turn(
@@ -120,12 +119,15 @@ class BasicWebhookSample(ds.DialogflowSample):
             )
             conversation_turns = [curr_turn]
 
-            self.test_case_delegators[display_name] = tcd.TestCaseDelegator(
-                self,
-                is_webhook_enabled=True,
-                display_name=display_name,
-                conversation_turns=conversation_turns,
-                expected_exception=test_config["expected_exception"],
+            self.add_test_case_delegator(
+                display_name,
+                tcd.TestCaseDelegator(
+                    self,
+                    is_webhook_enabled=True,
+                    display_name=display_name,
+                    conversation_turns=conversation_turns,
+                    expected_exception=test_config["expected_exception"],
+                ),
             )
 
     def setup(self):
