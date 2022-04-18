@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "@google-cloud/dialogflow-cx": "^2.15.0"
+    "@google-cloud/dialogflow-cx": "^2.15.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "eslint-plugin-json": "^3.1.0"
