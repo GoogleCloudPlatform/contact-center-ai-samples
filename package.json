@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@google-cloud/dialogflow-cx": "^2.15.0"
+    "@google-cloud/dialogflow-cx": "2.15.0"
   },
   "devDependencies": {
-    "eslint-plugin-json": "^3.1.0"
+    "eslint-plugin-json": "3.1.0"
   }
 }
