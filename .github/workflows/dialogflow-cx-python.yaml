@@ -106,7 +106,7 @@ jobs:
             create_credentials_file: 'true'
             workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
             service_account: 'oidc-sa-df-3@df-terraform-dev.iam.gserviceaccount.com'
-      - name: Dowload UUID
+      - name: Download UUID
         uses: actions/download-artifact@v1
         with:
           name: shared
