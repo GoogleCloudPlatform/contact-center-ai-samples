@@ -25,7 +25,9 @@ from utilities import hermetic_test_cases, run_hermetic_test
 @pytest.mark.parametrize("test_case_display_name", BasicWebhookSample.TEST_CASES)
 def test_basic_webhook_sample(test_case_display_name, basic_webhook_sample):
     """Test the BasicWebhookSample test cases."""
-    test_case_delegator = basic_webhook_sample.test_case_delegators[test_case_display_name]
+    test_case_delegator = basic_webhook_sample.test_case_delegators[
+        test_case_display_name
+    ]
     if test_case_delegator.expected_exception:
         with pytest.raises(test_case_delegator.expected_exception):
             test_case_delegator.run_test_case()

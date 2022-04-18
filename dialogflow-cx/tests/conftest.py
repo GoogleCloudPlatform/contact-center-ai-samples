@@ -18,37 +18,41 @@ import uuid
 from typing import Generator
 
 import pytest
-from utilities import RequestMock
-from webhook.main import get_webhook_uri
-
-from validate_form_sample import ValidateFormSample
 from basic_webhook_sample import BasicWebhookSample
+from utilities import RequestMock
+from validate_form_sample import ValidateFormSample
+from webhook.main import get_webhook_uri
 
 
 @pytest.fixture(scope="function")
 def mocked_request() -> Generator[RequestMock, None, None]:
+    """Test fixture providing a mocked flask.Request interface."""
     request = RequestMock()
     yield request
     del request
 
 
-@pytest.fixture(scope="session")
-def session_uuid():
+@pytest.fixture(name="session_uuid", scope="session")
+def fixture_session_uuid():
+    """Test fixture providing a unique ID for the test session."""
     return uuid.uuid4()
 
 
-@pytest.fixture(scope="session")
-def project_id():
+@pytest.fixture(name="project_id", scope="session")
+def fixture_project_id():
+    """Test fixture providing a project ID used for testing."""
     return os.environ["PROJECT_ID"]
 
 
-@pytest.fixture(scope="session")
-def build_uuid():
+@pytest.fixture(name="build_uuid", scope="session")
+def fixture_build_uuid():
+    """Test fixture providing a unique ID for the test build."""
     return os.environ["BUILD_UUID"]
 
 
-@pytest.fixture(scope="session")
-def webhook_uri(project_id, build_uuid):
+@pytest.fixture(name="webhook_uri", scope="session")
+def fixture_webhook_uri(project_id, build_uuid):
+    """Test fixture providings the URI for the fixture webhook."""
     return get_webhook_uri(project_id, build_uuid)
 
 

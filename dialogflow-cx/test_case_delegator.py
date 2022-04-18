@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Dialogflow TestCase API interactions."""
+
 import time
 
 import client_delegator as cd
@@ -35,6 +37,7 @@ class DialogflowTestCaseFailure(Exception):
 
 
 class TestCaseDelegator(cd.ClientDelegator):
+    """Class for organizing interactions with the Dialogflow TestCases API."""
 
     _CLIENT_CLASS = TestCasesClient
 
@@ -47,11 +50,13 @@ class TestCaseDelegator(cd.ClientDelegator):
 
     @property
     def test_case(self):
+        """Test Case set in Dialogflow."""
         if not self._test_case:
             raise RuntimeError("Test Case not yet created")
         return self._test_case
 
     def initialize(self):
+        """Initializes the test cases delegator."""
         try:
             self._test_case = self.client.create_test_case(
                 parent=self.controller.agent_delegator.agent.name,
@@ -75,6 +80,7 @@ class TestCaseDelegator(cd.ClientDelegator):
                     return
 
     def tear_down(self):
+        """Destroys the test case."""
         request = BatchDeleteTestCasesRequest(
             parent=self.parent,
             names=[self.test_case.name],
@@ -86,6 +92,7 @@ class TestCaseDelegator(cd.ClientDelegator):
             pass
 
     def run_test_case(self, wait=10, max_retries=3):
+        """Runs the test case."""
         retry_count = 0
         result = None
         while retry_count < max_retries:
@@ -106,8 +113,8 @@ class TestCaseDelegator(cd.ClientDelegator):
                             f'Test "{self.test_case.display_name}" failed'
                         )
                     return
-                except google.api_core.exceptions.NotFound as e:
-                    if str(e) == (
+                except google.api_core.exceptions.NotFound as exc:
+                    if str(exc) == (
                         "404 com.google.apps.framework.request.NotFoundException: "
                         "NLU model for flow '00000000-0000-0000-0000-000000000000' does not exist. "
                         "Please try again after retraining the flow."

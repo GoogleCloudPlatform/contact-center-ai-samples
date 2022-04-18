@@ -20,15 +20,14 @@ from utilities import hermetic_test_cases, run_hermetic_test
 from validate_form_sample import ValidateFormSample
 
 
-
-
-
 @pytest.mark.integration
 @pytest.mark.flaky(max_runs=3, reruns_delay=15)
 @pytest.mark.parametrize("test_case_display_name", ValidateFormSample.TEST_CASES)
 def test_form_validation_sample(test_case_display_name, validate_form_webhook_sample):
     """Test the ValidateFormSample test cases."""
-    test_case_delegator = validate_form_webhook_sample.test_case_delegators[test_case_display_name]
+    test_case_delegator = validate_form_webhook_sample.test_case_delegators[
+        test_case_display_name
+    ]
     if test_case_delegator.expected_exception:
         with pytest.raises(test_case_delegator.expected_exception):
             test_case_delegator.run_test_case()

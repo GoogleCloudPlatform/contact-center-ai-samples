@@ -12,30 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Dialogflow Flows API interactions."""
+
 import client_delegator as cd
 import dialogflow_sample as ds
 from google.cloud.dialogflowcx import FlowsClient, TransitionRoute
 
 
 class StartFlowDelegator(cd.ClientDelegator):
+    """Class for organizing interactions with the Dialogflow Flows API."""
 
     _CLIENT_CLASS = FlowsClient
 
-    def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
+    def __init__(self, controller: ds.DialogflowSample) -> None:
         super().__init__(controller)
         self._flow = None
 
     @property
     def flow(self):
+        """Start Flow set in Dialogflow."""
         if not self._flow:
             raise RuntimeError("Flow not yet created")
         return self._flow
 
     def initialize(self):
+        """Initializes the start flow delegator."""
         flow_name = self.controller.start_flow
         self._flow = self.client.get_flow(name=flow_name)
 
     def append_transition_route(self, target_page, intent):
+        """Appends a transition route to the flow."""
         self.flow.transition_routes.append(
             TransitionRoute(
                 intent=intent,
@@ -45,6 +51,7 @@ class StartFlowDelegator(cd.ClientDelegator):
         self.client.update_flow(flow=self.flow)
 
     def tear_down(self):
+        """Removes the appended transition routes; required to delete agente."""
         self.flow.transition_routes = self.flow.transition_routes[:1]
         self.client.update_flow(flow=self.flow)
 

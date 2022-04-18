@@ -15,15 +15,16 @@
 """Module for Turn class."""
 
 import dataclasses
+
 import intent_delegator as idy
 import page_delegator as pd
-
 from google.cloud.dialogflowcx import (
     ConversationTurn,
     QueryInput,
     ResponseMessage,
     TextInput,
 )
+
 
 @dataclasses.dataclass(frozen=True)
 class Turn:

@@ -75,7 +75,10 @@ def validate_form(request):
                         {
                             "text": {
                                 "text": [
-                                    f'Age {parameter_dict["age"]} not valid (must be positive)'
+                                    (
+                                        f'Age {parameter_dict["age"]} not valid '
+                                        "(must be positive)"
+                                    )
                                 ],
                             }
                         }
