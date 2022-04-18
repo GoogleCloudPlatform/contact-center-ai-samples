@@ -13,6 +13,8 @@
 # limitations under the License.
 ---
 name: "Dialogflow CX Examples: Basic Python"
+env:
+  WORKLOAD_IDENTITY_PROVIDER: 'projects/792212140555/locations/global/workloadIdentityPools/gh-pool-df-3/providers/gh-provider-df-3'
 on:
   push:
     branches: [main]
@@ -50,7 +52,7 @@ jobs:
         uses: 'google-github-actions/auth@v0'
         with:
           create_credentials_file: 'true'
-          workload_identity_provider: 'projects/792212140555/locations/global/workloadIdentityPools/gh-pool-df-3/providers/gh-provider-df-3'
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: 'oidc-sa-df-3@df-terraform-dev.iam.gserviceaccount.com'
       - id: 'basic_sample'
         name: Get Webhook Env Vars
@@ -102,7 +104,7 @@ jobs:
         uses: 'google-github-actions/auth@v0'
         with:
             create_credentials_file: 'true'
-            workload_identity_provider: 'projects/792212140555/locations/global/workloadIdentityPools/gh-pool-df-3/providers/gh-provider-df-3'
+            workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
             service_account: 'oidc-sa-df-3@df-terraform-dev.iam.gserviceaccount.com'
       - name: Dowload UUID
         uses: actions/download-artifact@v1
@@ -139,7 +141,7 @@ jobs:
         uses: 'google-github-actions/auth@v0'
         with:
             create_credentials_file: 'true'
-            workload_identity_provider: 'projects/792212140555/locations/global/workloadIdentityPools/gh-pool-df-3/providers/gh-provider-df-3'
+            workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
             service_account: 'oidc-sa-df-3@df-terraform-dev.iam.gserviceaccount.com'
       - name: Dowload UUID
         uses: actions/download-artifact@v1
