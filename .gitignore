@@ -179,3 +179,16 @@ temp/
 **/application_default_credentials.json
 
 dialogflow-cx/terraform/webhook
+**/*.log
+**/node_modules
+.coverage
+coverage
+.nyc_output
+docs/
+out/
+build/
+system-test/secrets.js
+system-test/*key.json
+*.lock
+package-lock.json
+__pycache__

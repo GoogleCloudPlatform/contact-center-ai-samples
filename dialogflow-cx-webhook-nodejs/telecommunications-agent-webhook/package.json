@@ -1,0 +1,7 @@
+{
+  "name": "sample-http",
+  "version": "0.0.1",
+  "dependencies": {
+    "moment": "2.29.2"
+  }
+}
