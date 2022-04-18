@@ -21,6 +21,9 @@ import pytest
 from utilities import RequestMock
 from webhook.main import get_webhook_uri
 
+from validate_form_sample import ValidateFormSample
+from basic_webhook_sample import BasicWebhookSample
+
 
 @pytest.fixture(scope="function")
 def mocked_request() -> Generator[RequestMock, None, None]:
@@ -47,3 +50,31 @@ def build_uuid():
 @pytest.fixture(scope="session")
 def webhook_uri(project_id, build_uuid):
     return get_webhook_uri(project_id, build_uuid)
+
+
+@pytest.fixture(scope="session")
+def validate_form_webhook_sample(session_uuid, project_id, webhook_uri):
+    """Test fixture reused for all ValidateFormSample tests."""
+    sample = ValidateFormSample(
+        agent_display_name=f"ValidateFormSample (test session {session_uuid})",
+        project_id=project_id,
+        webhook_uri=webhook_uri,
+    )
+    sample.initialize()
+    yield sample
+    sample.tear_down()
+    del sample
+
+
+@pytest.fixture(scope="session")
+def basic_webhook_sample(session_uuid, project_id, webhook_uri):
+    """Test fixture reused for all BasicWebhookSample tests."""
+    sample = BasicWebhookSample(
+        agent_display_name=f"BasicWebhookSample (test session {session_uuid})",
+        project_id=project_id,
+        webhook_uri=webhook_uri,
+    )
+    sample.initialize()
+    yield sample
+    sample.tear_down()
+    del sample

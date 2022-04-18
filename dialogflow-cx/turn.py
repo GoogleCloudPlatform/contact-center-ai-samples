@@ -35,6 +35,7 @@ class Turn:
     triggered_intent_delegator: idy.IntentDelegator = None
 
     def get_conversation_turn(self, is_webhook_enabled):
+        """Gets a ConversationTurn object from user input and the expected response."""
         text_responses = [ResponseMessage.Text(text=text) for text in self.agent_output]
         if not self.triggered_intent_delegator:
             triggered_intent = None

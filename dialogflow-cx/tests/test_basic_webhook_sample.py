@@ -20,24 +20,12 @@ from basic_webhook_sample import BasicWebhookSample
 from utilities import hermetic_test_cases, run_hermetic_test
 
 
-@pytest.fixture(scope="session")
-def webhook_sample(session_uuid, project_id, webhook_uri):
-    sample = BasicWebhookSample(
-        agent_display_name=f"BasicWebhookSample (test session {session_uuid})",
-        project_id=project_id,
-        webhook_uri=webhook_uri,
-    )
-    sample.initialize()
-    yield sample
-    sample.tear_down()
-    del sample
-
-
 @pytest.mark.integration
 @pytest.mark.flaky(max_runs=3, reruns_delay=15)
 @pytest.mark.parametrize("test_case_display_name", BasicWebhookSample.TEST_CASES)
-def test_basic_webhook_integration(test_case_display_name, webhook_sample):
-    test_case_delegator = webhook_sample.test_case_delegators[test_case_display_name]
+def test_basic_webhook_sample(test_case_display_name, basic_webhook_sample):
+    """Test the BasicWebhookSample test cases."""
+    test_case_delegator = basic_webhook_sample.test_case_delegators[test_case_display_name]
     if test_case_delegator.expected_exception:
         with pytest.raises(test_case_delegator.expected_exception):
             test_case_delegator.run_test_case()
@@ -47,7 +35,8 @@ def test_basic_webhook_integration(test_case_display_name, webhook_sample):
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize("differences,test_result,xfail", hermetic_test_cases)
-def test_basic_webhook_hermetic(differences, test_result, xfail):
+def test_basic_webhook_sample_hermetic(differences, test_result, xfail):
+    """Test the BasicWebhookSample test cases with mocked API interactions."""
     sample = BasicWebhookSample(
         agent_display_name="MOCK_AGENT_DISPLAY_NAME",
         project_id=-1,

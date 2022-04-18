@@ -20,6 +20,7 @@ from webhook.main import build_request_dict_basic, extract_text, webhook_fcn
 
 @pytest.mark.hermetic
 def test_basic_webhook(mocked_request):
+    """Locally tests the entry fulfillment webhook function."""
 
     # Arrange:
     mock_tag = "basic_webhook"
@@ -45,6 +46,7 @@ def test_basic_webhook(mocked_request):
     ],
 )
 def test_validate_form(mocked_request, test_input, expected):
+    """Locally tests the form validation webhook function."""
 
     # Arrange:
     request_mapping = {}
