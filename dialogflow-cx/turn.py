@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Module for Turn class."""
+
+import dataclasses
+import intent_delegator as idy
+import page_delegator as pd
+
 from google.cloud.dialogflowcx import (
     ConversationTurn,
     QueryInput,
@@ -19,16 +25,14 @@ from google.cloud.dialogflowcx import (
     TextInput,
 )
 
-
+@dataclasses.dataclass(frozen=True)
 class Turn:
-    def __init__(
-        self, user_input, agent_output, page_delegator, triggered_intent_delegator=None
-    ):
+    """Turn class reorganizes a conversational turn using Dialogflow CX protos."""
 
-        self.user_input = user_input
-        self.triggered_intent_delegator = triggered_intent_delegator
-        self.page_delegator = page_delegator
-        self.agent_output = agent_output
+    user_input: str
+    agent_output: str
+    page_delegator: pd.PageDelegator
+    triggered_intent_delegator: idy.IntentDelegator = None
 
     def get_conversation_turn(self, is_webhook_enabled):
         text_responses = [ResponseMessage.Text(text=text) for text in self.agent_output]
