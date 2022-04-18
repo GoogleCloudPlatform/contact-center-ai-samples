@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Module for creating and organizing GCP project credentials."""
+
+import dataclasses
 import json
 import os
 
@@ -23,10 +26,10 @@ from google.oauth2 import service_account
 
 
 def get_credentials(quota_project_id=None):
-
+    """Obtain credentials object from json file and environment configuration."""
     credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-    with open(credentials_path, "r", encoding="utf8") as f:
-        credentials_data = f.read()
+    with open(credentials_path, "r", encoding="utf8") as file_handle:
+        credentials_data = file_handle.read()
         credentials_dict = json.loads(credentials_data)
 
     if "client_email" in credentials_dict:
@@ -38,26 +41,19 @@ def get_credentials(quota_project_id=None):
     return google.auth.default(quota_project_id=quota_project_id)[0]
 
 
+@dataclasses.dataclass(frozen=True)
 class AuthDelegator:
+    """Class for organizing information related to GCP project credentials configuration."""
 
-    _DEFAULT_LOCATION = "global"
+    controller: ds.DialogflowSample
+    project_id: str
+    quota_project_id: None
+    location: str = "global"
 
-    def __init__(
-        self,
-        controller: ds.DialogflowSample,
-        project_id=None,
-        quota_project_id=None,
-        credentials=None,
-        **kwargs,
-    ):
-        self.location = kwargs.get("location", self._DEFAULT_LOCATION)
-        self.project_id = project_id
-        self.controller = controller
-        if not quota_project_id:
-            quota_project_id = project_id
-        self.quota_project_id = quota_project_id
-        self.credentials = (
-            credentials
-            if credentials
-            else get_credentials(quota_project_id=quota_project_id)
-        )
+    @property
+    def credentials(self):
+        """Access cached credentials."""
+        if not self.controller.credentials:
+            credentials = get_credentials(quota_project_id=self.quota_project_id)
+            self.controller.set_credentials(credentials)
+        return self.controller.credentials

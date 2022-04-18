@@ -14,12 +14,14 @@
 
 """Module for the base class for all Dialogflow CX samples."""
 
+
 class DialogflowSample:
     """Base class for samples."""
 
     def __init__(self) -> None:
         self._agent_delegator = None
         self._auth_delegator = None
+        self._credentials = None
         self.test_case_delegators = None
 
     def set_auth_delegator(self, auth_delegator):
@@ -30,6 +32,10 @@ class DialogflowSample:
         """Sets the AgentDelegator for the sample."""
         self._agent_delegator = agent_delegator
 
+    def set_credentials(self, credentials):
+        """Sets the AgentDelegator for the sample."""
+        self._credentials = credentials
+
     @property
     def auth_delegator(self):
         """Accesses the auth_delegator for the sample."""
@@ -39,6 +45,11 @@ class DialogflowSample:
     def agent_delegator(self):
         """Accesses the agent_delegator for the sample."""
         return self._agent_delegator
+
+    @property
+    def credentials(self):
+        """Accesses the agent_delegator for the sample."""
+        return self._credentials
 
     @property
     def project_id(self):

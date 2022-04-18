@@ -62,6 +62,7 @@ def validate_form_webhook_sample(session_uuid, project_id, webhook_uri):
     sample = ValidateFormSample(
         agent_display_name=f"ValidateFormSample (test session {session_uuid})",
         project_id=project_id,
+        quota_project_id=project_id,
         webhook_uri=webhook_uri,
     )
     sample.initialize()
@@ -76,6 +77,7 @@ def basic_webhook_sample(session_uuid, project_id, webhook_uri):
     sample = BasicWebhookSample(
         agent_display_name=f"BasicWebhookSample (test session {session_uuid})",
         project_id=project_id,
+        quota_project_id=project_id,
         webhook_uri=webhook_uri,
     )
     sample.initialize()

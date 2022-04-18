@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""AgentDelegator module. Coordinates agent state with Dialogflow."""
+"""Agent Delegator module. Coordinates agent state with Dialogflow."""
 
 
 import client_delegator as cd
@@ -29,6 +29,7 @@ from google.cloud.dialogflowcx import (
 
 
 class AgentDelegator(cd.ClientDelegator):
+    """Class for organizing interactions with the Dialogflow Agent API."""
 
     _DEFAULT_LANGUAGE_CODE = "en"
     _DEFAULT_TIME_ZONE = "America/Los_Angeles"
@@ -36,13 +37,14 @@ class AgentDelegator(cd.ClientDelegator):
 
     def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         super().__init__(controller, **kwargs)
+        self._agent = None
         self.default_language_code = kwargs.get(
             "default_language_code", self._DEFAULT_LANGUAGE_CODE
         )
         self.time_zone = kwargs.get("time_zone", self._DEFAULT_TIME_ZONE)
 
     def initialize(self):
-        """Initializes an agent to use for the sample."""
+        """Initializes the agent delegator."""
         try:
             agent = Agent(
                 display_name=self.display_name,
@@ -64,6 +66,7 @@ class AgentDelegator(cd.ClientDelegator):
                     break
 
     def tear_down(self):
+        """Destroys the Dialogflow agent."""
         request = DeleteAgentRequest(name=self.agent.name)
         try:
             self.client.delete_agent(request=request)
@@ -73,14 +76,17 @@ class AgentDelegator(cd.ClientDelegator):
 
     @property
     def parent(self):
+        """Accesses the parent of the agent."""
         return f"projects/{self.controller.project_id}/locations/{self.controller.location}"
 
     @property
     def agent(self):
+        """Agent set in Dialogflow."""
         if not self._agent:
             raise RuntimeError("Agent not yet created")
         return self._agent
 
     @property
     def start_flow(self):
+        """Accesses the start flow of the agent."""
         return self.agent.start_flow

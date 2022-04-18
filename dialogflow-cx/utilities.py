@@ -59,12 +59,12 @@ def patch_client(client, method_name, stack, return_value=None):
     )
 
 
-hermetic_test_cases = (
+hermetic_test_cases = [
     ([TestRunDifference(description="XFAIL")], TestResult.FAILED, True),
     ([TestRunDifference(description="XFAIL")], TestResult.PASSED, True),
     ([], TestResult.FAILED, True),
     ([], TestResult.PASSED, False),
-)
+]
 
 
 def run_hermetic_test(sample, differences, test_result, xfail):

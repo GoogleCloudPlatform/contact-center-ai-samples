@@ -78,7 +78,6 @@ class ValidateFormSample(ds.DialogflowSample):
                 self,
                 project_id=project_id,
                 quota_project_id=quota_project_id,
-                credentials=None,
             )
         )
         self.set_agent_delegator(

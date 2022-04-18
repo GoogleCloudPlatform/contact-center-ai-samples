@@ -15,6 +15,7 @@
 """Module for Turn class."""
 
 import dataclasses
+from typing import Optional
 
 import intent_delegator as idy
 import page_delegator as pd
@@ -33,7 +34,7 @@ class Turn:
     user_input: str
     agent_output: str
     page_delegator: pd.PageDelegator
-    triggered_intent_delegator: idy.IntentDelegator = None
+    triggered_intent_delegator: Optional[idy.IntentDelegator] = None
 
     def get_conversation_turn(self, is_webhook_enabled):
         """Gets a ConversationTurn object from user input and the expected response."""
