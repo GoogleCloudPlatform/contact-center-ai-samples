@@ -16,6 +16,7 @@ name: "Dialogflow CX Examples: Basic Python"
 env:
   WORKLOAD_IDENTITY_PROVIDER: 'projects/792212140555/locations/global/workloadIdentityPools/gh-pool-df-3/providers/gh-provider-df-3'
   OIDC_SERVICE_ACCOUNT: 'oidc-sa-df-3@df-terraform-dev.iam.gserviceaccount.com'
+  TERRAFORM_IMAGE: 'hashicorp/terraform:1.1.7'
 on:
   push:
     branches: [main]
@@ -71,8 +72,8 @@ jobs:
         run: |-
           cp "${{ steps.auth.outputs.credentials_file_path }}" terraform/application_default_credentials.json
           cp -r webhook terraform
-          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v "$(pwd)"/terraform:/app -v "$(pwd)"/webhook:/app/webhook hashicorp/terraform:1.1.7 init
-          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v "$(pwd)"/terraform:/app -v "$(pwd)"/webhook:/app/webhook hashicorp/terraform:1.1.7 apply --auto-approve -var project_id="${PROJECT_ID?}" -var webhook_function_name="${WEBHOOK_FUNCTION_NAME?}" -var webhook_function_entrypoint="${WEBHOOK_FUNCTION_ENTRYPOINT?}"
+          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v "$(pwd)"/terraform:/app -v "$(pwd)"/webhook:/app/webhook ${{ env.TERRAFORM_IMAGE }} init
+          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v "$(pwd)"/terraform:/app -v "$(pwd)"/webhook:/app/webhook ${{ env.TERRAFORM_IMAGE }} apply --auto-approve -var project_id="${PROJECT_ID?}" -var webhook_function_name="${WEBHOOK_FUNCTION_NAME?}" -var webhook_function_entrypoint="${WEBHOOK_FUNCTION_ENTRYPOINT?}"
         env:
           PROJECT_ID: df-terraform-dev
           WEBHOOK_FUNCTION_NAME: ${{ steps.basic_sample.outputs.webhook-name }}
@@ -168,8 +169,8 @@ jobs:
         run: |-
           cp "${{ steps.auth.outputs.credentials_file_path }}" terraform/application_default_credentials.json
           cp -r webhook terraform
-          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v "$(pwd)"/terraform:/app -v "$(pwd)"/webhook:/app/webhook hashicorp/terraform:1.1.7 init
-          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v "$(pwd)"/terraform:/app -v "$(pwd)"/webhook:/app/webhook hashicorp/terraform:1.1.7 destroy --auto-approve -var project_id="${PROJECT_ID?}" -var webhook_function_name="${WEBHOOK_FUNCTION_NAME?}" -var webhook_function_entrypoint="${WEBHOOK_FUNCTION_ENTRYPOINT?}"
+          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v "$(pwd)"/terraform:/app -v "$(pwd)"/webhook:/app/webhook ${{ env.TERRAFORM_IMAGE }} init
+          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v "$(pwd)"/terraform:/app -v "$(pwd)"/webhook:/app/webhook ${{ env.TERRAFORM_IMAGE }} destroy --auto-approve -var project_id="${PROJECT_ID?}" -var webhook_function_name="${WEBHOOK_FUNCTION_NAME?}" -var webhook_function_entrypoint="${WEBHOOK_FUNCTION_ENTRYPOINT?}"
         env:
           PROJECT_ID: df-terraform-dev
           WEBHOOK_FUNCTION_NAME: ${{ steps.basic_sample.outputs.webhook-name }}
