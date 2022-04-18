@@ -51,10 +51,11 @@ class StartFlowDelegator(cd.ClientDelegator):
         self.client.update_flow(flow=self.flow)
 
     def tear_down(self):
-        """Removes the appended transition routes; required to delete agente."""
+        """Removes the appended transition routes; required to delete agent."""
         self.flow.transition_routes = self.flow.transition_routes[:1]
         self.client.update_flow(flow=self.flow)
 
     @property
     def start_page_name(self):
+        """Gets start page name based on start flow name."""
         return f"{self.flow.name}/pages/START_PAGE"

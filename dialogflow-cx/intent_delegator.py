@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Dialogflow Intents API interactions."""
+
+from typing import List
+
 import client_delegator as cd
 import dialogflow_sample as ds
 import google.api_core.exceptions
@@ -25,23 +29,28 @@ from google.cloud.dialogflowcx import (
 
 
 class IntentDelegator(cd.ClientDelegator):
+    """Class for organizing interactions with the Dialogflow Intents API."""
 
     _CLIENT_CLASS = IntentsClient
 
-    def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
+    def __init__(
+        self, controller: ds.DialogflowSample, training_phrases: List[str], **kwargs
+    ) -> None:
+        self._intent = None
+        self.training_phrases = training_phrases
         super().__init__(controller, **kwargs)
 
     @property
     def intent(self):
+        """Intent set in Dialogflow."""
         if not self._intent:
             raise RuntimeError("Intent not yet created")
         return self._intent
 
-    def initialize(self, training_phrases_text):
-        # Create an intent-triggered transition into the page:
-
+    def initialize(self):
+        """Initializes the intent delegator."""
         training_phrases = []
-        for training_phrase_text in training_phrases_text:
+        for training_phrase_text in self.training_phrases:
             training_phrase = Intent.TrainingPhrase(
                 {
                     "parts": [{"text": f"{training_phrase_text}"}],

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Dialogflow Pages API interactions."""
+
 import client_delegator as cd
 import dialogflow_sample as ds
 import google.api_core.exceptions
@@ -29,6 +31,7 @@ from google.cloud.dialogflowcx import (
 
 
 class PageDelegator(cd.ClientDelegator):
+    """Class for organizing interactions with the Dialogflow Pages API."""
 
     _CLIENT_CLASS = PagesClient
 
@@ -39,20 +42,23 @@ class PageDelegator(cd.ClientDelegator):
 
     @property
     def page(self):
+        """Page set in Dialogflow."""
         if not self._page:
             raise RuntimeError("Page not yet created")
         return self._page
 
     @property
     def parent(self):
+        """Accesses the parent of page; equivalent to the start_flow."""
         return self.controller.start_flow
 
     @property
     def entry_fulfillment(self):
+        """Accesses the entry fullfillment set for this page."""
         return self._entry_fulfillment
 
     def initialize(self):
-
+        """Initializes the page delegator."""
         page = Page(
             display_name=self.display_name,
             entry_fulfillment=self.entry_fulfillment,
@@ -74,6 +80,7 @@ class PageDelegator(cd.ClientDelegator):
                     return
 
     def tear_down(self, force=True):
+        """Destroys the Dialogflow page."""
         request = DeletePageRequest(name=self.page.name, force=force)
         try:
             self.client.delete_page(request=request)
@@ -84,6 +91,7 @@ class PageDelegator(cd.ClientDelegator):
     def append_transition_route(
         self, target_page, intent=None, condition=None, trigger_fulfillment=None
     ):
+        """Appends a transition route to the page."""
         transition_route = TransitionRoute(
             condition=condition,
             trigger_fulfillment=trigger_fulfillment,
@@ -93,38 +101,29 @@ class PageDelegator(cd.ClientDelegator):
         self.page.transition_routes.append(transition_route)
         self.client.update_page(page=self.page)
 
-    def add_parameter(
-        self,
-        display_name,
-        entity_type,
-        fill_behavior,
-        default_value=None,
-        redact=False,
-        is_list=False,
-        required=True,
-    ):
+    def add_parameter(self, display_name, entity_type, fill_behavior, **kwargs):
+        """Adds a form parameter to the page."""
         parameter = Form.Parameter(
             display_name=display_name,
             entity_type=entity_type,
             fill_behavior=fill_behavior,
-            default_value=default_value,
-            redact=redact,
-            is_list=is_list,
-            required=required,
+            **kwargs
         )
         self.page.form.parameters.append(parameter)
 
 
 class StartPageDelegator(PageDelegator):
-    def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
-        super().__init__(controller, **kwargs)
+    """Special delegator necessary when the start page is a transition target."""
 
     @property
     def page(self):
+        """Mock out the page attribute with the expected name for this special case."""
         return Page(name=self.controller.start_flow_delegator.start_page_name)
 
 
 class FulfillmentPageDelegator(PageDelegator):
+    """Class for organizing interactions with the Dialogflow Pages API with fulfillments."""
+
     def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         self._entry_fulfillment_text = kwargs.pop("entry_fulfillment_text")
         self._webhook_delegator = kwargs.pop("webhook_delegator", None)
@@ -132,6 +131,7 @@ class FulfillmentPageDelegator(PageDelegator):
         super().__init__(controller, **kwargs)
 
     def initialize(self):
+        """Initializes the fulfillment page delegator."""
         webhook_name = (
             self._webhook_delegator.webhook.name if self._webhook_delegator else None
         )

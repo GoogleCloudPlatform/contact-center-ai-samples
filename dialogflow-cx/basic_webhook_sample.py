@@ -96,7 +96,9 @@ class BasicWebhookSample(ds.DialogflowSample):
             self, display_name=self._WEBHOOK_DISPLAY_NAME, uri=webhook_uri
         )
         self.intent_delegator = idy.IntentDelegator(
-            self, display_name=self._INTENT_DISPLAY_NAME
+            self,
+            display_name=self._INTENT_DISPLAY_NAME,
+            training_phrases=self._INTENT_TRAINING_PHRASES_TEXT,
         )
         self.page_delegator = pd.FulfillmentPageDelegator(
             self,
@@ -130,7 +132,7 @@ class BasicWebhookSample(ds.DialogflowSample):
         """Initializes the sample by communicating with the Dialogflow API."""
         self.agent_delegator.initialize()
         self.webhook_delegator.initialize()
-        self.intent_delegator.initialize(self._INTENT_TRAINING_PHRASES_TEXT)
+        self.intent_delegator.initialize()
         self.page_delegator.initialize()
         self.start_flow_delegator.initialize()
         self.start_flow_delegator.append_transition_route(
