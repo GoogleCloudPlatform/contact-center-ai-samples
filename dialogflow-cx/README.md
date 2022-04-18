@@ -62,7 +62,7 @@ to create a webhook for a
      --project=${PROJECT_ID?} \
      --region=${REGION?} \
      --source=webhook \
-     --entry-point=dialogflow_webhook \
+     --entry-point=webhook_fcn \
      --trigger-http \
      --allow-unauthenticated
    ```
@@ -73,11 +73,11 @@ to create a webhook for a
    where `<CLOUD_FUNCTION_URL>` is the URL of the Cloud Function you deployed
    in the previous step. The URL should take the following form:
    ```bash
-   CLOUD_FUNCTION_URL="https://${REGION?}-${PROJECT_ID?}.cloudfunctions.net/dialogflow_webhook"
+   CLOUD_FUNCTION_URL="https://${REGION?}-${PROJECT_ID?}.cloudfunctions.net/webhook_fcn"
    ```
    For example:
    ```bash
-   https://us-central1-my-project-id.cloudfunctions.net/dialogflow_webhook
+   https://us-central1-my-project-id.cloudfunctions.net/webhook_fcn
    ```
 
 ## Running the sample
