@@ -82,4 +82,8 @@ to create a webhook for a
 
 ## Running the sample
 
-1. Go to the Dialogflow agent created by `main.py` and query the agent:
+1. Run a Dialog flow agent sample:
+
+```bash
+python basic_webhook_sample.py --webhook-uri=${CLOUD_FUNCTION_URL?} --project-id=${PROJECT_ID?} --agent-display-name=example_agent
+```
