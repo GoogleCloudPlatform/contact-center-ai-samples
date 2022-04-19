@@ -38,6 +38,7 @@ def fixture_sample(session_uuid, project_id, webhook_uri):
 
 
 @pytest.mark.integration
+@pytest.mark.flaky(max_runs=3, reruns_delay=5)
 @pytest.mark.parametrize("display_name,user_input,exception", [
     ('basic_webhook_sample', 'trigger intent', None),
     ('basic_webhook_sample_xfail', 'XFAIL', ds.UnexpectedResponseFailure),
@@ -54,12 +55,13 @@ def test_basic_webhook_sample(display_name, user_input, exception, sample):
             is_webhook_enabled,
         )
     ]
+    expected_session_parameters = [{}]
     test_case = sample.create_test_case(display_name, test_case_conversation_turns)
     if exception:
         with pytest.raises(exception):
-            sample.run_test_case(test_case)    
+            sample.run_test_case(test_case, expected_session_parameters)
     else:
-        sample.run_test_case(test_case)
+        sample.run_test_case(test_case, expected_session_parameters)
 
 
 @pytest.mark.hermetic

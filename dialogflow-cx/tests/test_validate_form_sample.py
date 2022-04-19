@@ -32,16 +32,17 @@ def fixture_sample(session_uuid, project_id, webhook_uri):
     )
     sample.setup()
     yield sample
-    # sample.tear_down()
+    sample.tear_down()
     del sample
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("display_name,user_input,exception", [
-    ('validate_form_sample', '22', None),
-    # ('validate_form_sample_xfail', 'XFAIL', ds.UnexpectedResponseFailure),
+@pytest.mark.flaky(max_runs=3, reruns_delay=5)
+@pytest.mark.parametrize("display_name,user_input,expected_response,exception", [
+    ('validate_form_sample_valid', '22.0', 'Valid age', None),
+    ('validate_form_sample_not_valid', '-1.0', 'Age -1.0 not valid (must be positive)', None),
 ])
-def test_validate_form_sample(display_name, user_input, exception, sample):
+def test_validate_form_sample(display_name, user_input, expected_response, exception, sample):
     """Test the ValidateFormSample test cases."""
     is_webhook_enabled = True
     test_case_conversation_turns = [
@@ -54,18 +55,22 @@ def test_validate_form_sample(display_name, user_input, exception, sample):
         ),
         create_conversational_turn(
             user_input,
-            ['Form Filled', 'Valid age'],
+            ['Form Filled', expected_response],
             None,
             sample.start_page_delegator.page,
             is_webhook_enabled,
         ),
     ]
-    test_case = sample.create_test_case(display_name, test_case_conversation_turns)
+    expected_session_parameters = [{}, {'age': float(user_input)}]
+    test_case = sample.create_test_case(
+      display_name, 
+      test_case_conversation_turns,
+    )
     if exception:
         with pytest.raises(exception):
-            sample.run_test_case(test_case)    
+            sample.run_test_case(test_case, expected_session_parameters)
     else:
-        sample.run_test_case(test_case)
+        sample.run_test_case(test_case, expected_session_parameters)
 
 
 @pytest.mark.hermetic

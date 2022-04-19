@@ -89,7 +89,7 @@ class BasicWebhookSample(ds.DialogflowSample):
         self.sessions_delegator = sd.SessionsDelegator(self)
 
 
-    def setup(self, wait=1):
+    def setup(self, wait=2):
         """Initializes the sample by communicating with the Dialogflow API."""
         self.agent_delegator.setup()
         self.webhook_delegator.setup()

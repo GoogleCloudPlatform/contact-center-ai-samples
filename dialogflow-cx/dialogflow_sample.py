@@ -21,6 +21,9 @@ class UnexpectedResponseFailure(AssertionError):
 class TestCaseFailure(AssertionError):
     """Exception to raise when a test case fails"""
 
+class SessionParametersFailure(AssertionError):
+    """Exception to raise when a test case fails"""
+
 
 from typing import Dict
 
@@ -29,6 +32,7 @@ import time
 
 import google.cloud.dialogflowcx as cx
 import uuid
+import google.api_core.exceptions
 
 
 class DialogflowSample:
@@ -143,17 +147,26 @@ class DialogflowSample:
         """Create a test case."""
         if flow is None:
             flow = self.start_flow
+        try:
+            return self.test_cases_client.create_test_case(
+                parent=self.agent_delegator.agent.name,
+                test_case=cx.TestCase(
+                    display_name=display_name,
+                    test_case_conversation_turns=test_case_conversation_turns,
+                    test_config=cx.TestConfig(flow=flow),
+                ),
+            )
+        except google.api_core.exceptions.AlreadyExists:
+            request = cx.ListTestCasesRequest(parent=self.agent_delegator.agent.name)
+            for curr_test_case in self.test_cases_client.list_test_cases(request=request):
+                if curr_test_case.display_name == display_name:
+                    request = cx.GetTestCaseRequest(
+                        name=curr_test_case.name,
+                    )
+                    return self.test_cases_client.get_test_case(request=request)
 
-        return self.test_cases_client.create_test_case(
-            parent=self.agent_delegator.agent.name,
-            test_case=cx.TestCase(
-                display_name=display_name,
-                test_case_conversation_turns=test_case_conversation_turns,
-                test_config=cx.TestConfig(flow=flow),
-            ),
-        )
 
-    def run_test_case(self, test_case):
+    def run_test_case(self, test_case, expected_session_parameters):
 
         lro = self.test_cases_client.run_test_case(
             request=cx.RunTestCaseRequest(name=test_case.name)
@@ -171,13 +184,13 @@ class DialogflowSample:
         
         final_session_parameters = []
         for conversation_turn in result.conversation_turns:
-            print(conversation_turn.virtual_agent_output)
-            if conversation_turn.virtual_agent_output.parameters:
-                final_session_parameters.append(dict(conversation_turn.virtual_agent_output.parameters))
+            if conversation_turn.virtual_agent_output.session_parameters:
+                final_session_parameters.append(dict(conversation_turn.virtual_agent_output.session_parameters))
             else:
                 final_session_parameters.append({})
-        print(final_session_parameters)
-
+        
+        if expected_session_parameters != final_session_parameters:
+            raise SessionParametersFailure(f'{expected_session_parameters!r} != {final_session_parameters!r}')
 
         if result.test_result != cx.TestResult.PASSED:
             raise(TestCaseFailure)
