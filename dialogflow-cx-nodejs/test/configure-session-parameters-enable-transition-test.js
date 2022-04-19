@@ -19,7 +19,6 @@ const {describe, it} = require('mocha');
 const execSync = require('child_process').execSync;
 const exec = cmd => execSync(cmd, {encoding: 'utf8'});
 
-// projects/python-docs-samples-tests/locations/us-central1/agents/5b7712f3-034b-4647-9af6-a1b936cd057b/flows/e56e4f6f-5164-42b8-849c-fbc8c29ec2f8/flow_creation?pageId=047e518f-64f6-45ae-a347-955f3cd65a84
 describe('configure session parameters to trigger transition', async () => {
   const cmd = 'node configure-session-parameters-enable-transition.js';
   const webhookUrl = process.env.WEBHOOK_URL;

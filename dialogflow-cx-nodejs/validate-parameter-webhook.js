@@ -14,36 +14,31 @@
 
 'use strict';
 
-const axios = require('axios');
+function main(phoneNumber, webhookUrl) {
+  // [START dialogflow_v3beta1_webhook_validate_form_parameters_async]
 
-function main(phoneNumber, billMonth, webhookUrl) {
-  // [START dialogflow_v3beta1_webhook_configure_session_parameters_async]
-  /*
-    TODO(developer): Uncomment these variables before running the sample.
-    const phoneNumber = 'your-phone-line';
-    const billMonth = 'your-bill-month';
-    const webhookUrl = 'your-webhook-trigger-url';
-  */
+  // TODO(developer): Uncomment these variables before running the sample.
+  // const phoneNumber = 'your-phone-line';
+  // const webhookUrl = 'your-webhook-trigger-url';
 
-  // Webhook will verify if phone number is valid. You can find the webhook logic in lines 15-69 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
+  // Webhook will verify if phone number is valid. You can find the webhook logic in lines 70-117 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
   // List of covered phone lines.
   // ['5555555555','5105105100','1231231234','9999999999]
 
+  const axios = require('axios');
+
   const webhookRequest = {
     fulfillmentInfo: {
-      tag: 'detectCustomerAnomaly',
+      tag: 'validatePhoneLine',
     },
     sessionInfo: {
       parameters: {
         phone_number: phoneNumber,
-        bill_state: billMonth,
       },
     },
   };
 
-  console.log('Webhook request', webhookRequest);
-
-  async function configureSessionParameters() {
+  async function validateParameter() {
     await axios({
       method: 'POST',
       url: webhookUrl,
@@ -51,14 +46,16 @@ function main(phoneNumber, billMonth, webhookUrl) {
     })
       .then(res => {
         console.log('response body', res.data);
-        // The WebhookResponse will return new parameters created by the webhook logic.
-        const updatedParameters = res.data.sessionInfo.parameters;
+        const fulfillmentResponseMessage =
+          res.data.sessionInfo.parameters.phone_line_verified;
+        const parameterInfoState =
+          res.data.pageInfo.formInfo.parameterInfo[0].state;
 
-        console.log('Created purchase_amount parameter:');
-        console.log(updatedParameters.purchase_amount, '\n'); // 'true' or 'false'
+        console.log('Fulfillment Response:');
+        console.log(fulfillmentResponseMessage, '\n'); // 'true' or 'false'
 
-        console.log('Created first_month parameter:');
-        console.log(updatedParameters.first_month, '\n'); // Parameter state: 'VALID' or 'INVALID'
+        console.log('Parameter Status:');
+        console.log(parameterInfoState, '\n'); // Parameter state: 'VALID' or 'INVALID'
       })
       .catch(err => {
         if (err.response) {
@@ -76,9 +73,9 @@ function main(phoneNumber, billMonth, webhookUrl) {
         }
       });
   }
-  // [END dialogflow_v3beta1_webhook_configure_session_parameters_async]
+  // [END dialogflow_v3beta1_webhook_validate_form_parameters_async]
 
-  configureSessionParameters();
+  validateParameter();
 }
 
 process.on('unhandledRejection', err => {

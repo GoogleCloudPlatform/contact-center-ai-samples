@@ -14,8 +14,6 @@
 
 'use strict';
 
-const axios = require('axios');
-
 function main(
   phoneNumber,
   billMonth,
@@ -26,20 +24,21 @@ function main(
   flowId
 ) {
   // [START dialogflow_v3beta1_webhook_configure_session_parameters_enable_transition_async]
-  /*
-    TODO(developer): Uncomment these variables before running the sample.
-    const phoneNumber = 'your-phone-line';
-    const billMonth = 'your-bill-month';
-    const webhookUrl = 'your-webhook-trigger-url';
-    const agentId = 'your-agent-id'; Format 'projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>/flows/<Flow ID>/pages/<Page ID>'
-    const flowId = 'your-flow-id';
-    const showBillDetailsPageId = 'your-transition-page-id';
-    const suggestServiceCancellationPageId = 'another-transition-page-id';
-  */
+
+  // TODO(developer): Uncomment these variables before running the sample.
+  // const phoneNumber = 'your-phone-line';
+  // const billMonth = 'your-bill-month';
+  // const webhookUrl = 'your-webhook-trigger-url';
+  // const agentId = 'your-agent-id'; Format 'projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>/flows/<Flow ID>/pages/<Page ID>'
+  // const flowId = 'your-flow-id';
+  // const showBillDetailsPageId = 'your-transition-page-id';
+  // const suggestServiceCancellationPageId = 'another-transition-page-id';
 
   // You can find the webhook logic for this sample on lines 15-84 in the Prebuilt Telecommunications Agent webhook (`telecommunications-agent-webhook/index.js`).
   // List of covered phone lines.
   // ['5555555555','5105105100','1231231234','9999999999']
+
+  const axios = require('axios');
 
   const webhookRequest = {
     fulfillmentInfo: {
