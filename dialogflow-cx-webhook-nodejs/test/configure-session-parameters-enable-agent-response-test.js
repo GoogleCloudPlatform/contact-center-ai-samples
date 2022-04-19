@@ -20,7 +20,7 @@ const {describe, it} = require('mocha');
 const execSync = require('child_process').execSync;
 const exec = cmd => execSync(cmd, {encoding: 'utf8'});
 
-describe('validate parameter', async () => {
+describe('configure session parameters to trigger agent response', async () => {
   const cmd = 'node configure-session-parameters-enable-agent-response.js';
   const webhookUrl = process.env.WEBHOOK_URL;
 

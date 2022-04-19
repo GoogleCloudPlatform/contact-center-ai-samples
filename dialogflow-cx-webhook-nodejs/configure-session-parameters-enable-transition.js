@@ -16,16 +16,28 @@
 
 const axios = require('axios');
 
-function main(phoneNumber, billMonth, webhookUrl) {
-  // [START dialogflow_v3beta1_webhook_configure_session_parameters_enable_agent_response_async]
+function main(
+  phoneNumber,
+  billMonth,
+  webhookUrl,
+  showBillDetailsPageId,
+  suggestServiceCancellationPageId,
+  agentId,
+  flowId
+) {
+  // [START dialogflow_v3beta1_webhook_configure_session_parameters_enable_transition_async]
   /*
     TODO(developer): Uncomment these variables before running the sample.
     const phoneNumber = 'your-phone-line';
     const billMonth = 'your-bill-month';
     const webhookUrl = 'your-webhook-trigger-url';
+    const agentId = 'your-agent-id'; Format 'projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>/flows/<Flow ID>/pages/<Page ID>'
+    const flowId = 'your-flow-id';
+    const showBillDetailsPageId = 'your-transition-page-id';
+    const suggestServiceCancellationPageId = 'another-transition-page-id';
   */
 
-  // You can find the webhook logic for this sample on lines 15-78 in the Prebuilt Telecommunications Agent webhook (`telecommunications-agent-webhook/index.js`).
+  // You can find the webhook logic for this sample on lines 15-84 in the Prebuilt Telecommunications Agent webhook (`telecommunications-agent-webhook/index.js`).
   // List of covered phone lines.
   // ['5555555555','5105105100','1231231234','9999999999']
 
@@ -39,11 +51,19 @@ function main(phoneNumber, billMonth, webhookUrl) {
         bill_state: billMonth,
       },
     },
+    payload: {
+      fields: {
+        show_bill_details_page_id: showBillDetailsPageId,
+        suggest_service_cancellation_page_id: suggestServiceCancellationPageId,
+        agentId: agentId,
+        flowId: flowId,
+      },
+    },
   };
 
   console.log('Webhook request', webhookRequest);
 
-  async function configureSessionParametersEnableAgentResponse() {
+  async function configureSessionParametersEnableTransition() {
     await axios({
       method: 'POST',
       url: webhookUrl,
@@ -51,16 +71,13 @@ function main(phoneNumber, billMonth, webhookUrl) {
     })
       .then(res => {
         console.log('response body', res.data);
-        // The WebhookResponse will return new parameters populated by the webhook logic.
-        const updatedParameters = res.data.sessionInfo.parameters;
+        // The WebhookResponse will return the target page based on the session parameter value.
+        const targetPage = res.data.targetPage;
+        const responseMessage =
+          res.data.fulfillmentResponse.messages[0].text.text;
 
-        // The webhook updates the `first_month` session parameter.
-        console.log('First Month Session Parameter:');
-        console.log(updatedParameters.first_month, '\n');
-
-        // The configured parameter can be used in the fulfillment message returned by the webhook.
-        console.log('Agent Response:');
-        console.log(res.data.fulfillmentResponse.messages[0].text.text, '\n');
+        console.log('Agent Response: ', responseMessage, '\n');
+        console.log('Target Page: ', targetPage, '\n');
       })
       .catch(err => {
         if (err.response) {
@@ -78,9 +95,9 @@ function main(phoneNumber, billMonth, webhookUrl) {
         }
       });
   }
-  // [END dialogflow_v3beta1_webhook_configure_session_parameters_enable_agent_response_async]
+  // [END dialogflow_v3beta1_webhook_configure_session_parameters_enable_transition_async]
 
-  configureSessionParametersEnableAgentResponse();
+  configureSessionParametersEnableTransition();
 }
 
 process.on('unhandledRejection', err => {

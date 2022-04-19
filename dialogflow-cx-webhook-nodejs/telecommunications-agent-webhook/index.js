@@ -18,6 +18,9 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
         const phone_number = req.body.sessionInfo.parameters.phone_number;
         const bill_month = req.body.sessionInfo.parameters.bill_state;
         const parameters = req.body.sessionInfo.parameters;
+        const agentId = req.body.payload.fields.agentId;
+        const flowId = req.body.payload.fields.flowId;
+        let targetPage = req.body.payload.fields.show_bill_details_page_id;
         let bill_amount;
         let product_line;
         let anomaly_detect = 'false';
@@ -36,13 +39,15 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
         // December, December 1st, November
 
         // Only 999999 will have anomaly detection
-        if (phone_number.toString() === '999999') {
+        if (phone_number.toString() === '9999999999') {
           anomaly_detect = 'true';
           product_line = 'phone';
           purchase = 'device protection';
           updated_parameters['product_line'] = product_line;
           updated_parameters['bill_month'] = month_name;
           updated_parameters['last_month'] = last_month_name;
+          targetPage =
+            req.body.payload.fields.suggest_service_cancellation_page_id;
         }
 
         // If bill hike amount is given - we just add it to the total bill
@@ -73,6 +78,7 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
           sessionInfo: {
             parameters: updated_parameters,
           },
+          targetPage: `${agentId}/flows/${flowId}/pages/${targetPage}`,
         });
         break;
       }
