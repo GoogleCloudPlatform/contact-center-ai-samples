@@ -33,11 +33,11 @@ describe('configure session parameters to trigger transition', async () => {
     const phoneNumber = '5105105100';
     const billMonth = 'current';
 
-    const output = exec(
+    const outputResponse = exec(
       `${cmd} ${phoneNumber} ${billMonth} ${webhookUrl} ${showBillDetailsPageId} ${suggestServiceCancellationPageId} ${agentId} ${flowId}`
     );
-    console.log('webhook-response', output);
-    assert.include(output, 'Target Page');
+    console.log('webhook-response', outputResponse);
+    assert.include(outputResponse, 'Target Page');
   });
 
   it('should set target page based on `anomaly_detect == true` parameter value', async () => {
