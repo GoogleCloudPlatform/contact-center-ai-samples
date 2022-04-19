@@ -54,33 +54,3 @@ def fixture_build_uuid():
 def fixture_webhook_uri(project_id, build_uuid):
     """Test fixture providings the URI for the fixture webhook."""
     return get_webhook_uri(project_id, build_uuid)
-
-
-@pytest.fixture(scope="session")
-def validate_form_webhook_sample(session_uuid, project_id, webhook_uri):
-    """Test fixture reused for all ValidateFormSample tests."""
-    sample = ValidateFormSample(
-        agent_display_name=f"ValidateFormSample (test session {session_uuid})",
-        project_id=project_id,
-        quota_project_id=project_id,
-        webhook_uri=webhook_uri,
-    )
-    sample.setup()
-    yield sample
-    sample.tear_down()
-    del sample
-
-
-@pytest.fixture(scope="session")
-def basic_webhook_sample(session_uuid, project_id, webhook_uri):
-    """Test fixture reused for all BasicWebhookSample tests."""
-    sample = BasicWebhookSample(
-        agent_display_name=f"BasicWebhookSample (test session {session_uuid})",
-        project_id=project_id,
-        quota_project_id=project_id,
-        webhook_uri=webhook_uri,
-    )
-    sample.setup()
-    yield sample
-    sample.tear_down()
-    del sample

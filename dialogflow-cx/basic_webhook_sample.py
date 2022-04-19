@@ -21,10 +21,12 @@ import intent_delegator as idy
 import page_delegator as pd
 import start_flow_delegator as sfd
 import test_case_delegator as tcd
+import sessions_delegator as sd
 import turn
 import webhook.main as wh
 import webhook_delegator as wd
 from utilities import RequestMock
+from webhook.main import get_webhook_uri
 
 
 def get_expected_response(tag, input_text):
@@ -46,33 +48,7 @@ class BasicWebhookSample(ds.DialogflowSample):
     _PAGE_ENTRY_FULFILLMENT_TEXT = f"Entering {_PAGE_DISPLAY_NAME}"
     _PAGE_WEBHOOK_ENTRY_TAG = "basic_webhook"
 
-    TEST_CASES = {
-        "Test Case 0": {
-            "input_text": _INTENT_TRAINING_PHRASES_TEXT[0],
-            "expected_response_text": [
-                _PAGE_ENTRY_FULFILLMENT_TEXT,
-                get_expected_response(
-                    _PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[0]
-                ),
-            ],
-            "expected_exception": None,
-        },
-        "Test Case 1": {
-            "input_text": _INTENT_TRAINING_PHRASES_TEXT[1],
-            "expected_response_text": [
-                _PAGE_ENTRY_FULFILLMENT_TEXT,
-                get_expected_response(
-                    _PAGE_WEBHOOK_ENTRY_TAG, _INTENT_TRAINING_PHRASES_TEXT[1]
-                ),
-            ],
-            "expected_exception": None,
-        },
-        "Test Case XFAIL": {
-            "input_text": "FAIL",
-            "expected_response_text": ["FAIL"],
-            "expected_exception": tcd.DialogflowTestCaseFailure,
-        },
-    }
+
 
     def __init__(
         self,
@@ -110,29 +86,10 @@ class BasicWebhookSample(ds.DialogflowSample):
             tag=self._PAGE_WEBHOOK_ENTRY_TAG,
         )
         self.start_flow_delegator = sfd.StartFlowDelegator(self)
+        self.sessions_delegator = sd.SessionsDelegator(self)
 
-        for display_name, test_config in self.TEST_CASES.items():
 
-            curr_turn = turn.Turn(
-                test_config["input_text"],
-                test_config["expected_response_text"],
-                self.page_delegator,
-                self.intent_delegator,
-            )
-            conversation_turns = [curr_turn]
-
-            self.add_test_case_delegator(
-                display_name,
-                tcd.TestCaseDelegator(
-                    self,
-                    is_webhook_enabled=True,
-                    display_name=display_name,
-                    conversation_turns=conversation_turns,
-                    expected_exception=test_config["expected_exception"],
-                ),
-            )
-
-    def setup(self):
+    def setup(self, wait=1):
         """Initializes the sample by communicating with the Dialogflow API."""
         self.agent_delegator.setup()
         self.webhook_delegator.setup()
@@ -143,13 +100,12 @@ class BasicWebhookSample(ds.DialogflowSample):
             target_page=self.page_delegator.page.name,
             intent=self.intent_delegator.intent.name,
         )
-        for test_case_delegator in self.test_case_delegators.values():
-            test_case_delegator.setup()
+        self.sessions_delegator.setup()
+        self.start_page_delegator = pd.StartPageDelegator(self)
+        super().setup(wait=wait)
 
     def tear_down(self):
         """Deletes the sample components via the Dialogflow API."""
-        for test_case_delegator in self.test_case_delegators.values():
-            test_case_delegator.tear_down()
         self.page_delegator.tear_down()
         self.start_flow_delegator.tear_down()
         self.intent_delegator.tear_down()
@@ -170,14 +126,6 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument(
-        "--webhook-uri",
-        help=(
-            "Webhook URL for the Dialogflow CX to use. "
-            "Format: https://<region>-<project_id>.cloudfunctions.net/<webhook_name>"
-        ),
-        required=True,
-    )
-    parser.add_argument(
         "--project-id",
         help="Google Cloud project to create/use Dialogflow CX in",
         required=True,
@@ -187,8 +135,36 @@ if __name__ == "__main__":
         help="Quota project, if different from project-id",
         default=None,
     )
+    parser.add_argument(
+        '--user-input',
+        nargs='+',
+        help='User text utterances',
+        required=False,
+        default=[])
+    parser.add_argument(
+        '--tear-down',
+        action='store_true',
+        help='Destroy the agent after run?')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "--webhook-uri",
+        help=(
+            "Webhook URL for the Dialogflow CX to use. "
+            "Format: https://<region>-<project_id>.cloudfunctions.net/<webhook_name>"
+        ),
+    )
+    group.add_argument('--build-uuid',
+        help='Infer the webhook URI from the build_uuid and project id')
 
-    sample = BasicWebhookSample(**vars(parser.parse_args()))
+    args = vars(parser.parse_args())
+    if args['build_uuid']:
+        assert not args['webhook_uri']
+        args['webhook_uri'] = get_webhook_uri(args['project_id'], args.pop('build_uuid'))
+
+    tear_down = args.pop('tear_down')
+    user_input = args.pop('user_input', [])
+    sample = BasicWebhookSample(**args)
     sample.setup()
-    sample.run()
-    sample.tear_down()
+    sample.run(user_input)
+    if tear_down:
+        sample.tear_down()

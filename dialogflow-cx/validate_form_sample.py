@@ -20,10 +20,12 @@ import dialogflow_sample as ds
 import intent_delegator as idy
 import page_delegator as pd
 import start_flow_delegator as sfd
-import test_case_delegator as tcd
+import sessions_delegator as sd
 import turn
 import webhook_delegator as wd
 from google.cloud.dialogflowcx import Form, Fulfillment, ResponseMessage
+
+from webhook.main import get_webhook_uri
 
 
 def build_fulfillment(text=None, webhook=None, tag=None):
@@ -46,24 +48,6 @@ class ValidateFormSample(ds.DialogflowSample):
     _PAGE_WEBHOOK_ENTRY_TAG = "validate_form"
     _PAGE_PROMPT = "What is your age?"
 
-    TEST_CASES = {
-        "Test Case 0": {
-            "input_text": ["trigger_intent", "21"],
-            "expected_response_text": [
-                [_PAGE_ENTRY_FULFILLMENT_TEXT, _PAGE_PROMPT],
-                ["Form Filled", "Valid age"],
-            ],
-            "expected_exception": None,
-        },
-        "Test Case 1": {
-            "input_text": ["trigger_intent", "-1"],
-            "expected_response_text": [
-                [_PAGE_ENTRY_FULFILLMENT_TEXT, _PAGE_PROMPT],
-                ["Form Filled", "Age -1 not valid (must be positive)"],
-            ],
-            "expected_exception": tcd.DialogflowTestCaseFailure,
-        },
-    }
 
     def __init__(
         self,
@@ -100,31 +84,8 @@ class ValidateFormSample(ds.DialogflowSample):
         )
         self.start_flow_delegator = sfd.StartFlowDelegator(self)
         self.start_page_delegator = pd.StartPageDelegator(self)
+        self.sessions_delegator = sd.SessionsDelegator(self)
 
-        for display_name, test_config in self.TEST_CASES.items():
-            turn_0 = turn.Turn(
-                test_config["input_text"][0],
-                test_config["expected_response_text"][0],
-                self.page_delegator,
-                self.intent_delegator,
-            )
-            turn_1 = turn.Turn(
-                test_config["input_text"][1],
-                test_config["expected_response_text"][1],
-                self.start_page_delegator,
-            )
-            conversation_turns = [turn_0, turn_1]
-
-            self.add_test_case_delegator(
-                display_name,
-                tcd.TestCaseDelegator(
-                    self,
-                    is_webhook_enabled=True,
-                    display_name=display_name,
-                    conversation_turns=conversation_turns,
-                    expected_exception=test_config["expected_exception"],
-                ),
-            )
 
     def setup(self):
         """Initializes the sample by communicating with the Dialogflow API."""
@@ -157,13 +118,11 @@ class ValidateFormSample(ds.DialogflowSample):
                 text=["Form Filled"],
             ),
         )
-        for test_case_delegator in self.test_case_delegators.values():
-            test_case_delegator.setup()
+        self.sessions_delegator.setup()
+        super().setup()
 
     def tear_down(self):
         """Deletes the sample components via the Dialogflow API."""
-        for test_case_delegator in self.test_case_delegators.values():
-            test_case_delegator.tear_down()
         self.page_delegator.tear_down()
         self.start_flow_delegator.tear_down()
         self.intent_delegator.tear_down()
@@ -184,14 +143,6 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument(
-        "--webhook-uri",
-        help=(
-            "Webhook URL for the Dialogflow CX to use. "
-            "Format: https://<region>-<project_id>.cloudfunctions.net/<webhook_name>"
-        ),
-        required=True,
-    )
-    parser.add_argument(
         "--project-id",
         help="Google Cloud project to create/use Dialogflow CX in",
         required=True,
@@ -201,8 +152,88 @@ if __name__ == "__main__":
         help="Quota project, if different from project-id",
         default=None,
     )
+    parser.add_argument(
+        '--user-input',
+        nargs='+',
+        help='User text utterances',
+        required=False,
+        default=[])
+    parser.add_argument(
+        '--tear-down',
+        action='store_true',
+        help='Destroy the agent after run?')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "--webhook-uri",
+        help=(
+            "Webhook URL for the Dialogflow CX to use. "
+            "Format: https://<region>-<project_id>.cloudfunctions.net/<webhook_name>"
+        ),
+    )
+    group.add_argument('--build-uuid',
+        help='Infer the webhook URI from the build_uuid and project id')
 
-    sample = ValidateFormSample(**vars(parser.parse_args()))
+    args = vars(parser.parse_args())
+    if args['build_uuid']:
+        assert not args['webhook_uri']
+        args['webhook_uri'] = get_webhook_uri(args['project_id'], args.pop('build_uuid'))
+
+    tear_down = args.pop('tear_down')
+    user_input = args.pop('user_input', [])
+    sample = ValidateFormSample(**args)
     sample.setup()
-    sample.run()
-    sample.tear_down()
+    sample.run(user_input)
+    if tear_down:
+        sample.tear_down()
+
+
+
+
+        # for test_case_delegator in self.test_case_delegators.values():
+        #     test_case_delegator.tear_down()
+# import test_case_delegator as tcd        
+    # TEST_CASES = {
+    #     "Test Case 0": {
+    #         "input_text": ["trigger_intent", "21"],
+    #         "expected_response_text": [
+    #             [_PAGE_ENTRY_FULFILLMENT_TEXT, _PAGE_PROMPT],
+    #             ["Form Filled", "Valid age"],
+    #         ],
+    #         "expected_exception": None,
+    #     },
+    #     "Test Case 1": {
+    #         "input_text": ["trigger_intent", "-1"],
+    #         "expected_response_text": [
+    #             [_PAGE_ENTRY_FULFILLMENT_TEXT, _PAGE_PROMPT],
+    #             ["Form Filled", "Age -1 not valid (must be positive)"],
+    #         ],
+    #         "expected_exception": tcd.DialogflowTestCaseFailure,
+    #     },
+    # }
+            # for test_case_delegator in self.test_case_delegators.values():
+            # test_case_delegator.setup()
+
+        # for display_name, test_config in self.TEST_CASES.items():
+        #     turn_0 = turn.Turn(
+        #         test_config["input_text"][0],
+        #         test_config["expected_response_text"][0],
+        #         self.page_delegator,
+        #         self.intent_delegator,
+        #     )
+        #     turn_1 = turn.Turn(
+        #         test_config["input_text"][1],
+        #         test_config["expected_response_text"][1],
+        #         self.start_page_delegator,
+        #     )
+        #     conversation_turns = [turn_0, turn_1]
+
+        #     self.add_test_case_delegator(
+        #         display_name,
+        #         tcd.TestCaseDelegator(
+        #             self,
+        #             is_webhook_enabled=True,
+        #             display_name=display_name,
+        #             conversation_turns=conversation_turns,
+        #             expected_exception=test_config["expected_exception"],
+        #         ),
+        #     )
