@@ -18,9 +18,7 @@ import uuid
 from typing import Generator
 
 import pytest
-from basic_webhook_sample import BasicWebhookSample
 from utilities import RequestMock
-from validate_form_sample import ValidateFormSample
 from webhook.main import get_webhook_uri
 
 

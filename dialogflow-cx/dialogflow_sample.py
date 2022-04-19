@@ -15,24 +15,23 @@
 """Module for the base class for all Dialogflow CX samples."""
 
 
+import time
+import uuid
+
+import google.api_core.exceptions
+import google.cloud.dialogflowcx as cx
+
+
 class UnexpectedResponseFailure(AssertionError):
     """Exception to raise when a test case fails"""
+
 
 class TestCaseFailure(AssertionError):
     """Exception to raise when a test case fails"""
 
+
 class SessionParametersFailure(AssertionError):
     """Exception to raise when a test case fails"""
-
-
-from typing import Dict
-
-import client_delegator as cd
-import time
-
-import google.cloud.dialogflowcx as cx
-import uuid
-import google.api_core.exceptions
 
 
 class DialogflowSample:
@@ -43,6 +42,8 @@ class DialogflowSample:
         self._auth_delegator = None
         self._credentials = None
         self._test_cases_client = None
+        self._start_flow_delegator = None
+        self._session_delegator = None
 
     def set_auth_delegator(self, auth_delegator):
         """Sets the AuthDelegator for the sample."""
@@ -51,6 +52,14 @@ class DialogflowSample:
     def set_agent_delegator(self, agent_delegator):
         """Sets the AgentDelegator for the sample."""
         self._agent_delegator = agent_delegator
+
+    def set_session_delegator(self, session_delegator):
+        """Sets the SessionDelegator for the sample."""
+        self._session_delegator = session_delegator
+
+    def set_start_flow_delegator(self, start_flow_delegator):
+        """Sets the AgentDelegator for the sample."""
+        self._start_flow_delegator = start_flow_delegator
 
     def set_credentials(self, credentials):
         """Sets the AgentDelegator for the sample."""
@@ -65,6 +74,16 @@ class DialogflowSample:
     def agent_delegator(self):
         """Accesses the agent_delegator for the sample."""
         return self._agent_delegator
+
+    @property
+    def start_flow_delegator(self):
+        """Accesses the start_flow_delegator for the sample."""
+        return self._start_flow_delegator
+
+    @property
+    def session_delegator(self):
+        """Accesses the start_flow_delegator for the sample."""
+        return self._session_delegator
 
     @property
     def credentials(self):
@@ -103,16 +122,23 @@ class DialogflowSample:
 
     def setup(self, wait=0):
         """Set up sample. Especially, train the start flow."""
-        request = cx.TrainFlowRequest(
-            name=self.start_flow_delegator.flow.name
-        )
+        request = cx.TrainFlowRequest(name=self.start_flow_delegator.flow.name)
         lro = self.start_flow_delegator.client.train_flow(request=request)
-        t0 = time.time()
+        time.time()
         while lro.running():
-            time.sleep(.1)
+            time.sleep(0.1)
         time.sleep(wait)
 
-    def run(self, user_text_list, session_id=None, language_code='en', wait=1, parameters=None, current_page=None, quiet=False):
+    #  pylint: disable=too-many-arguments
+    def run(
+        self,
+        user_text_list,
+        session_id=None,
+        wait=1,
+        parameters=None,
+        current_page=None,
+        quiet=False,
+    ):
         """Runs a conversation with this agent."""
         time.sleep(wait)
 
@@ -124,31 +150,29 @@ class DialogflowSample:
 
         for text in user_text_list:
             if not quiet:
-                print('User: ')
-                print(f'  Text: {text}')
-                print(f'  Starting Parameters: {parameters}')
-                print(f'  Page: {current_page}')
-            responses, current_page, parameters = self.sessions_delegator.detect_intent(
-                text, 
+                print("User: ")
+                print(f"  Text: {text}")
+                print(f"  Starting Parameters: {parameters}")
+                print(f"  Page: {current_page}")
+            responses, current_page, parameters = self.session_delegator.detect_intent(
+                text,
                 parameters=parameters,
                 current_page=current_page,
                 session_id=session_id,
-                language_code=language_code,
             )
             if not quiet:
-                print('  Agent:')
+                print("  Agent:")
                 for response in responses:
-                    print(f'    Text: {response}')
-                print(f'    Ending Parameters: {parameters}')
-                print(f'    Ending Page: {current_page}')
-
+                    print(f"    Text: {response}")
+                print(f"    Ending Parameters: {parameters}")
+                print(f"    Ending Page: {current_page}")
 
     def create_test_case(self, display_name, test_case_conversation_turns, flow=None):
         """Create a test case."""
         if flow is None:
             flow = self.start_flow
         try:
-            return self.test_cases_client.create_test_case(
+            test_case = self.test_cases_client.create_test_case(
                 parent=self.agent_delegator.agent.name,
                 test_case=cx.TestCase(
                     display_name=display_name,
@@ -158,21 +182,24 @@ class DialogflowSample:
             )
         except google.api_core.exceptions.AlreadyExists:
             request = cx.ListTestCasesRequest(parent=self.agent_delegator.agent.name)
-            for curr_test_case in self.test_cases_client.list_test_cases(request=request):
+            for curr_test_case in self.test_cases_client.list_test_cases(
+                request=request
+            ):
                 if curr_test_case.display_name == display_name:
                     request = cx.GetTestCaseRequest(
                         name=curr_test_case.name,
                     )
-                    return self.test_cases_client.get_test_case(request=request)
-
+                    test_case = self.test_cases_client.get_test_case(request=request)
+                    break
+        return test_case
 
     def run_test_case(self, test_case, expected_session_parameters):
-
+        """Runs a test case using the TestCases API."""
         lro = self.test_cases_client.run_test_case(
             request=cx.RunTestCaseRequest(name=test_case.name)
         )
         while lro.running():
-            time.sleep(.1)
+            time.sleep(0.1)
         result = lro.result().result
         agent_response_differences = [
             conversation_turn.virtual_agent_output.differences
@@ -181,17 +208,20 @@ class DialogflowSample:
 
         if any(agent_response_differences):
             raise UnexpectedResponseFailure(agent_response_differences)
-        
+
         final_session_parameters = []
         for conversation_turn in result.conversation_turns:
             if conversation_turn.virtual_agent_output.session_parameters:
-                final_session_parameters.append(dict(conversation_turn.virtual_agent_output.session_parameters))
+                final_session_parameters.append(
+                    dict(conversation_turn.virtual_agent_output.session_parameters)
+                )
             else:
                 final_session_parameters.append({})
-        
+
         if expected_session_parameters != final_session_parameters:
-            raise SessionParametersFailure(f'{expected_session_parameters!r} != {final_session_parameters!r}')
+            raise SessionParametersFailure(
+                f"{expected_session_parameters!r} != {final_session_parameters!r}"
+            )
 
         if result.test_result != cx.TestResult.PASSED:
-            raise(TestCaseFailure)
-        
+            raise TestCaseFailure

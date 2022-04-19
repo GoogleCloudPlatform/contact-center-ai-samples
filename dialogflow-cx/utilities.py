@@ -14,35 +14,33 @@
 
 """Helper functions for creating and testing Dialogflow CX samples."""
 
+import contextlib
+import time
 from contextlib import ExitStack
 from dataclasses import dataclass, field
 from typing import Mapping
 
+import google.api_core.exceptions
 import mock
-import pytest
-import test_case_delegator as tcd
 from google.api_core.operation import Operation
 from google.cloud.dialogflowcx import (
     Agent,
     ConversationTurn,
+    DetectIntentResponse,
     Flow,
     Intent,
     Page,
+    QueryInput,
+    ResponseMessage,
     RunTestCaseResponse,
     TestCase,
     TestCaseResult,
     TestResult,
     TestRunDifference,
-    Webhook,
-    ResponseMessage, 
-    QueryInput, 
     TextInput,
-    DetectIntentResponse,
+    Webhook,
 )
 
-import contextlib
-import google.api_core.exceptions
-import time
 
 @dataclass
 class RequestMock:
@@ -76,7 +74,7 @@ hermetic_test_cases = [
 
 def run_hermetic_test(sample):
     """Drives a hermetic sample test suite by mocking out client interactions."""
-    user_input = ['MOCK_USER_INPUT']
+    user_input = ["MOCK_USER_INPUT"]
     with ExitStack() as stack:
         patch_client(
             sample.agent_delegator.client,
@@ -111,8 +109,10 @@ def run_hermetic_test(sample):
         patch_client(sample.page_delegator.client, "update_page", stack)
         patch_client(sample.start_flow_delegator.client, "update_flow", stack)
         lro = mock.create_autospec(Operation, instance=True, spec_set=True)
-        lro.running = lambda : False
-        patch_client(sample.start_flow_delegator.client, "train_flow", stack, return_value=lro)
+        lro.running = lambda: False
+        patch_client(
+            sample.start_flow_delegator.client, "train_flow", stack, return_value=lro
+        )
         patch_client(sample.page_delegator.client, "delete_page", stack)
         patch_client(sample.intent_delegator.client, "delete_intent", stack)
         patch_client(sample.webhook_delegator.client, "delete_webhook", stack)
@@ -128,10 +128,10 @@ def run_hermetic_test(sample):
         )
         patch_client(sample.test_cases_client, "batch_delete_test_cases", stack)
         patch_client(
-            sample.sessions_delegator.client, 
-            "detect_intent", 
-            stack, 
-            return_value=DetectIntentResponse()
+            sample.session_delegator.client,
+            "detect_intent",
+            stack,
+            return_value=DetectIntentResponse(),
         )
 
         def result():
@@ -147,11 +147,10 @@ def run_hermetic_test(sample):
                     ],
                 )
             )
+
         lro = mock.create_autospec(Operation, instance=True, spec_set=True)
         lro.result = result
-        patch_client(
-            sample.test_cases_client, "run_test_case", stack, return_value=lro
-        )
+        patch_client(sample.test_cases_client, "run_test_case", stack, return_value=lro)
         sample.setup()
         sample.run(user_input, quiet=True)
         sample.tear_down()
@@ -159,6 +158,7 @@ def run_hermetic_test(sample):
 
 @contextlib.contextmanager
 def retry_call(api_method, request, max_retries=3, delay=1):
+    """Retry an api call multiple times if needed."""
     retry_count = 0
     result = None
     while retry_count < max_retries:
@@ -173,22 +173,24 @@ def retry_call(api_method, request, max_retries=3, delay=1):
             ):
                 retry_count += 1
                 time.sleep(delay)
-    
+
     if retry_count == max_retries:
-        raise RuntimeError('Too many return attempts')
+        raise RuntimeError("Too many return attempts")
 
     yield result
 
 
-def create_conversational_turn(user_input, agent_response_list, triggered_intent, output_page, is_webhook_enabled):
+def create_conversational_turn(
+    user_input, agent_response_list, triggered_intent, output_page, is_webhook_enabled
+):
     """Create a conversational turn."""
     turn = ConversationTurn(
-        virtual_agent_output = ConversationTurn.VirtualAgentOutput(
+        virtual_agent_output=ConversationTurn.VirtualAgentOutput(
             current_page=output_page,
             triggered_intent=triggered_intent,
             text_responses=[
                 ResponseMessage.Text(text=text) for text in agent_response_list
-            ]
+            ],
         ),
         user_input=ConversationTurn.UserInput(
             is_webhook_enabled=is_webhook_enabled,

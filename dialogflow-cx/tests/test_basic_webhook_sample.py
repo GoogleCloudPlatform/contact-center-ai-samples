@@ -14,14 +14,13 @@
 
 """Dialogflow CX webhook sample unit tests."""
 
-import time
+import dialogflow_sample as ds
 import pytest
 from basic_webhook_sample import BasicWebhookSample
 from utilities import create_conversational_turn, run_hermetic_test
-import dialogflow_sample as ds
 
 
-@pytest.fixture(name='sample', scope="session")
+@pytest.fixture(name="sample", scope="session")
 def fixture_sample(session_uuid, project_id, webhook_uri):
     """Test fixture reused for all BasicWebhookSample tests."""
     sample = BasicWebhookSample(
@@ -36,20 +35,25 @@ def fixture_sample(session_uuid, project_id, webhook_uri):
     del sample
 
 
-
 @pytest.mark.integration
 @pytest.mark.flaky(max_runs=3, reruns_delay=5)
-@pytest.mark.parametrize("display_name,user_input,exception", [
-    ('basic_webhook_sample', 'trigger intent', None),
-    ('basic_webhook_sample_xfail', 'XFAIL', ds.UnexpectedResponseFailure),
-])
+@pytest.mark.parametrize(
+    "display_name,user_input,exception",
+    [
+        ("basic_webhook_sample", "trigger intent", None),
+        ("basic_webhook_sample_xfail", "XFAIL", ds.UnexpectedResponseFailure),
+    ],
+)
 def test_basic_webhook_sample(display_name, user_input, exception, sample):
     """Test the BasicWebhookSample test cases."""
     is_webhook_enabled = True
     test_case_conversation_turns = [
         create_conversational_turn(
             user_input,
-            ['Entering Main Page', 'Webhook received: trigger intent (Tag: basic_webhook)'],
+            [
+                "Entering Main Page",
+                "Webhook received: trigger intent (Tag: basic_webhook)",
+            ],
             sample.intent_delegator.intent,
             sample.page_delegator.page,
             is_webhook_enabled,

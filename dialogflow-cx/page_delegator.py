@@ -109,9 +109,9 @@ class PageDelegator(cd.ClientDelegator):
             fill_behavior=fill_behavior,
             **kwargs
         )
-        for pi, curr_parameter in enumerate(self.page.form.parameters):
+        for page_idx, curr_parameter in enumerate(self.page.form.parameters):
             if curr_parameter.display_name == display_name:
-                self.page.form.parameters[pi] = parameter
+                self.page.form.parameters[page_idx] = parameter
                 return
         self.page.form.parameters.append(parameter)
 

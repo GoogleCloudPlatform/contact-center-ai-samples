@@ -18,16 +18,15 @@ import uuid
 
 import client_delegator as cd
 import dialogflow_sample as ds
-
-from utilities import retry_call
-
 from google.cloud.dialogflowcx import (
-    SessionsClient,
     DetectIntentRequest,
     QueryInput,
-    TextInput,
     QueryParameters,
+    SessionsClient,
+    TextInput,
 )
+from utilities import retry_call
+
 
 class SessionsDelegator(cd.ClientDelegator):
     """Class for organizing interactions with the Dialogflow TestCases API."""
@@ -37,7 +36,14 @@ class SessionsDelegator(cd.ClientDelegator):
     def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         super().__init__(controller, **kwargs)
 
-    def detect_intent(self, text, current_page=None, session_id=None, parameters=None, language_code='en'):
+    def detect_intent(
+        self,
+        text,
+        current_page=None,
+        session_id=None,
+        parameters=None,
+    ):
+        """Run detect_intent for a session against an Agent."""
 
         if parameters is None:
             parameters = {}
@@ -49,25 +55,26 @@ class SessionsDelegator(cd.ClientDelegator):
             current_page = self.controller.start_flow_delegator.start_page_name
 
         request = DetectIntentRequest(
-            session=f'{self.controller.agent_delegator.agent.name}/sessions/{session_id}', 
+            session=f"{self.controller.agent_delegator.agent.name}/sessions/{session_id}",
             query_input=QueryInput(
-                language_code=language_code, 
                 text=TextInput(
                     text=text,
-                )
+                ),
             ),
             query_params=QueryParameters(
                 parameters=parameters,
                 current_page=current_page,
-            )
+            ),
         )
 
         with retry_call(self.client.detect_intent, request) as response:
-            responses = [x.text.text[0] for x in response.query_result.response_messages]
+            responses = [
+                x.text.text[0] for x in response.query_result.response_messages
+            ]
             current_page = response.query_result.current_page.name
             parameters = response.query_result.parameters
-            if parameters is None: 
-                parameters = {}    
+            if parameters is None:
+                parameters = {}
             else:
                 parameters = dict(parameters)
         return responses, current_page, parameters

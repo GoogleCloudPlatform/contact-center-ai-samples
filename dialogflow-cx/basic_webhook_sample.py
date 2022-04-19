@@ -19,10 +19,8 @@ import auth_delegator as ad
 import dialogflow_sample as ds
 import intent_delegator as idy
 import page_delegator as pd
-import start_flow_delegator as sfd
-import test_case_delegator as tcd
 import sessions_delegator as sd
-import turn
+import start_flow_delegator as sfd
 import webhook.main as wh
 import webhook_delegator as wd
 from utilities import RequestMock
@@ -47,8 +45,6 @@ class BasicWebhookSample(ds.DialogflowSample):
     _PAGE_DISPLAY_NAME = "Main Page"
     _PAGE_ENTRY_FULFILLMENT_TEXT = f"Entering {_PAGE_DISPLAY_NAME}"
     _PAGE_WEBHOOK_ENTRY_TAG = "basic_webhook"
-
-
 
     def __init__(
         self,
@@ -85,9 +81,9 @@ class BasicWebhookSample(ds.DialogflowSample):
             webhook_delegator=self.webhook_delegator,
             tag=self._PAGE_WEBHOOK_ENTRY_TAG,
         )
-        self.start_flow_delegator = sfd.StartFlowDelegator(self)
-        self.sessions_delegator = sd.SessionsDelegator(self)
-
+        self.set_start_flow_delegator(sfd.StartFlowDelegator(self))
+        self.start_page_delegator = pd.StartPageDelegator(self)
+        self.set_session_delegator(sd.SessionsDelegator(self))
 
     def setup(self, wait=2):
         """Initializes the sample by communicating with the Dialogflow API."""
@@ -100,8 +96,6 @@ class BasicWebhookSample(ds.DialogflowSample):
             target_page=self.page_delegator.page.name,
             intent=self.intent_delegator.intent.name,
         )
-        self.sessions_delegator.setup()
-        self.start_page_delegator = pd.StartPageDelegator(self)
         super().setup(wait=wait)
 
     def tear_down(self):
@@ -136,15 +130,15 @@ if __name__ == "__main__":
         default=None,
     )
     parser.add_argument(
-        '--user-input',
-        nargs='+',
-        help='User text utterances',
+        "--user-input",
+        nargs="+",
+        help="User text utterances",
         required=False,
-        default=[])
+        default=[],
+    )
     parser.add_argument(
-        '--tear-down',
-        action='store_true',
-        help='Destroy the agent after run?')
+        "--tear-down", action="store_true", help="Destroy the agent after run?"
+    )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "--webhook-uri",
@@ -153,16 +147,19 @@ if __name__ == "__main__":
             "Format: https://<region>-<project_id>.cloudfunctions.net/<webhook_name>"
         ),
     )
-    group.add_argument('--build-uuid',
-        help='Infer the webhook URI from the build_uuid and project id')
+    group.add_argument(
+        "--build-uuid", help="Infer the webhook URI from the build_uuid and project id"
+    )
 
     args = vars(parser.parse_args())
-    if args['build_uuid']:
-        assert not args['webhook_uri']
-        args['webhook_uri'] = get_webhook_uri(args['project_id'], args.pop('build_uuid'))
+    if args["build_uuid"]:
+        assert not args["webhook_uri"]
+        args["webhook_uri"] = get_webhook_uri(
+            args["project_id"], args.pop("build_uuid")
+        )
 
-    tear_down = args.pop('tear_down')
-    user_input = args.pop('user_input', [])
+    tear_down = args.pop("tear_down")
+    user_input = args.pop("user_input", [])
     sample = BasicWebhookSample(**args)
     sample.setup()
     sample.run(user_input)

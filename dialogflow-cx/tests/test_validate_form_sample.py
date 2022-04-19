@@ -18,10 +18,9 @@
 import pytest
 from utilities import create_conversational_turn, run_hermetic_test
 from validate_form_sample import ValidateFormSample
-import dialogflow_sample as ds
 
 
-@pytest.fixture(name='sample', scope="session")
+@pytest.fixture(name="sample", scope="session")
 def fixture_sample(session_uuid, project_id, webhook_uri):
     """Test fixture reused for all ValidateFormSample tests."""
     sample = ValidateFormSample(
@@ -38,33 +37,43 @@ def fixture_sample(session_uuid, project_id, webhook_uri):
 
 @pytest.mark.integration
 @pytest.mark.flaky(max_runs=3, reruns_delay=5)
-@pytest.mark.parametrize("display_name,user_input,expected_response,exception", [
-    ('validate_form_sample_valid', '22.0', 'Valid age', None),
-    ('validate_form_sample_not_valid', '-1.0', 'Age -1.0 not valid (must be positive)', None),
-])
-def test_validate_form_sample(display_name, user_input, expected_response, exception, sample):
+@pytest.mark.parametrize(
+    "display_name,user_input,expected_response,exception",
+    [
+        ("validate_form_sample_valid", "22.0", "Valid age", None),
+        (
+            "validate_form_sample_not_valid",
+            "-1.0",
+            "Age -1.0 not valid (must be positive)",
+            None,
+        ),
+    ],
+)
+def test_validate_form_sample(
+    display_name, user_input, expected_response, exception, sample
+):
     """Test the ValidateFormSample test cases."""
     is_webhook_enabled = True
     test_case_conversation_turns = [
         create_conversational_turn(
-            'trigger intent',
-            ['Entering Main Page', 'What is your age?'],
+            "trigger intent",
+            ["Entering Main Page", "What is your age?"],
             sample.intent_delegator.intent,
             sample.page_delegator.page,
             is_webhook_enabled,
         ),
         create_conversational_turn(
             user_input,
-            ['Form Filled', expected_response],
+            ["Form Filled", expected_response],
             None,
             sample.start_page_delegator.page,
             is_webhook_enabled,
         ),
     ]
-    expected_session_parameters = [{}, {'age': float(user_input)}]
+    expected_session_parameters = [{}, {"age": float(user_input)}]
     test_case = sample.create_test_case(
-      display_name, 
-      test_case_conversation_turns,
+        display_name,
+        test_case_conversation_turns,
     )
     if exception:
         with pytest.raises(exception):

@@ -46,6 +46,3 @@ class ClientDelegator:
     def display_name(self):
         """Accesses the display_name for the delegator."""
         return self._display_name
-
-    def setup(self):
-        pass
