@@ -1,6 +1,8 @@
 # Google Cloud Contact Center AI Samples
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![GitHub Super-Linter](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+![Contact Center AI](https://storage.googleapis.com/gweb-cloudblog-publish/images/google_contact_center_ai.max-2200x2200.jpg)
 
 Welcome to the Google Cloud [Contact Center AI](https://cloud.google.com/solutions/contact-center) sample repository.
 
