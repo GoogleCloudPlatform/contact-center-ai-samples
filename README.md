@@ -17,6 +17,8 @@ limitations under the License.
 # Google Cloud Contact Center AI Samples
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![GitHub Super-Linter](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+![Contact Center AI](https://storage.googleapis.com/gweb-cloudblog-publish/images/google_contact_center_ai.max-2200x2200.jpg)
 
 Welcome to the Google Cloud [Contact Center AI](https://cloud.google.com/solutions/contact-center) sample repository.
 
@@ -30,6 +32,9 @@ The repository contains samples, tutorials, and demos that demonstrate how to us
 ## Samples
 
 * [Dialogflow CX Webhook Python Sample](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx): This project uses Google Cloud Functions to create a webhook for a Dialogflow CX agent
+
+* [Dialogflow CX Samples - Node.js](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx-nodejs)
+  - [Webhook Samples](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx-nodejs/dialogflow-cx-webhook-nodejs): Demonstrates how to integrate webhooks with Dialogflow CX.
 
 ## Contributing
 
