@@ -21,25 +21,9 @@ from dataclasses import dataclass, field
 from typing import Mapping
 
 import google.api_core.exceptions
+import google.cloud.dialogflowcx as cx
 import mock
 from google.api_core.operation import Operation
-from google.cloud.dialogflowcx import (
-    Agent,
-    ConversationTurn,
-    DetectIntentResponse,
-    Flow,
-    Intent,
-    Page,
-    QueryInput,
-    ResponseMessage,
-    RunTestCaseResponse,
-    TestCase,
-    TestCaseResult,
-    TestResult,
-    TestRunDifference,
-    TextInput,
-    Webhook,
-)
 
 
 @dataclass
@@ -65,10 +49,10 @@ def patch_client(client, method_name, stack, return_value=None):
 
 
 hermetic_test_cases = [
-    ([TestRunDifference(description="XFAIL")], TestResult.FAILED, True),
-    ([TestRunDifference(description="XFAIL")], TestResult.PASSED, True),
-    ([], TestResult.FAILED, True),
-    ([], TestResult.PASSED, False),
+    ([cx.TestRunDifference(description="XFAIL")], cx.TestResult.FAILED, True),
+    ([cx.TestRunDifference(description="XFAIL")], cx.TestResult.PASSED, True),
+    ([], cx.TestResult.FAILED, True),
+    ([], cx.TestResult.PASSED, False),
 ]
 
 
@@ -80,31 +64,31 @@ def run_hermetic_test(sample):
             sample.agent_delegator.client,
             "create_agent",
             stack,
-            return_value=Agent(name="MOCK_AGENT_NAME"),
+            return_value=cx.Agent(name="MOCK_AGENT_NAME"),
         )
         patch_client(
             sample.webhook_delegator.client,
             "create_webhook",
             stack,
-            return_value=Webhook(name="MOCK_WEBHOOK_NAME"),
+            return_value=cx.Webhook(name="MOCK_WEBHOOK_NAME"),
         )
         patch_client(
             sample.intent_delegator.client,
             "create_intent",
             stack,
-            return_value=Intent(name="MOCK_INTENT_NAME"),
+            return_value=cx.Intent(name="MOCK_INTENT_NAME"),
         )
         patch_client(
             sample.page_delegator.client,
             "create_page",
             stack,
-            return_value=Page(name="MOCK_PAGE_NAME"),
+            return_value=cx.Page(name="MOCK_PAGE_NAME"),
         )
         patch_client(
             sample.start_flow_delegator.client,
             "get_flow",
             stack,
-            return_value=Flow(name="MOCK_FLOW_NAME"),
+            return_value=cx.Flow(name="MOCK_FLOW_NAME"),
         )
         patch_client(sample.page_delegator.client, "update_page", stack)
         patch_client(sample.start_flow_delegator.client, "update_flow", stack)
@@ -121,7 +105,7 @@ def run_hermetic_test(sample):
             sample.test_cases_client,
             "create_test_case",
             stack,
-            return_value=TestCase(
+            return_value=cx.TestCase(
                 name="MOCK_TEST_CASE_NAME",
                 display_name="MOCK_TEST_CASE_DISPLAY_NAME",
             ),
@@ -131,16 +115,16 @@ def run_hermetic_test(sample):
             sample.session_delegator.client,
             "detect_intent",
             stack,
-            return_value=DetectIntentResponse(),
+            return_value=cx.DetectIntentResponse(),
         )
 
         def result():
-            return RunTestCaseResponse(
-                result=TestCaseResult(
-                    test_result=TestResult.PASSED,
+            return cx.RunTestCaseResponse(
+                result=cx.TestCaseResult(
+                    test_result=cx.TestResult.PASSED,
                     conversation_turns=[
-                        ConversationTurn(
-                            virtual_agent_output=ConversationTurn.VirtualAgentOutput(
+                        cx.ConversationTurn(
+                            virtual_agent_output=cx.ConversationTurn.VirtualAgentOutput(
                                 differences=[],
                             )
                         )
@@ -184,18 +168,18 @@ def create_conversational_turn(
     user_input, agent_response_list, triggered_intent, output_page, is_webhook_enabled
 ):
     """Create a conversational turn."""
-    turn = ConversationTurn(
-        virtual_agent_output=ConversationTurn.VirtualAgentOutput(
+    turn = cx.ConversationTurn(
+        virtual_agent_output=cx.ConversationTurn.VirtualAgentOutput(
             current_page=output_page,
             triggered_intent=triggered_intent,
             text_responses=[
-                ResponseMessage.Text(text=text) for text in agent_response_list
+                cx.ResponseMessage.Text(text=text) for text in agent_response_list
             ],
         ),
-        user_input=ConversationTurn.UserInput(
+        user_input=cx.ConversationTurn.UserInput(
             is_webhook_enabled=is_webhook_enabled,
-            input=QueryInput(
-                text=TextInput(
+            input=cx.QueryInput(
+                text=cx.TextInput(
                     text=user_input,
                 )
             ),

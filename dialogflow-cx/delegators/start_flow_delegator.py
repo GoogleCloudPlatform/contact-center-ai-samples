@@ -14,15 +14,16 @@
 
 """Dialogflow Flows API interactions."""
 
-import client_delegator as cd
 import dialogflow_sample as ds
-from google.cloud.dialogflowcx import FlowsClient, TransitionRoute
+import google.cloud.dialogflowcx as cx
+
+from .client_delegator import ClientDelegator
 
 
-class StartFlowDelegator(cd.ClientDelegator):
+class StartFlowDelegator(ClientDelegator):
     """Class for organizing interactions with the Dialogflow Flows API."""
 
-    _CLIENT_CLASS = FlowsClient
+    _CLIENT_CLASS = cx.FlowsClient
 
     def __init__(self, controller: ds.DialogflowSample) -> None:
         super().__init__(controller)
@@ -43,7 +44,7 @@ class StartFlowDelegator(cd.ClientDelegator):
     def append_transition_route(self, target_page, intent):
         """Appends a transition route to the flow."""
         self.flow.transition_routes.append(
-            TransitionRoute(
+            cx.TransitionRoute(
                 intent=intent,
                 target_page=target_page,
             )

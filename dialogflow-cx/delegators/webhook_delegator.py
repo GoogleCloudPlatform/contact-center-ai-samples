@@ -14,23 +14,18 @@
 
 """Dialogflow Webhooks API interactions."""
 
-import client_delegator as cd
 import dialogflow_sample as ds
 import google.api_core.exceptions
 import google.auth
-from google.cloud.dialogflowcx import (
-    DeleteWebhookRequest,
-    GetWebhookRequest,
-    ListWebhooksRequest,
-    Webhook,
-    WebhooksClient,
-)
+import google.cloud.dialogflowcx as cx
+
+from .client_delegator import ClientDelegator
 
 
-class WebhookDelegator(cd.ClientDelegator):
+class WebhookDelegator(ClientDelegator):
     """Class for organizing interactions with the Dialogflow Webhooks API."""
 
-    _CLIENT_CLASS = WebhooksClient
+    _CLIENT_CLASS = cx.WebhooksClient
 
     def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         self._uri = kwargs.pop("uri")
@@ -46,7 +41,7 @@ class WebhookDelegator(cd.ClientDelegator):
 
     def setup(self):
         """Initializes the webhook delegator."""
-        webhook = Webhook(
+        webhook = cx.Webhook(
             {
                 "display_name": self.display_name,
                 "generic_web_service": {"uri": self._uri},
@@ -58,12 +53,12 @@ class WebhookDelegator(cd.ClientDelegator):
                 webhook=webhook,
             )
         except google.api_core.exceptions.AlreadyExists:
-            request = ListWebhooksRequest(
+            request = cx.ListWebhooksRequest(
                 parent=self.parent,
             )
             for webhook in self.client.list_webhooks(request=request):
                 if webhook.display_name == self.display_name:
-                    request = GetWebhookRequest(
+                    request = cx.GetWebhookRequest(
                         name=webhook.name,
                     )
                     self._webhook = self.client.get_webhook(request=request)
@@ -71,7 +66,7 @@ class WebhookDelegator(cd.ClientDelegator):
 
     def tear_down(self):
         """Destroys the Dialogflow webhook."""
-        request = DeleteWebhookRequest(name=self.webhook.name)
+        request = cx.DeleteWebhookRequest(name=self.webhook.name)
         try:
             self.client.delete_webhook(request=request)
             self._webhook = None

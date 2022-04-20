@@ -14,24 +14,17 @@
 
 """Dialogflow CX Sample: Entry fullfillment with a webhook."""
 
-import agent_delegator as agd
-import auth_delegator as ad
+import delegators as dg
 import dialogflow_sample as ds
-import intent_delegator as idy
-import page_delegator as pd
-import sessions_delegator as sd
-import start_flow_delegator as sfd
-import webhook.main as wh
-import webhook_delegator as wd
 from utilities import RequestMock
 from webhook.main import get_webhook_uri
 
 
 def get_expected_response(tag, input_text):
     """Gets the response expected from the webhook, for a given tag."""
-    return wh.extract_text(
-        wh.webhook_fcn(
-            RequestMock(payload=wh.build_request_dict_basic(tag, input_text))
+    return dg.extract_text(
+        dg.webhook_fcn(
+            RequestMock(payload=dg.build_request_dict_basic(tag, input_text))
         )
     )
 
@@ -57,33 +50,33 @@ class BasicWebhookSample(ds.DialogflowSample):
         if not quota_project_id:
             quota_project_id = project_id
         self.set_auth_delegator(
-            ad.AuthDelegator(
+            dg.AuthDelegator(
                 self,
                 project_id=project_id,
                 quota_project_id=quota_project_id,
             )
         )
         self.set_agent_delegator(
-            agd.AgentDelegator(self, display_name=agent_display_name)
+            dg.AgentDelegator(self, display_name=agent_display_name)
         )
-        self.webhook_delegator = wd.WebhookDelegator(
+        self.webhook_delegator = dg.WebhookDelegator(
             self, display_name=self._WEBHOOK_DISPLAY_NAME, uri=webhook_uri
         )
-        self.intent_delegator = idy.IntentDelegator(
+        self.intent_delegator = dg.IntentDelegator(
             self,
             display_name=self._INTENT_DISPLAY_NAME,
             training_phrases=self._INTENT_TRAINING_PHRASES_TEXT,
         )
-        self.page_delegator = pd.FulfillmentPageDelegator(
+        self.page_delegator = dg.FulfillmentPageDelegator(
             self,
             display_name=self._PAGE_DISPLAY_NAME,
             entry_fulfillment_text=self._PAGE_ENTRY_FULFILLMENT_TEXT,
             webhook_delegator=self.webhook_delegator,
             tag=self._PAGE_WEBHOOK_ENTRY_TAG,
         )
-        self.set_start_flow_delegator(sfd.StartFlowDelegator(self))
-        self.start_page_delegator = pd.StartPageDelegator(self)
-        self.set_session_delegator(sd.SessionsDelegator(self))
+        self.set_start_flow_delegator(dg.StartFlowDelegator(self))
+        self.start_page_delegator = dg.StartPageDelegator(self)
+        self.set_session_delegator(dg.SessionsDelegator(self))
 
     def setup(self, wait=2):
         """Initializes the sample by communicating with the Dialogflow API."""

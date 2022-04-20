@@ -145,7 +145,7 @@ jobs:
             create_credentials_file: 'true'
             workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
             service_account: ${{ env.OIDC_SERVICE_ACCOUNT }}
-      - name: Dowload UUID
+      - name: Download UUID
         uses: actions/download-artifact@v1
         with:
           name: shared

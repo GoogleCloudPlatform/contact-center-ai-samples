@@ -14,24 +14,18 @@
 
 """Dialogflow CX Sample: Form validation with a webhook."""
 
-import agent_delegator as agd
-import auth_delegator as ad
+import delegators as dg
 import dialogflow_sample as ds
-import intent_delegator as idy
-import page_delegator as pd
-import sessions_delegator as sd
-import start_flow_delegator as sfd
-import webhook_delegator as wd
-from google.cloud.dialogflowcx import Form, Fulfillment, ResponseMessage
+import google.cloud.dialogflowcx as cx
 from webhook.main import get_webhook_uri
 
 
 def build_fulfillment(text=None, webhook=None, tag=None):
     """Helper method that provides a Fulfillment based on text, webhook and tag."""
-    return Fulfillment(
+    return cx.Fulfillment(
         webhook=webhook,
         tag=tag,
-        messages=[ResponseMessage(text=ResponseMessage.Text(text=text))],
+        messages=[cx.ResponseMessage(text=cx.ResponseMessage.Text(text=text))],
     )
 
 
@@ -57,31 +51,31 @@ class ValidateFormSample(ds.DialogflowSample):
         if not quota_project_id:
             quota_project_id = project_id
         self.set_auth_delegator(
-            ad.AuthDelegator(
+            dg.AuthDelegator(
                 self,
                 project_id=project_id,
                 quota_project_id=quota_project_id,
             )
         )
         self.set_agent_delegator(
-            agd.AgentDelegator(self, display_name=agent_display_name)
+            dg.AgentDelegator(self, display_name=agent_display_name)
         )
-        self.webhook_delegator = wd.WebhookDelegator(
+        self.webhook_delegator = dg.WebhookDelegator(
             self, display_name=self._WEBHOOK_DISPLAY_NAME, uri=webhook_uri
         )
-        self.intent_delegator = idy.IntentDelegator(
+        self.intent_delegator = dg.IntentDelegator(
             self,
             display_name=self._INTENT_DISPLAY_NAME,
             training_phrases=self._INTENT_TRAINING_PHRASES_TEXT,
         )
-        self.page_delegator = pd.FulfillmentPageDelegator(
+        self.page_delegator = dg.FulfillmentPageDelegator(
             self,
             display_name=self._PAGE_DISPLAY_NAME,
             entry_fulfillment_text=self._PAGE_ENTRY_FULFILLMENT_TEXT,
         )
-        self.set_start_flow_delegator(sfd.StartFlowDelegator(self))
-        self.set_session_delegator(sd.SessionsDelegator(self))
-        self.start_page_delegator = pd.StartPageDelegator(self)
+        self.set_start_flow_delegator(dg.StartFlowDelegator(self))
+        self.set_session_delegator(dg.SessionsDelegator(self))
+        self.start_page_delegator = dg.StartPageDelegator(self)
 
     def setup(self, wait=1):
         """Initializes the sample by communicating with the Dialogflow API."""
@@ -98,7 +92,7 @@ class ValidateFormSample(ds.DialogflowSample):
             display_name="age",
             required=True,
             entity_type="projects/-/locations/-/agents/-/entityTypes/sys.number",
-            fill_behavior=Form.Parameter.FillBehavior(
+            fill_behavior=cx.Form.Parameter.FillBehavior(
                 initial_prompt_fulfillment=build_fulfillment(text=[self._PAGE_PROMPT])
             ),
             default_value=None,

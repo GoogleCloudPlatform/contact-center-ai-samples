@@ -16,30 +16,22 @@
 
 import time
 
-import client_delegator as cd
 import dialogflow_sample as ds
 import google.api_core.exceptions
 import google.auth
-from google.cloud.dialogflowcx import (
-    BatchDeleteTestCasesRequest,
-    GetTestCaseRequest,
-    ListTestCasesRequest,
-    RunTestCaseRequest,
-    TestCase,
-    TestCasesClient,
-    TestConfig,
-    TestResult,
-)
+import google.cloud.dialogflowcx as cx
+
+from .client_delegator import ClientDelegator
 
 
 class DialogflowTestCaseFailure(Exception):
     """Exception to raise when a test case fails"""
 
 
-class TestCaseDelegator(cd.ClientDelegator):
+class TestCaseDelegator(ClientDelegator):
     """Class for organizing interactions with the Dialogflow TestCases API."""
 
-    _CLIENT_CLASS = TestCasesClient
+    _CLIENT_CLASS = cx.TestCasesClient
 
     def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         self._is_webhook_enabled = kwargs.pop("is_webhook_enabled", False)
@@ -60,20 +52,20 @@ class TestCaseDelegator(cd.ClientDelegator):
         try:
             self._test_case = self.client.create_test_case(
                 parent=self.controller.agent_delegator.agent.name,
-                test_case=TestCase(
+                test_case=cx.TestCase(
                     display_name=self.display_name,
                     test_case_conversation_turns=[
                         t.get_conversation_turn(self._is_webhook_enabled)
                         for t in self._conversation_turns
                     ],
-                    test_config=TestConfig(flow=self.controller.start_flow),
+                    test_config=cx.TestConfig(flow=self.controller.start_flow),
                 ),
             )
         except google.api_core.exceptions.AlreadyExists:
-            request = ListTestCasesRequest(parent=self.parent)
+            request = cx.ListTestCasesRequest(parent=self.parent)
             for curr_test_case in self.client.list_test_cases(request=request):
                 if curr_test_case.display_name == self.display_name:
-                    request = GetTestCaseRequest(
+                    request = cx.GetTestCaseRequest(
                         name=curr_test_case.name,
                     )
                     self._test_case = self.client.get_test_case(request=request)
@@ -81,7 +73,7 @@ class TestCaseDelegator(cd.ClientDelegator):
 
     def tear_down(self):
         """Destroys the test case."""
-        request = BatchDeleteTestCasesRequest(
+        request = cx.BatchDeleteTestCasesRequest(
             parent=self.parent,
             names=[self.test_case.name],
         )
@@ -98,7 +90,7 @@ class TestCaseDelegator(cd.ClientDelegator):
         while retry_count < max_retries:
             time.sleep(wait)
             lro = self.client.run_test_case(
-                request=RunTestCaseRequest(name=self.test_case.name)
+                request=cx.RunTestCaseRequest(name=self.test_case.name)
             )
             while lro.running():
                 try:
@@ -107,7 +99,7 @@ class TestCaseDelegator(cd.ClientDelegator):
                         conversation_turn.virtual_agent_output.differences
                         for conversation_turn in result.conversation_turns
                     ]
-                    test_case_fail = result.test_result != TestResult.PASSED
+                    test_case_fail = result.test_result != cx.TestResult.PASSED
                     if any(agent_response_differences) or test_case_fail:
                         raise DialogflowTestCaseFailure(
                             f'Test "{self.test_case.display_name}" failed'

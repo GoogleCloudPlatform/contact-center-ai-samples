@@ -14,26 +14,17 @@
 
 """Dialogflow Pages API interactions."""
 
-import client_delegator as cd
 import dialogflow_sample as ds
 import google.api_core.exceptions
-from google.cloud.dialogflowcx import (
-    DeletePageRequest,
-    Form,
-    Fulfillment,
-    GetPageRequest,
-    ListPagesRequest,
-    Page,
-    PagesClient,
-    ResponseMessage,
-    TransitionRoute,
-)
+import google.cloud.dialogflowcx as cx
+
+from .client_delegator import ClientDelegator
 
 
-class PageDelegator(cd.ClientDelegator):
+class PageDelegator(ClientDelegator):
     """Class for organizing interactions with the Dialogflow Pages API."""
 
-    _CLIENT_CLASS = PagesClient
+    _CLIENT_CLASS = cx.PagesClient
 
     def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
         self._page = None
@@ -59,7 +50,7 @@ class PageDelegator(cd.ClientDelegator):
 
     def setup(self):
         """Initializes the page delegator."""
-        page = Page(
+        page = cx.Page(
             display_name=self.display_name,
             entry_fulfillment=self.entry_fulfillment,
         )
@@ -70,10 +61,10 @@ class PageDelegator(cd.ClientDelegator):
             )
         except google.api_core.exceptions.AlreadyExists:
 
-            request = ListPagesRequest(parent=self.parent)
+            request = cx.ListPagesRequest(parent=self.parent)
             for curr_page in self.client.list_pages(request=request):
                 if curr_page.display_name == self.display_name:
-                    request = GetPageRequest(
+                    request = cx.GetPageRequest(
                         name=curr_page.name,
                     )
                     self._page = self.client.get_page(request=request)
@@ -81,7 +72,7 @@ class PageDelegator(cd.ClientDelegator):
 
     def tear_down(self, force=True):
         """Destroys the Dialogflow page."""
-        request = DeletePageRequest(name=self.page.name, force=force)
+        request = cx.DeletePageRequest(name=self.page.name, force=force)
         try:
             self.client.delete_page(request=request)
             self._page = None
@@ -92,7 +83,7 @@ class PageDelegator(cd.ClientDelegator):
         self, target_page, intent=None, condition=None, trigger_fulfillment=None
     ):
         """Appends a transition route to the page."""
-        transition_route = TransitionRoute(
+        transition_route = cx.TransitionRoute(
             condition=condition,
             trigger_fulfillment=trigger_fulfillment,
             intent=intent,
@@ -103,7 +94,7 @@ class PageDelegator(cd.ClientDelegator):
 
     def add_parameter(self, display_name, entity_type, fill_behavior, **kwargs):
         """Adds a form parameter to the page."""
-        parameter = Form.Parameter(
+        parameter = cx.Form.Parameter(
             display_name=display_name,
             entity_type=entity_type,
             fill_behavior=fill_behavior,
@@ -122,7 +113,7 @@ class StartPageDelegator(PageDelegator):
     @property
     def page(self):
         """Mock out the page attribute with the expected name for this special case."""
-        return Page(name=self.controller.start_flow_delegator.start_page_name)
+        return cx.Page(name=self.controller.start_flow_delegator.start_page_name)
 
 
 class FulfillmentPageDelegator(PageDelegator):
@@ -139,11 +130,13 @@ class FulfillmentPageDelegator(PageDelegator):
         webhook_name = (
             self._webhook_delegator.webhook.name if self._webhook_delegator else None
         )
-        self._entry_fulfillment = Fulfillment(
+        self._entry_fulfillment = cx.Fulfillment(
             {
                 "messages": [
-                    ResponseMessage(
-                        text=ResponseMessage.Text(text=[self._entry_fulfillment_text])
+                    cx.ResponseMessage(
+                        text=cx.ResponseMessage.Text(
+                            text=[self._entry_fulfillment_text]
+                        )
                     )
                 ],
                 "webhook": webhook_name,
