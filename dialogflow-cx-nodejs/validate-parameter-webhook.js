@@ -14,19 +14,18 @@
 
 'use strict';
 
-const axios = require('axios');
-
 function main(phoneNumber, webhookUrl) {
   // [START dialogflow_v3beta1_webhook_validate_form_parameters_async]
-  /*
-    TODO(developer): Uncomment these variables before running the sample.
-    const phoneNumber = 'your-phone-line';
-    const webhookUrl = 'your-webhook-trigger-url';
-  */
+
+  // TODO(developer): Uncomment these variables before running the sample.
+  // const phoneNumber = 'your-phone-line';
+  // const webhookUrl = 'your-webhook-trigger-url';
 
   // Webhook will verify if phone number is valid. You can find the webhook logic in lines 70-117 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
   // List of covered phone lines.
   // ['5555555555','5105105100','1231231234','9999999999]
+
+  const axios = require('axios');
 
   const webhookRequest = {
     fulfillmentInfo: {
