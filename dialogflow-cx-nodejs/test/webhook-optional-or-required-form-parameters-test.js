@@ -19,23 +19,17 @@ const {describe, it} = require('mocha');
 const execSync = require('child_process').execSync;
 const exec = cmd => execSync(cmd, {encoding: 'utf8'});
 
-describe('validate parameter', async () => {
-  const cmd = 'node validate-parameter-webhook.js';
+describe('optional or required parameters', async () => {
+  const cmd = 'node webhook-optional-or-required-form-parameters.js';
   const webhookUrl = process.env.WEBHOOK_URL;
 
-  it('should validate form parameter', async () => {
-    const phoneNumber = '5105105100';
-
-    const output = exec(`${cmd} ${phoneNumber} ${webhookUrl}`);
-    console.log('valid-output', output);
-    assert.include(output, 'VALID');
-  });
-
-  it('should invalidate form parameter', async () => {
+  it('should reprompt for required parameter if parameter status is `INVALID` ', async () => {
     const phoneNumber = '1952919481';
+    const billMonth = 'current';
 
-    const output = exec(`${cmd} ${phoneNumber} ${webhookUrl}`);
-    console.log('invalid-output', output);
+    const output = exec(`${cmd} ${phoneNumber} ${billMonth} ${webhookUrl}`);
+    console.log('required-parameter', output);
+    assert.include(output, 'Sorry');
     assert.include(output, 'INVALID');
   });
 });
