@@ -11,15 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# Code owners file.
-# This file controls who is tagged for review for any given pull request.
-#
-# For syntax help see:
-# https://help.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners#codeowners-syntax
-
-# @GoogleCloudPlatform/ml-apis are the default owners for changes in this repo
-*     @GoogleCloudPlatform/ml-apis
-
-# @nicain is the default owner for the Dialogflow CX webhook python sample
-/dialogflow-cx/ @nicain
