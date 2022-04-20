@@ -45,7 +45,7 @@ jobs:
           echo "::set-output name=id::$(date +%s)" > uuid.txt
           cat uuid.txt
       - name: Upload UUID
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: shared
           path: ./dialogflow-cx/uuid.txt
