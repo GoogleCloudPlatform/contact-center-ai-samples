@@ -85,17 +85,26 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
       // BEGIN validatePhoneLine
       case 'validatePhoneLine': {
         console.log(tag + ' was triggered.');
-        const phone = req.body.sessionInfo.parameters.phone_number;
+        let phone = req.body.sessionInfo.parameters.phone_number;
+        let parameter_state = 'VALID';
+        let fulfillmentMessage = 'Thanks for providing your phone number!';
         let phone_line_verified;
         let line_index;
         let domestic_coverage;
-        let parameter_state;
         const covered_lines = [
           '5555555555',
           '5105105100',
           '1231231234',
           '9999999999',
         ];
+
+        if (!covered_lines.includes(phone)) {
+          parameter_state = 'INVALID';
+          fulfillmentMessage =
+            'Sorry, we do not recognize that number. Please try again later!';
+          // we will reset the session parameter to 'null' so that the user can re-enter a new phone number
+          phone = null;
+        }
 
         // Loop over the covered lines array
         covered_lines.forEach((line, index) => {
@@ -110,10 +119,8 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
         // Only 9999 will fail;
         if (line_index === 3) {
           phone_line_verified = 'false';
-          parameter_state = 'INVALID';
         } else {
           phone_line_verified = 'true';
-          parameter_state = 'VALID';
         }
 
         // Only 1234 will have domestic coverage.
@@ -124,11 +131,21 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
         }
 
         res.status(200).send({
+          fulfillmentResponse: {
+            messages: [
+              {
+                text: {
+                  text: [fulfillmentMessage],
+                },
+              },
+            ],
+          },
           pageInfo: {
             formInfo: {
               parameterInfo: [
                 {
                   displayName: 'phone_number',
+                  required: true,
                   state: parameter_state,
                 },
               ],
@@ -138,6 +155,7 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
             parameters: {
               phone_line_verified: phone_line_verified,
               domestic_coverage: domestic_coverage,
+              phone: phone,
             },
           },
         });
