@@ -108,10 +108,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: shared
+          path: shared
       - name: UUID to env
+        working-directory: shared
         id: build_id
         run: |-
-          cat ../shared/uuid.txt
+          cat uuid.txt
       - name: Run unit tests
         run: |-
           pytest -m hermetic
@@ -145,10 +147,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: shared
+          path: shared
       - name: UUID to env
         id: build_id
+        working-directory: shared
         run: |-
-          cat ../shared/uuid.txt
+          cat uuid.txt
       - id: 'basic_sample'
         name: Get Webhook Env Vars
         run: |-
