@@ -74,3 +74,4 @@ jobs:
           PYTHON_ISORT_CONFIG_FILE: pyproject.toml
           JSCPD_CONFIG_FILE: .jscpd.json
           FILTER_REGEX_EXCLUDE: noxfile.py
+          PYTHON_FLAKE8_CONFIG_FILE: .flake8

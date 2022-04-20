@@ -31,10 +31,8 @@ def test_basic_webhook(mocked_request):
     response_json = webhook_fcn(mocked_request)
 
     # Assert:
-    assert (
-        extract_text(response_json)
-        == f"Webhook received: {mock_text} (Tag: {mock_tag})"
-    )
+    expected = f"Webhook received: {mock_text} (Tag: {mock_tag})"
+    assert extract_text(response_json) == expected
 
 
 @pytest.mark.hermetic
