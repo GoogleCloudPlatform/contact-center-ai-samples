@@ -14,7 +14,7 @@
 
 'use strict';
 
-function main(phoneNumber, billMonth, webhookUrl, paramRequired) {
+function main(phoneNumber, webhookUrl, paramRequired) {
   // [START dialogflow_v3beta1_webhook_optional_or_required_form_parameters_async]
   /*
     TODO(developer): Uncomment these variables before running the sample.
@@ -34,14 +34,16 @@ function main(phoneNumber, billMonth, webhookUrl, paramRequired) {
     fulfillmentInfo: {
       tag: 'validatePhoneLine',
     },
-    sessionInfo: {
-      parameters: {
-        phone_number: phoneNumber,
-        bill_state: billMonth,
+    pageInfo: {
+      formInfo: {
+        parameterInfo: [
+          {
+            displayName: 'phone_number',
+            required: paramRequired,
+            value: phoneNumber,
+          },
+        ],
       },
-    },
-    payload: {
-        paramRequired: paramRequired,
     },
   };
 

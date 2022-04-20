@@ -85,8 +85,9 @@ exports.cxPrebuiltAgentsTelecom = (req, res) => {
       // BEGIN validatePhoneLine
       case 'validatePhoneLine': {
         console.log(tag + ' was triggered.');
-        const paramRequired = req.body.payload.paramRequired;
-        let phone = req.body.sessionInfo.parameters.phone_number;
+        const paramRequired =
+          req.body.pageInfo.formInfo.parameterInfo[0].required;
+        let phone = req.body.pageInfo.formInfo.parameterInfo[0].value;
         let parameter_state = 'VALID';
         let fulfillmentMessage = 'Thanks for providing your phone number!';
         let phone_line_verified;
