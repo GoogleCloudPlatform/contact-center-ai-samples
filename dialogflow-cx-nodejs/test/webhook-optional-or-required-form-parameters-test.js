@@ -26,8 +26,24 @@ describe('optional or required parameters', async () => {
   it('should reprompt for required parameter if parameter status is `INVALID` ', async () => {
     const phoneNumber = '1952919481';
     const billMonth = 'current';
+    const paramRequired = true;
 
-    const output = exec(`${cmd} ${phoneNumber} ${billMonth} ${webhookUrl}`);
+    const output = exec(
+      `${cmd} ${phoneNumber} ${billMonth} ${webhookUrl} ${paramRequired}`
+    );
+    console.log('required-parameter', output);
+    assert.include(output, 'Sorry');
+    assert.include(output, 'INVALID');
+  });
+
+  it('should NOT reprompt for optional parameter even if parameter status is `INVALID` ', async () => {
+    const phoneNumber = '1952919481';
+    const billMonth = 'current';
+    const paramRequired = false;
+
+    const output = exec(
+      `${cmd} ${phoneNumber} ${billMonth} ${webhookUrl} ${paramRequired}`
+    );
     console.log('required-parameter', output);
     assert.include(output, 'Sorry');
     assert.include(output, 'INVALID');

@@ -14,13 +14,14 @@
 
 'use strict';
 
-function main(phoneNumber, billMonth, webhookUrl) {
+function main(phoneNumber, billMonth, webhookUrl, paramRequired) {
   // [START dialogflow_v3beta1_webhook_optional_or_required_form_parameters_async]
   /*
     TODO(developer): Uncomment these variables before running the sample.
     const phoneNumber = 'your-phone-line';
     const billMonth = 'your-bill-month';
     const webhookUrl = 'your-webhook-trigger-url';
+    const paramRequired = 'true-or-false';
   */
 
   // Webhook will verify if phone number is valid. You can find the webhook logic in lines 85-162 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
@@ -38,6 +39,9 @@ function main(phoneNumber, billMonth, webhookUrl) {
         phone_number: phoneNumber,
         bill_state: billMonth,
       },
+    },
+    payload: {
+        paramRequired: paramRequired,
     },
   };
 
