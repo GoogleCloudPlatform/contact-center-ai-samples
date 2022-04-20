@@ -75,3 +75,4 @@ jobs:
           JSCPD_CONFIG_FILE: .jscpd.json
           FILTER_REGEX_EXCLUDE: noxfile.py
           PYTHON_FLAKE8_CONFIG_FILE: .flake8
+          VALIDATE_GITHUB_ACTIONS: false
