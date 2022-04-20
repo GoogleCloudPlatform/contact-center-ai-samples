@@ -30,8 +30,6 @@ variable "webhook_function_entrypoint" {
 locals {
 	root_dir = abspath("./")
   archive_path = abspath("./tmp/function.zip")
-  billing_account = "0145C0-557C58-C970F3"
-  org_id = "298490623289"
   region = "us-central1"
 }
 
