@@ -1,0 +1,173 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+name: "Dialogflow CX Examples: Basic Python"
+env:
+  WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+  OIDC_SERVICE_ACCOUNT: ${{ secrets.OIDC_SERVICE_ACCOUNT }}
+  TERRAFORM_IMAGE: 'hashicorp/terraform:1.1.7'
+on:
+  pull_request_target:
+    branches: [main]
+    paths:
+      - .github/workflows/dialogflow-cx-python.yaml
+      - dialogflow-cx/**
+permissions: {}
+jobs:
+  setup_terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./dialogflow-cx
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create run uuid
+        id: build_id
+        run: |-
+          echo "::set-output name=id::$(date +%s)" > uuid.txt
+          cat uuid.txt
+      - name: Upload UUID
+        uses: actions/upload-artifact@v3
+        with:
+          name: shared
+          path: ./dialogflow-cx/uuid.txt
+      - id: 'auth'
+        name: 'Authenticate to GCP'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          create_credentials_file: 'true'
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.OIDC_SERVICE_ACCOUNT }}
+      - id: 'basic_sample'
+        name: Get Webhook Env Vars
+        run: |-
+          export WEBHOOK_FUNCTION_NAME 
+          export WEBHOOK_FUNCTION_ENTRYPOINT 
+          WEBHOOK_FUNCTION_NAME="$(python -c "from webhook.main import get_webhook_name; print(get_webhook_name(\"${BUILD_UUID?}\"))")"
+          WEBHOOK_FUNCTION_ENTRYPOINT="$(python -c "from webhook.main import get_webhook_entrypoint; print(get_webhook_entrypoint())")"
+          echo "::set-output name=webhook-name::$WEBHOOK_FUNCTION_NAME"
+          echo "::set-output name=webhook-entrypoint::$WEBHOOK_FUNCTION_ENTRYPOINT"
+        env:
+          PROJECT_ID: df-terraform-dev
+          BUILD_UUID: ${{ steps.build_id.outputs.id }}
+      - name: Terraform Init/Apply
+        run: |-
+          cp "${{ steps.auth.outputs.credentials_file_path }}" terraform/application_default_credentials.json
+          cp -r webhook terraform
+          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v "$(pwd)"/terraform:/app -v "$(pwd)"/webhook:/app/webhook ${{ env.TERRAFORM_IMAGE }} init
+          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v "$(pwd)"/terraform:/app -v "$(pwd)"/webhook:/app/webhook ${{ env.TERRAFORM_IMAGE }} apply --auto-approve -var project_id="${PROJECT_ID?}" -var webhook_function_name="${WEBHOOK_FUNCTION_NAME?}" -var webhook_function_entrypoint="${WEBHOOK_FUNCTION_ENTRYPOINT?}"
+        env:
+          PROJECT_ID: df-terraform-dev
+          WEBHOOK_FUNCTION_NAME: ${{ steps.basic_sample.outputs.webhook-name }}
+          WEBHOOK_FUNCTION_ENTRYPOINT: ${{ steps.basic_sample.outputs.webhook-entrypoint }}
+  integration_tests:
+    needs: [setup_terraform]
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./dialogflow-cx
+    strategy:
+      matrix:
+        python: ["3.9"]
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+      - uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/checkout@v3
+      - name: Install requirements.txt
+        run: |-
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-test.txt
+      - id: 'auth'
+        name: 'Authenticate to GCP'
+        uses: 'google-github-actions/auth@v0'
+        with:
+            create_credentials_file: 'true'
+            workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+            service_account: ${{ env.OIDC_SERVICE_ACCOUNT }}
+      - name: Download UUID
+        uses: actions/download-artifact@v3
+        with:
+          name: shared
+      - name: UUID to env
+        id: build_id
+        run: |-
+          cat ../shared/uuid.txt
+      - name: Run unit tests
+        run: |-
+          pytest -m hermetic
+      - name: Run integration tests
+        run: |-
+          pytest -m integration
+        env:
+          PROJECT_ID: df-terraform-dev
+          BUILD_UUID: ${{ steps.build_id.outputs.id }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+  teardown_terraform:
+    needs: [setup_terraform, integration_tests]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./dialogflow-cx
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+      - uses: actions/checkout@v3
+      - id: 'auth'
+        name: 'Authenticate to GCP'
+        uses: 'google-github-actions/auth@v0'
+        with:
+            create_credentials_file: 'true'
+            workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+            service_account: ${{ env.OIDC_SERVICE_ACCOUNT }}
+      - name: Download UUID
+        uses: actions/download-artifact@v3
+        with:
+          name: shared
+      - name: UUID to env
+        id: build_id
+        run: |-
+          cat ../shared/uuid.txt
+      - id: 'basic_sample'
+        name: Get Webhook Env Vars
+        run: |-
+          export WEBHOOK_NAME
+          export WEBHOOK_ENTRYPOINT
+          WEBHOOK_NAME="$(python -c "from webhook.main import get_webhook_name; print(get_webhook_name(\"${BUILD_UUID?}\"))")"
+          WEBHOOK_ENTRYPOINT="$(python -c "from webhook.main import get_webhook_entrypoint; print(get_webhook_entrypoint())")"
+          echo "::set-output name=webhook-name::$WEBHOOK_NAME"
+          echo "::set-output name=webhook-entrypoint::$WEBHOOK_ENTRYPOINT"
+        env:
+          PROJECT_ID: df-terraform-dev
+          BUILD_UUID: ${{ steps.build_id.outputs.id }}
+      - name: Terraform Init/Destroy
+        run: |-
+          cp "${{ steps.auth.outputs.credentials_file_path }}" terraform/application_default_credentials.json
+          cp -r webhook terraform
+          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v "$(pwd)"/terraform:/app -v "$(pwd)"/webhook:/app/webhook ${{ env.TERRAFORM_IMAGE }} init
+          docker run --env GOOGLE_APPLICATION_CREDENTIALS=/app/application_default_credentials.json -w /app -v "$(pwd)"/terraform:/app -v "$(pwd)"/webhook:/app/webhook ${{ env.TERRAFORM_IMAGE }} destroy --auto-approve -var project_id="${PROJECT_ID?}" -var webhook_function_name="${WEBHOOK_FUNCTION_NAME?}" -var webhook_function_entrypoint="${WEBHOOK_FUNCTION_ENTRYPOINT?}"
+        env:
+          PROJECT_ID: df-terraform-dev
+          WEBHOOK_FUNCTION_NAME: ${{ steps.basic_sample.outputs.webhook-name }}
+          WEBHOOK_FUNCTION_ENTRYPOINT: ${{ steps.basic_sample.outputs.webhook-entrypoint }}
