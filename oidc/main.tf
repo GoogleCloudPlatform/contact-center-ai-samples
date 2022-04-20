@@ -17,6 +17,11 @@ variable "project_id" {
   type        = string
 }
 
+variable "oidc_service_account" {
+  description = "Required uuid for a test build; links apply and destroy"
+  type        = string
+}
+
 resource "google_project_service" "service" {
   for_each = toset([
     "cloudfunctions.googleapis.com",
@@ -36,16 +41,6 @@ resource "google_project_service" "service" {
   disable_dependent_services = true
 }
 
-resource "google_project_iam_binding" "project" {
-  project = var.project_id
-  role    = "roles/editor"
-
-  members = [
-    "user:nicholascain@google.com",
-    "user:aribray@google.com",
-  ]
-}
-
 resource "google_storage_bucket" "bucket" {
   project = var.project_id
   name     = "ccai-samples-df-tf"
@@ -56,7 +51,7 @@ resource "google_storage_bucket" "bucket" {
 
 resource "google_service_account" "oidc_sa" {
   project    = var.project_id
-  account_id = "oidc-sa-df-3"
+  account_id = var.oidc_service_account
 }
 
 resource "google_project_iam_member" "project" {

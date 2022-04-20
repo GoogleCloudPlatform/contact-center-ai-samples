@@ -14,8 +14,8 @@
 ---
 name: "Dialogflow CX Examples: Basic Python"
 env:
-  WORKLOAD_IDENTITY_PROVIDER: 'projects/792212140555/locations/global/workloadIdentityPools/gh-pool-df-3/providers/gh-provider-df-3'
-  OIDC_SERVICE_ACCOUNT: 'oidc-sa-df-3@df-terraform-dev.iam.gserviceaccount.com'
+  WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+  OIDC_SERVICE_ACCOUNT: ${{ secrets.OIDC_SERVICE_ACCOUNT }}
   TERRAFORM_IMAGE: 'hashicorp/terraform:1.1.7'
 on:
   push:
