@@ -194,7 +194,7 @@ class DialogflowSample:
         return test_case
 
     def run_test_case(self, test_case, expected_session_parameters):
-        """Runs a test case using the TestCases API."""
+        """Runs a test case using TestCases API."""
         lro = self.test_cases_client.run_test_case(
             request=cx.RunTestCaseRequest(name=test_case.name)
         )
