@@ -29,6 +29,7 @@ class SessionsDelegator(ClientDelegator):
     _CLIENT_CLASS = cx.SessionsClient
 
     def __init__(self, controller: ds.DialogflowSample, **kwargs) -> None:
+        self.language_code = kwargs.pop("language_code", "en")
         super().__init__(controller, **kwargs)
 
     def detect_intent(
@@ -55,6 +56,7 @@ class SessionsDelegator(ClientDelegator):
                 text=cx.TextInput(
                     text=text,
                 ),
+                language_code=self.language_code,
             ),
             query_params=cx.QueryParameters(
                 parameters=parameters,
