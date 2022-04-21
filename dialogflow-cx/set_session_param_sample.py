@@ -21,6 +21,7 @@ from webhook.main import get_webhook_uri
 
 
 def get_expected_response():
+    """Gets the response expected from the webhook."""
     return "Session parameter set"
 
 

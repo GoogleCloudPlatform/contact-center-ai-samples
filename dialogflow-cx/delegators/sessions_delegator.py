@@ -70,7 +70,9 @@ class SessionsDelegator(ClientDelegator):
             else:
                 parameters = dict(parameters)
 
-        # Parameters that are "None" are removed from the session. drop_none_params=True performs the same behavior client-side, to stay in-sync
+        # Parameters that are "None" are removed from the session.
+        #  drop_none_params=True performs the same behavior client-side,
+        #  to stay in-sync
         if drop_none_params:
             parameters = {
                 key: val for key, val in parameters.items() if val is not None

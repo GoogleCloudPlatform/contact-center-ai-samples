@@ -102,6 +102,7 @@ def validate_form(request):
 
 
 def set_session_param(request):
+    """Sets a session param detected in the intent."""
     request_dict = request.get_json()
     parameters = request_dict["sessionInfo"]["parameters"]
     key = parameters["key"]

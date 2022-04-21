@@ -43,6 +43,7 @@ class IntentDelegator(ClientDelegator):
         return self._intent
 
     def get_intent(self):
+        """Create and Intent object to be pushed to the API."""
         training_phrases = []
         for training_phrase_text in self.training_phrases:
             training_phrase = cx.Intent.TrainingPhrase(
@@ -92,6 +93,8 @@ class IntentDelegator(ClientDelegator):
 
 
 class AnnotatedIntentDelegator(IntentDelegator):
+    """IntentDelegator with annotated spans of text for parameter detection."""
+
     def __init__(
         self,
         controller: ds.DialogflowSample,
@@ -103,6 +106,7 @@ class AnnotatedIntentDelegator(IntentDelegator):
         self.parameters = parameters
 
     def get_intent(self):
+        """Create and Intent object to be pushed to the API, including parameters."""
         return cx.Intent(
             {
                 "display_name": self.display_name,

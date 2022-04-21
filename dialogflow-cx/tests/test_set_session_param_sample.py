@@ -36,6 +36,7 @@ def fixture_sample(session_uuid, project_id, webhook_uri):
     del sample
 
 
+#  pylint: disable=too-many-arguments
 @pytest.mark.integration
 @pytest.mark.flaky(max_runs=3, reruns_delay=5)
 @pytest.mark.parametrize(
