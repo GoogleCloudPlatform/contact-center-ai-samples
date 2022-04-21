@@ -39,9 +39,11 @@ class SessionsDelegator(ClientDelegator):
         **kwargs,
     ):
         """Run detect_intent for a session against an Agent."""
-        parameters = kwargs.pop('parameters', {})
-        session_id = kwargs.pop('session_id', str(uuid.uuid1()))
-        current_page = kwargs.pop('current_page', self.controller.start_flow_delegator.start_page_name)
+        parameters = kwargs.pop("parameters", {})
+        session_id = kwargs.pop("session_id", str(uuid.uuid1()))
+        current_page = kwargs.pop(
+            "current_page", self.controller.start_flow_delegator.start_page_name
+        )
 
         request = cx.DetectIntentRequest(
             session=f"{self.controller.agent_delegator.agent.name}/sessions/{session_id}",
@@ -70,6 +72,8 @@ class SessionsDelegator(ClientDelegator):
 
         # Parameters that are "None" are removed from the session. drop_none_params=True performs the same behavior client-side, to stay in-sync
         if drop_none_params:
-            parameters = {key:val for key, val in parameters.items() if val is not None}
+            parameters = {
+                key: val for key, val in parameters.items() if val is not None
+            }
 
         return responses, current_page, parameters

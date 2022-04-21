@@ -15,7 +15,12 @@
 """Tests for webhook module."""
 
 import pytest
-from webhook.main import build_request_dict_basic, extract_text, webhook_fcn
+from webhook.main import (
+    build_request_dict_basic,
+    extract_session_parameters,
+    extract_text,
+    webhook_fcn,
+)
 
 
 @pytest.mark.hermetic
@@ -62,3 +67,28 @@ def test_validate_form(mocked_request, test_input, expected):
 
     # Assert:
     assert extract_text(response_json) == expected
+
+
+@pytest.mark.hermetic
+def test_set_session_param(mocked_request):
+    """Locally tests the set session parameter webhook function."""
+
+    # Arrange:
+    mock_key = "MOCK_KEY"
+    mock_val = "MOCK_VAL"
+    request_mapping = {}
+    request_mapping["fulfillmentInfo"] = {}
+    request_mapping["fulfillmentInfo"]["tag"] = "set_session_param"
+    request_mapping["sessionInfo"] = {}
+    request_mapping["sessionInfo"]["parameters"] = {
+        "key": mock_key,
+        "val": mock_val,
+    }
+    mocked_request.payload = request_mapping
+
+    # Act:
+    response_json = webhook_fcn(mocked_request)
+
+    # Assert:
+    assert extract_text(response_json) == "Session parameter set"
+    assert extract_session_parameters(response_json)[mock_key] == mock_val

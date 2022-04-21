@@ -17,7 +17,7 @@
 from .agent_delegator import AgentDelegator
 from .auth_delegator import AuthDelegator
 from .client_delegator import ClientDelegator
-from .intent_delegator import IntentDelegator
+from .intent_delegator import AnnotatedIntentDelegator, IntentDelegator
 from .page_delegator import FulfillmentPageDelegator, PageDelegator, StartPageDelegator
 from .sessions_delegator import SessionsDelegator
 from .start_flow_delegator import StartFlowDelegator
@@ -29,6 +29,7 @@ __all__ = (
     "AuthDelegator",
     "ClientDelegator",
     "IntentDelegator",
+    "AnnotatedIntentDelegator",
     "FulfillmentPageDelegator",
     "PageDelegator",
     "StartPageDelegator",

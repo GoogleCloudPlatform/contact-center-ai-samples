@@ -101,6 +101,33 @@ def validate_form(request):
     )
 
 
+def set_session_param(request):
+    request_dict = request.get_json()
+    parameters = request_dict["sessionInfo"]["parameters"]
+    key = parameters["key"]
+    val = parameters["val"]
+    return json.dumps(
+        {
+            "fulfillment_response": {
+                "messages": [
+                    {
+                        "text": {
+                            "text": ["Session parameter set"],
+                        }
+                    }
+                ]
+            },
+            "session_info": {
+                "parameters": {
+                    key: val,
+                    "key": None,
+                    "val": None,
+                }
+            },
+        }
+    )
+
+
 def webhook_fcn(request):
     """Delegates a request to an appropriate function, based on tag."""
     request_dict = request.get_json()
@@ -111,6 +138,8 @@ def webhook_fcn(request):
         return basic_webhook(request)
     if tag == "validate_form":
         return validate_form(request)
+    if tag == "set_session_param":
+        return set_session_param(request)
     raise RuntimeError(f"Unrecognized tag: {tag}")
 
 
@@ -144,3 +173,9 @@ def extract_text(response_json: str, message_index=0):
     response = json.loads(response_json)
     messages = response["fulfillment_response"]["messages"]
     return messages[message_index]["text"]["text"][0]
+
+
+def extract_session_parameters(response_json: str):
+    """Extracts session parameters from the json response of a Dialogflow webhook."""
+    response = json.loads(response_json)
+    return response["session_info"]["parameters"]
