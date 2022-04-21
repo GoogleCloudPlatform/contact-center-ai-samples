@@ -15,7 +15,7 @@
 'use strict';
 
 async function main(projectId, location, agentId, query, languageCode) {
-  // [START dialogflow_revive_previous_session_state_async]
+  // [START dialogflow_v3beta1_revive_previous_session_state_async]
 
   // projectId = 'my-project';
   // location = 'global';
@@ -123,7 +123,7 @@ async function main(projectId, location, agentId, query, languageCode) {
   }
 
   revivePreviousSessionState();
-  // [END dialogflow_revive_previous_session_state_async]
+  // [END dialogflow_v3beta1_revive_previous_session_state_async]
 }
 
 process.on('unhandledRejection', err => {
