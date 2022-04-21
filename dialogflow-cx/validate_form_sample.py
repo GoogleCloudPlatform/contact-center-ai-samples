@@ -123,9 +123,7 @@ if __name__ == "__main__":
 
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Setup Dialogflow CX basic webhook sample"
-    )
+    parser = argparse.ArgumentParser(description="Setup Validate Form webhook sample")
     parser.add_argument(
         "--agent-display-name",
         help="Display name of the Dialogflow CX agent",
@@ -177,52 +175,8 @@ if __name__ == "__main__":
     sample.run(user_input)
     if tear_down:
         sample.tear_down()
-
-        # for test_case_delegator in self.test_case_delegators.values():
-        #     test_case_delegator.tear_down()
-# import test_case_delegator as tcd
-# TEST_CASES = {
-#     "Test Case 0": {
-#         "input_text": ["trigger_intent", "21"],
-#         "expected_response_text": [
-#             [_PAGE_ENTRY_FULFILLMENT_TEXT, _PAGE_PROMPT],
-#             ["Form Filled", "Valid age"],
-#         ],
-#         "expected_exception": None,
-#     },
-#     "Test Case 1": {
-#         "input_text": ["trigger_intent", "-1"],
-#         "expected_response_text": [
-#             [_PAGE_ENTRY_FULFILLMENT_TEXT, _PAGE_PROMPT],
-#             ["Form Filled", "Age -1 not valid (must be positive)"],
-#         ],
-#         "expected_exception": tcd.DialogflowTestCaseFailure,
-#     },
-# }
-# for test_case_delegator in self.test_case_delegators.values():
-# test_case_delegator.setup()
-
-# for display_name, test_config in self.TEST_CASES.items():
-#     turn_0 = turn.Turn(
-#         test_config["input_text"][0],
-#         test_config["expected_response_text"][0],
-#         self.page_delegator,
-#         self.intent_delegator,
-#     )
-#     turn_1 = turn.Turn(
-#         test_config["input_text"][1],
-#         test_config["expected_response_text"][1],
-#         self.start_page_delegator,
-#     )
-#     conversation_turns = [turn_0, turn_1]
-
-#     self.add_test_case_delegator(
-#         display_name,
-#         tcd.TestCaseDelegator(
-#             self,
-#             is_webhook_enabled=True,
-#             display_name=display_name,
-#             conversation_turns=conversation_turns,
-#             expected_exception=test_config["expected_exception"],
-#         ),
-#     )
+    else:
+        print(
+            "Agent sample available at: "
+            f"https://dialogflow.cloud.google.com/cx/{sample.start_flow_delegator.flow.name}"
+        )

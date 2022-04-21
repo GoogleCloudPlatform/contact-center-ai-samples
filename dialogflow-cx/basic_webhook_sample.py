@@ -161,3 +161,8 @@ if __name__ == "__main__":
     sample.run(user_input)
     if tear_down:
         sample.tear_down()
+    else:
+        print(
+            "Agent sample available at: "
+            f"https://dialogflow.cloud.google.com/cx/{sample.start_flow_delegator.flow.name}"
+        )
