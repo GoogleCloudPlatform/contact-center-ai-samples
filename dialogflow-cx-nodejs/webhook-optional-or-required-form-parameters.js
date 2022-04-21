@@ -14,12 +14,15 @@
 
 'use strict';
 
-function main(phoneNumber, webhookUrl) {
-  // [START dialogflow_v3beta1_webhook_validate_form_parameters_async]
-
-  // TODO(developer): Uncomment these variables before running the sample.
-  // const phoneNumber = 'your-phone-line';
-  // const webhookUrl = 'your-webhook-trigger-url';
+function main(phoneNumber, webhookUrl, paramRequired) {
+  // [START dialogflow_v3beta1_webhook_optional_or_required_form_parameters_async]
+  /*
+    TODO(developer): Uncomment these variables before running the sample.
+    const phoneNumber = 'your-phone-line';
+    const billMonth = 'your-bill-month';
+    const webhookUrl = 'your-webhook-trigger-url';
+    const paramRequired = 'true-or-false';
+  */
 
   // Webhook will verify if phone number is valid. You can find the webhook logic in lines 85-162 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
   // List of covered phone lines.
@@ -31,14 +34,22 @@ function main(phoneNumber, webhookUrl) {
     fulfillmentInfo: {
       tag: 'validatePhoneLine',
     },
-    sessionInfo: {
-      parameters: {
-        phone_number: phoneNumber,
+    pageInfo: {
+      formInfo: {
+        parameterInfo: [
+          {
+            displayName: 'phone_number',
+            required: paramRequired,
+            value: phoneNumber,
+          },
+        ],
       },
     },
   };
 
-  async function validateParameter() {
+  console.log('Webhook request', webhookRequest);
+
+  async function setParametersOptionalOrRequired() {
     await axios({
       method: 'POST',
       url: webhookUrl,
@@ -46,21 +57,17 @@ function main(phoneNumber, webhookUrl) {
     })
       .then(res => {
         console.log('response body', res.data);
-        const fulfillmentResponseMessage =
-          res.data.fulfillmentResponse.messages[0].text.text[0];
 
-        const parameterInfoState =
-          res.data.pageInfo.formInfo.parameterInfo[0].state;
+        // The WebhookResponse will trigger a reprompt if an 'INVALID' parameter is 'required: true'
+        console.log('Is phone number parameter required?:');
+        console.log(res.data.pageInfo.formInfo.parameterInfo[0].required, '\n'); // 'true' or 'false'
 
-        console.log('Fulfillment Response:');
-        console.log(fulfillmentResponseMessage, '\n');
+        console.log('Is phone number parameter `VALID` or `INVALID`?');
+        console.log(res.data.pageInfo.formInfo.parameterInfo[0].state);
 
-        console.log('Parameter Status:');
-        console.log(parameterInfoState, '\n'); // Parameter state: 'VALID' or 'INVALID'
-
-        // We reset the session parameter state to `null` so that the user can re-enter a phone number without
-        console.log('Phone Number parameter value:');
-        console.log(res.data.sessionInfo.parameters.phone, '\n');
+        // The webhook will return a fulfillment message for the user
+        console.log('Fulfillment Message');
+        console.log(res.data.fulfillmentResponse.messages[0].text.text[0]);
       })
       .catch(err => {
         if (err.response) {
@@ -78,9 +85,9 @@ function main(phoneNumber, webhookUrl) {
         }
       });
   }
-  // [END dialogflow_v3beta1_webhook_validate_form_parameters_async]
+  // [END dialogflow_v3beta1_webhook_optional_or_required_form_parameters_async]
 
-  validateParameter();
+  setParametersOptionalOrRequired();
 }
 
 process.on('unhandledRejection', err => {
