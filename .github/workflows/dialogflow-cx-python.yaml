@@ -109,9 +109,10 @@ jobs:
             workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
             service_account: ${{ env.OIDC_SERVICE_ACCOUNT }}
       - name: Download UUID
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
         with:
           name: shared
+          path: shared
       - name: UUID to env
         id: build_id
         run: |-
@@ -146,9 +147,10 @@ jobs:
             workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
             service_account: ${{ env.OIDC_SERVICE_ACCOUNT }}
       - name: Download UUID
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
         with:
           name: shared
+          path: shared
       - name: UUID to env
         id: build_id
         run: |-
