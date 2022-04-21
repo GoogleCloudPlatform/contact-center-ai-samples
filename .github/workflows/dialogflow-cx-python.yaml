@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-name: "Dialogflow CX Examples: Basic Python"
+name: "Dialogflow CX Examples: Python"
 env:
   WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
   OIDC_SERVICE_ACCOUNT: ${{ secrets.OIDC_SERVICE_ACCOUNT }}
