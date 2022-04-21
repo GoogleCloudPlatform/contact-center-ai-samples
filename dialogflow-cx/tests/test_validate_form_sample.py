@@ -20,7 +20,7 @@ from utilities import create_conversational_turn, run_hermetic_test
 from validate_form_sample import ValidateFormSample
 
 
-@pytest.fixture(name="sample", scope="session")
+@pytest.fixture(name="sample", scope="function")
 def fixture_sample(session_uuid, project_id, webhook_uri):
     """Test fixture reused for all ValidateFormSample tests."""
     sample = ValidateFormSample(

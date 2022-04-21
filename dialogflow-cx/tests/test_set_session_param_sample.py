@@ -21,7 +21,7 @@ from set_session_param_sample import SetSessionParamSample
 from utilities import create_conversational_turn, run_hermetic_test
 
 
-@pytest.fixture(name="sample", scope="session")
+@pytest.fixture(name="sample", scope="function")
 def fixture_sample(session_uuid, project_id, webhook_uri):
     """Test fixture reused for all SetSessionParamSample tests."""
     sample = SetSessionParamSample(
