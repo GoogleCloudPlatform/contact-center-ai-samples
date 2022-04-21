@@ -12,19 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Dialogflow CX form validation webhook sample unit tests."""
+"""Dialogflow CX sample: Setting a session parameter with a webhook."""
 
 
+import dialogflow_sample as ds
 import pytest
+from set_session_param_sample import SetSessionParamSample
 from utilities import create_conversational_turn, run_hermetic_test
-from validate_form_sample import ValidateFormSample
 
 
 @pytest.fixture(name="sample", scope="function")
 def fixture_sample(session_uuid, project_id, webhook_uri):
-    """Test fixture reused for all ValidateFormSample tests."""
-    sample = ValidateFormSample(
-        agent_display_name=f"ValidateFormSample (test session {session_uuid})",
+    """Test fixture reused for all SetSessionParamSample tests."""
+    sample = SetSessionParamSample(
+        agent_display_name=f"SetSessionParamSample (test session {session_uuid})",
         project_id=project_id,
         quota_project_id=project_id,
         webhook_uri=webhook_uri,
@@ -35,42 +36,44 @@ def fixture_sample(session_uuid, project_id, webhook_uri):
     del sample
 
 
+#  pylint: disable=too-many-arguments
 @pytest.mark.integration
 @pytest.mark.flaky(max_runs=3, reruns_delay=5)
 @pytest.mark.parametrize(
-    "display_name,user_input,expected_response,exception",
+    "display_name,user_input,expected_response,expected_params,exception",
     [
-        ("validate_form_sample_valid", "22.0", "Valid age", None),
         (
-            "validate_form_sample_not_valid",
-            "-1.0",
-            "Age -1.0 not valid (must be positive)",
+            "valid",
+            "set session parameter MOCK_KEY to MOCK_VAL",
+            ["Entering Main Page", "Session parameter set"],
+            {"MOCK_KEY": "MOCK_VAL", "val": None, "key": None},
             None,
         ),
+        (
+            "wrong_params",
+            "set session parameter MOCK_KEY to MOCK_VAL",
+            ["Entering Main Page", "Session parameter set"],
+            {},
+            ds.SessionParametersFailure,
+        ),
+        ("wrong_response", "XFAIL", ["XFAIL"], {}, ds.UnexpectedResponseFailure),
     ],
 )
-def test_validate_form_sample(
-    display_name, user_input, expected_response, exception, sample
+def test_set_session_param_sample(
+    display_name, user_input, expected_response, expected_params, exception, sample
 ):
-    """Test the ValidateFormSample test cases."""
+    """Test the SetSessionParamSample test cases."""
     is_webhook_enabled = True
     test_case_conversation_turns = [
         create_conversational_turn(
-            "trigger intent",
-            ["Entering Main Page", "What is your age?"],
+            user_input,
+            expected_response,
             sample.intent_delegator.intent,
             sample.page_delegator.page,
             is_webhook_enabled,
         ),
-        create_conversational_turn(
-            user_input,
-            ["Form Filled", expected_response],
-            None,
-            sample.start_page_delegator.page,
-            is_webhook_enabled,
-        ),
     ]
-    expected_session_parameters = [{}, {"age": float(user_input)}]
+    expected_session_parameters = [expected_params]
     test_case = sample.create_test_case(
         display_name,
         test_case_conversation_turns,
@@ -83,9 +86,9 @@ def test_validate_form_sample(
 
 
 @pytest.mark.hermetic
-def test_basic_webhook_sample_hermetic():
-    """Test the ValidateFormSample test cases with mocked API interactions."""
-    sample = ValidateFormSample(
+def test_set_session_param_sample_hermetic():
+    """Test the SetSessionParamSample test cases with mocked API interactions."""
+    sample = SetSessionParamSample(
         agent_display_name="MOCK_AGENT_DISPLAY_NAME",
         project_id=-1,
         webhook_uri="MOCK_WEBHOOK_URI",

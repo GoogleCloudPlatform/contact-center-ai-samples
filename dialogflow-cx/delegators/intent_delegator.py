@@ -42,8 +42,8 @@ class IntentDelegator(ClientDelegator):
             raise RuntimeError("Intent not yet created")
         return self._intent
 
-    def setup(self):
-        """Initializes the intent delegator."""
+    def get_intent(self):
+        """Create and Intent object to be pushed to the API."""
         training_phrases = []
         for training_phrase_text in self.training_phrases:
             training_phrase = cx.Intent.TrainingPhrase(
@@ -55,12 +55,16 @@ class IntentDelegator(ClientDelegator):
             )
             training_phrases.append(training_phrase)
 
-        intent = cx.Intent(
+        return cx.Intent(
             {
                 "display_name": self.display_name,
                 "training_phrases": training_phrases,
             }
         )
+
+    def setup(self):
+        """Initializes the intent delegator."""
+        intent = self.get_intent()
         try:
             self._intent = self.client.create_intent(
                 parent=self.parent,
@@ -86,3 +90,27 @@ class IntentDelegator(ClientDelegator):
             self._intent = None
         except google.api_core.exceptions.NotFound:
             pass
+
+
+class AnnotatedIntentDelegator(IntentDelegator):
+    """IntentDelegator with annotated spans of text for parameter detection."""
+
+    def __init__(
+        self,
+        controller: ds.DialogflowSample,
+        training_phrases: List[cx.Intent.TrainingPhrase.Part],
+        parameters: List[cx.Intent.Parameter],
+        **kwargs,
+    ) -> None:
+        super().__init__(controller, training_phrases=training_phrases, **kwargs)
+        self.parameters = parameters
+
+    def get_intent(self):
+        """Create and Intent object to be pushed to the API, including parameters."""
+        return cx.Intent(
+            {
+                "display_name": self.display_name,
+                "training_phrases": self.training_phrases,
+                "parameters": self.parameters,
+            }
+        )
