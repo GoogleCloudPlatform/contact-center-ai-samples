@@ -124,7 +124,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Setup Dialogflow CX basic webhook sample"
+        description="Setup Validate Form webhook sample"
     )
     parser.add_argument(
         "--agent-display-name",
