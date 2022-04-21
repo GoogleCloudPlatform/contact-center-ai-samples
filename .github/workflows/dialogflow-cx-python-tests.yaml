@@ -35,7 +35,7 @@ jobs:
       id-token: 'write'
     steps:
       - uses: actions/checkout@v3
-      - name: Create run uuid
+      - name: Create new run uuid
         id: build_id
         run: |-
           echo "::set-output name=id::$(date +%s)" > uuid.txt
