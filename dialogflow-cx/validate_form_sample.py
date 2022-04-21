@@ -123,9 +123,7 @@ if __name__ == "__main__":
 
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Setup Validate Form webhook sample"
-    )
+    parser = argparse.ArgumentParser(description="Setup Validate Form webhook sample")
     parser.add_argument(
         "--agent-display-name",
         help="Display name of the Dialogflow CX agent",
@@ -177,3 +175,8 @@ if __name__ == "__main__":
     sample.run(user_input)
     if tear_down:
         sample.tear_down()
+    else:
+        print(
+            "Agent sample available at: "
+            f"https://dialogflow.cloud.google.com/cx/{sample.start_flow_delegator.flow.name}"
+        )
