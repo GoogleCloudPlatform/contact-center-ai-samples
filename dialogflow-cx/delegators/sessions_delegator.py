@@ -63,7 +63,7 @@ class SessionsDelegator(ClientDelegator):
             responses = [
                 x.text.text[0] for x in response.query_result.response_messages
             ]
-            current_page = response.query_result.current_page.name
+            current_page = response.query_result.current_page.display_name
             parameters = response.query_result.parameters
             if parameters is None:
                 parameters = {}

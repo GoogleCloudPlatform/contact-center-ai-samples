@@ -148,13 +148,14 @@ class DialogflowSample:
         if not session_id:
             session_id = str(uuid.uuid1())
 
+        responses = []
         for text in user_text_list:
             if not quiet:
                 print("User: ")
                 print(f"  Text: {text}")
                 print(f"  Starting Parameters: {parameters}")
                 print(f"  Page: {current_page}")
-            responses, current_page, parameters = self.session_delegator.detect_intent(
+            replies, current_page, parameters = self.session_delegator.detect_intent(
                 text,
                 parameters=parameters,
                 current_page=current_page,
@@ -162,10 +163,12 @@ class DialogflowSample:
             )
             if not quiet:
                 print("  Agent:")
-                for response in responses:
-                    print(f"    Text: {response}")
+                for reply in replies:
+                    print(f"    Text: {reply}")
                 print(f"    Ending Parameters: {parameters}")
                 print(f"    Ending Page: {current_page}")
+            responses.append({'replies':replies, 'parameters':parameters})
+        return responses
 
     def create_test_case(self, display_name, test_case_conversation_turns, flow=None):
         """Create a test case."""
