@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * Uses a webhook to configure session parameters. The session parameters enable an agent response.
+ *
+ * See https://cloud.google.com/dialogflow/cx/docs/quick/api before running the code snippet.
+ */
+
 'use strict';
 
 function main(phoneNumber, billMonth, webhookUrl) {
@@ -22,14 +28,17 @@ function main(phoneNumber, billMonth, webhookUrl) {
   // const billMonth = 'your-bill-month';
   // const webhookUrl = 'your-webhook-trigger-url';
 
-  // You can find the webhook logic for this sample on lines 15-78 in the Prebuilt Telecommunications Agent webhook (`telecommunications-agent-webhook/index.js`).
+  // Webhook will detect a customer anomaly based on the phone number. You can find the webhook logic in lines 15-84 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
   // List of covered phone lines.
   // ['5555555555','5105105100','1231231234','9999999999']
 
+  // Imports axios
   const axios = require('axios');
 
+  // Creates a JSON representation of a WebhookRequest object
   const webhookRequest = {
     fulfillmentInfo: {
+      // Webhook uses tag to determine which function to execute
       tag: 'detectCustomerAnomaly',
     },
     sessionInfo: {
@@ -40,8 +49,7 @@ function main(phoneNumber, billMonth, webhookUrl) {
     },
   };
 
-  console.log('Webhook request', webhookRequest);
-
+  // Calls the webhook service and handles the response
   async function configureSessionParametersEnableAgentResponse() {
     await axios({
       method: 'POST',
@@ -50,14 +58,14 @@ function main(phoneNumber, billMonth, webhookUrl) {
     })
       .then(res => {
         console.log('response body', res.data);
-        // The WebhookResponse will return new parameters populated by the webhook logic.
+        // WebhookResponse will return new parameters populated by the webhook logic.
         const updatedParameters = res.data.sessionInfo.parameters;
 
         // The webhook updates the `first_month` session parameter.
         console.log('First Month Session Parameter:');
         console.log(updatedParameters.first_month, '\n');
 
-        // The configured parameter can be used in the fulfillment message returned by the webhook.
+        // Configured parameter can be used in the fulfillment message returned by the webhook.
         console.log('Agent Response:');
         console.log(res.data.fulfillmentResponse.messages[0].text.text, '\n');
       })

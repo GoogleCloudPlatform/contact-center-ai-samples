@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * Uses a webhook to validate form parameters.
+ *
+ * See https://cloud.google.com/dialogflow/cx/docs/quick/api before running the code snippet.
+ */
+
 'use strict';
 
 function main(phoneNumber, webhookUrl) {
@@ -21,14 +27,17 @@ function main(phoneNumber, webhookUrl) {
   // const phoneNumber = 'your-phone-line';
   // const webhookUrl = 'your-webhook-trigger-url';
 
-  // Webhook will verify if phone number is valid. You can find the webhook logic in lines 85-162 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
+  // Webhook will verify if customer phone number is valid (included in the list of covered phone lines). You can find the webhook logic in lines 85-162 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
   // List of covered phone lines.
   // ['5555555555','5105105100','1231231234','9999999999]
 
+  // Imports axios
   const axios = require('axios');
 
+  // Creates a JSON representation of a WebhookRequest object
   const webhookRequest = {
     fulfillmentInfo: {
+      // Webhook uses tag to determine which function to execute
       tag: 'validatePhoneLine',
     },
     sessionInfo: {
@@ -38,6 +47,7 @@ function main(phoneNumber, webhookUrl) {
     },
   };
 
+  // Calls the webhook service. Validates/invalidates the parameter and handles the response
   async function validateParameter() {
     await axios({
       method: 'POST',
@@ -58,7 +68,7 @@ function main(phoneNumber, webhookUrl) {
         console.log('Parameter Status:');
         console.log(parameterInfoState, '\n'); // Parameter state: 'VALID' or 'INVALID'
 
-        // We reset the session parameter state to `null` so that the user can re-enter a phone number without
+        // If parameter status is 'INVALID', resets the session parameter state to `null` so that the user can enter a new input
         console.log('Phone Number parameter value:');
         console.log(res.data.sessionInfo.parameters.phone, '\n');
       })

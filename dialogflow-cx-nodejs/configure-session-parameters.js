@@ -12,25 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * Uses a webhook to add new session parameters
+ *
+ * See https://cloud.google.com/dialogflow/cx/docs/quick/api before running the code snippet.
+ */
+
 'use strict';
 
 function main(phoneNumber, billMonth, webhookUrl) {
   // [START dialogflow_v3beta1_webhook_configure_session_parameters_async]
-  /*
-    TODO(developer): Uncomment these variables before running the sample.
-    const phoneNumber = 'your-phone-line';
-    const billMonth = 'your-bill-month';
-    const webhookUrl = 'your-webhook-trigger-url';
-  */
 
-  // Webhook will verify if phone number is valid. You can find the webhook logic in lines 15-69 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
+  // TODO(developer): Uncomment these variables before running the sample.
+  // const phoneNumber = 'your-phone-line';
+  // const billMonth = 'your-bill-month';
+  // const webhookUrl = 'your-webhook-trigger-url';
+
+  // Webhook will detect a customer anomaly based on the phone number. You can find the webhook logic in lines 15-84 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
   // List of covered phone lines.
   // ['5555555555','5105105100','1231231234','9999999999]
 
+  // Imports axios
   const axios = require('axios');
 
+  // Creates a JSON representation of a WebhookRequest object
   const webhookRequest = {
     fulfillmentInfo: {
+      // Webhook uses tag to determine which function to execute
       tag: 'detectCustomerAnomaly',
     },
     sessionInfo: {
@@ -41,8 +49,7 @@ function main(phoneNumber, billMonth, webhookUrl) {
     },
   };
 
-  console.log('Webhook request', webhookRequest);
-
+  // Makes a call to the webhook service and handles the response
   async function configureSessionParameters() {
     await axios({
       method: 'POST',
@@ -51,14 +58,15 @@ function main(phoneNumber, billMonth, webhookUrl) {
     })
       .then(res => {
         console.log('response body', res.data);
-        // The WebhookResponse will return new parameters created by the webhook logic.
+
+        // Webhook response includes new parameters created by the webhook
         const updatedParameters = res.data.sessionInfo.parameters;
 
         console.log('Created purchase_amount parameter:');
-        console.log(updatedParameters.purchase_amount, '\n'); // 'true' or 'false'
+        console.log(updatedParameters.purchase_amount, '\n');
 
         console.log('Created first_month parameter:');
-        console.log(updatedParameters.first_month, '\n'); // Parameter state: 'VALID' or 'INVALID'
+        console.log(updatedParameters.first_month, '\n');
       })
       .catch(err => {
         if (err.response) {

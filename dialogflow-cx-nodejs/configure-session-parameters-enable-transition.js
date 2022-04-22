@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * Uses a webhook to configure session parameters The session parameters trigger a page or flow transition.
+ *
+ * See https://cloud.google.com/dialogflow/cx/docs/quick/api before running the code snippet.
+ */
+
 'use strict';
 
 function main(
@@ -34,14 +40,19 @@ function main(
   // const showBillDetailsPageId = 'your-transition-page-id';
   // const suggestServiceCancellationPageId = 'another-transition-page-id';
 
-  // You can find the webhook logic for this sample on lines 15-84 in the Prebuilt Telecommunications Agent webhook (`telecommunications-agent-webhook/index.js`).
+  // Webhook will detect a customer anomaly based on the phone number. You can find the webhook logic in lines 15-84 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
   // List of covered phone lines.
   // ['5555555555','5105105100','1231231234','9999999999']
 
+  // Imports axios
   const axios = require('axios');
 
+  // Creates a JSON representation of a WebhookRequest object
+
+  // TODO move 'target-page' fields into 'pageInfo.formInfo' fields
   const webhookRequest = {
     fulfillmentInfo: {
+      // Webhook uses tag to determine which function to execute
       tag: 'detectCustomerAnomaly',
     },
     sessionInfo: {
@@ -60,8 +71,7 @@ function main(
     },
   };
 
-  console.log('Webhook request', webhookRequest);
-
+  // Calls the webhook service and handles the response
   async function configureSessionParametersEnableTransition() {
     await axios({
       method: 'POST',
@@ -70,7 +80,7 @@ function main(
     })
       .then(res => {
         console.log('response body', res.data);
-        // The WebhookResponse will return the target page based on the session parameter value.
+        // Webhook response returns the target page based on the session parameter value.
         const targetPage = res.data.targetPage;
         const responseMessage =
           res.data.fulfillmentResponse.messages[0].text.text;

@@ -12,26 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * Uses a webhook to configure form parameters as either optional or required.
+ *
+ * See https://cloud.google.com/dialogflow/cx/docs/quick/api before running the code snippet.
+ */
+
 'use strict';
 
 function main(phoneNumber, webhookUrl, paramRequired) {
   // [START dialogflow_v3beta1_webhook_optional_or_required_form_parameters_async]
-  /*
-    TODO(developer): Uncomment these variables before running the sample.
-    const phoneNumber = 'your-phone-line';
-    const billMonth = 'your-bill-month';
-    const webhookUrl = 'your-webhook-trigger-url';
-    const paramRequired = 'true-or-false';
-  */
 
-  // Webhook will verify if phone number is valid. You can find the webhook logic in lines 85-162 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
+  // TODO(developer): Uncomment these variables before running the sample.
+  // const phoneNumber = 'your-phone-line';
+  // const billMonth = 'your-bill-month';
+  // const webhookUrl = 'your-webhook-trigger-url';
+  // const paramRequired = 'true-or-false';
+
+  // Webhook will verify if customer phone number is valid (included in the list of covered phone lines). You can find the webhook logic in lines 85-162 in the Prebuilt Telecommunications Agent `telecommunications-agent-webhook/index.js`.
   // List of covered phone lines.
   // ['5555555555','5105105100','1231231234','9999999999]
 
+  // Imports axios
   const axios = require('axios');
 
+  // Creates a JSON representation of a WebhookRequest object
   const webhookRequest = {
     fulfillmentInfo: {
+      // Webhook uses tag to determine which function to execute
       tag: 'validatePhoneLine',
     },
     pageInfo: {
@@ -47,8 +55,7 @@ function main(phoneNumber, webhookUrl, paramRequired) {
     },
   };
 
-  console.log('Webhook request', webhookRequest);
-
+  // Calls the webhook service. Configures form parameters as optional or required
   async function setParametersOptionalOrRequired() {
     await axios({
       method: 'POST',
@@ -58,16 +65,18 @@ function main(phoneNumber, webhookUrl, paramRequired) {
       .then(res => {
         console.log('response body', res.data);
 
-        // The WebhookResponse will trigger a reprompt if an 'INVALID' parameter is 'required: true'
+        // Webhook response triggers a reprompt if an 'INVALID' parameter is 'required: true'
+        // Webhook response does NOT trigger a reprompt if an 'INVALID' parameter is 'required: false'
         console.log('Is phone number parameter required?:');
         console.log(res.data.pageInfo.formInfo.parameterInfo[0].required, '\n'); // 'true' or 'false'
 
         console.log('Is phone number parameter `VALID` or `INVALID`?');
         console.log(res.data.pageInfo.formInfo.parameterInfo[0].state);
 
-        // The webhook will return a fulfillment message for the user
+        // Webhook returns a fulfillment message for the user
         console.log('Fulfillment Message');
         console.log(res.data.fulfillmentResponse.messages[0].text.text[0]);
+        // TODO Show difference in target page based on 'required: true'
       })
       .catch(err => {
         if (err.response) {
