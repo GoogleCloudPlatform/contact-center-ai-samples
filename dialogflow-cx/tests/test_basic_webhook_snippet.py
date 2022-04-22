@@ -14,71 +14,56 @@
 
 """Dialogflow CX Snippet: Create a cx.Page with an entry webhook fulfillment."""
 
-from basic_webhook_sample import BasicWebhookSample
-import google.cloud.dialogflowcx as cx
-import pytest
 
-# project_id = 'df-terraform-dev'
-# webhook_uri = 'https://us-central1-df-terraform-dev.cloudfunctions.net/webhook_fcn_1650336093'
-# agent_display_name = 'snippet8'
+def test_page_with_webhook_fulfillment_snippet(basic_webhook_sample):
+    """Self-testing snippet that demonstrates a page with a webhook fulfillment."""
+    # pylint: disable=C0415,W0404
+    import google.cloud.dialogflowcx as cx
 
-
-@pytest.fixture(name="sample", scope="function")
-def fixture_sample(session_uuid, project_id, webhook_uri):
-    """Test fixture reused for all BasicWebhookSample tests."""
-    sample = BasicWebhookSample(
-        agent_display_name=f"BasicWebhookSample (test session {session_uuid})",
-        project_id=project_id,
-        quota_project_id=project_id,
-        webhook_uri=webhook_uri,
+    components = cx.WebhooksClient.parse_webhook_path(
+        basic_webhook_sample.webhook_delegator.webhook.name,
     )
-    sample.setup()
-    yield sample
-    sample.tear_down()
-    del sample
+    project = components["project"]
+    location = components["location"]
+    agent = components["agent"]
+    webhook = components["webhook"]
 
+    # [START TODO TAG]
+    import google.cloud.dialogflowcx as cx
 
+    webhook = (
+        f"projects/{project}/locations/{location}/agents/{agent}/webhooks/{webhook}"
+    )
 
-def test_foo(sample):
+    page = cx.Page(
+        display_name="Example Page",
+        entry_fulfillment=cx.Fulfillment(
+            messages=[
+                cx.ResponseMessage(
+                    text=cx.ResponseMessage.Text(text=["Entering Example Page"])
+                )
+            ],
+            webhook=webhook,
+            tag="basic_webhook",
+        ),
+    )
+    # [END TODO TAG]
 
-  webhook_name = sample.webhook_delegator.webhook.name
-  pages_client = sample.page_delegator.client
-
-
-  # Create a page with a webhook fulfillment:
-  # [START TODO TAG]
-  page = cx.Page(
-    display_name = "FOO",
-    entry_fulfillment = cx.Fulfillment(
-      messages = [
-        cx.ResponseMessage(
-          text = cx.ResponseMessage.Text(
-            text = ["Entering FOO"]
-          )
+    # Update live page:
+    page.name = basic_webhook_sample.page_delegator.page.name
+    basic_webhook_sample.page_delegator.client.update_page(
+        request=cx.UpdatePageRequest(
+            page=page,
         )
-      ],
-      webhook = webhook_name,
-      tag = "basic_webhook",
     )
-  )
-  # [END TODO TAG]
+    responses = basic_webhook_sample.run(["trigger intent"], quiet=True)
 
-
-  # Update live page:
-  page.name = sample.page_delegator.page.name
-  pages_client.update_page(
-    request = cx.UpdatePageRequest(
-      page=page,
-    )
-  )
-  responses = sample.run(['trigger intent'], quiet=True)
-
-
-  assert responses == [
-    {'replies': [
-      'Entering FOO', 
-      'Webhook received: trigger intent (Tag: basic_webhook)'
-      ], 
-      'parameters': {}
-    }
-  ]
+    assert responses == [
+        {
+            "replies": [
+                "Entering Example Page",
+                "Webhook received: trigger intent (Tag: basic_webhook)",
+            ],
+            "parameters": {},
+        }
+    ]

@@ -20,21 +20,6 @@ from basic_webhook_sample import BasicWebhookSample
 from utilities import create_conversational_turn, run_hermetic_test
 
 
-@pytest.fixture(name="sample", scope="function")
-def fixture_sample(session_uuid, project_id, webhook_uri):
-    """Test fixture reused for all BasicWebhookSample tests."""
-    sample = BasicWebhookSample(
-        agent_display_name=f"BasicWebhookSample (test session {session_uuid})",
-        project_id=project_id,
-        quota_project_id=project_id,
-        webhook_uri=webhook_uri,
-    )
-    sample.setup()
-    yield sample
-    sample.tear_down()
-    del sample
-
-
 @pytest.mark.integration
 @pytest.mark.flaky(max_runs=3, reruns_delay=5)
 @pytest.mark.parametrize(
@@ -44,7 +29,9 @@ def fixture_sample(session_uuid, project_id, webhook_uri):
         ("basic_webhook_sample_xfail", "XFAIL", ds.UnexpectedResponseFailure),
     ],
 )
-def test_basic_webhook_sample(display_name, user_input, exception, sample):
+def test_basic_webhook_sample(
+    display_name, user_input, exception, basic_webhook_sample
+):
     """Test the BasicWebhookSample test cases."""
     is_webhook_enabled = True
     test_case_conversation_turns = [
@@ -54,18 +41,18 @@ def test_basic_webhook_sample(display_name, user_input, exception, sample):
                 "Entering Main Page",
                 "Webhook received: trigger intent (Tag: basic_webhook)",
             ],
-            sample.intent_delegator.intent,
-            sample.page_delegator.page,
+            basic_webhook_sample.intent_delegator.intent,
+            basic_webhook_sample.page_delegator.page,
             is_webhook_enabled,
         )
     ]
     expected_session_parameters = [{}]
-    test_case = sample.create_test_case(display_name, test_case_conversation_turns)
+    test_case = basic_webhook_sample.create_test_case(display_name, test_case_conversation_turns)
     if exception:
         with pytest.raises(exception):
-            sample.run_test_case(test_case, expected_session_parameters)
+            basic_webhook_sample.run_test_case(test_case, expected_session_parameters)
     else:
-        sample.run_test_case(test_case, expected_session_parameters)
+        basic_webhook_sample.run_test_case(test_case, expected_session_parameters)
 
 
 @pytest.mark.hermetic

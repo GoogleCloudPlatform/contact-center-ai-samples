@@ -18,6 +18,7 @@ import uuid
 from typing import Generator
 
 import pytest
+from basic_webhook_sample import BasicWebhookSample
 from utilities import RequestMock
 from webhook.main import get_webhook_uri
 
@@ -52,3 +53,18 @@ def fixture_build_uuid():
 def fixture_webhook_uri(project_id, build_uuid):
     """Test fixture providings the URI for the fixture webhook."""
     return get_webhook_uri(project_id, build_uuid)
+
+
+@pytest.fixture(name="basic_webhook_sample", scope="function")
+def fixture_basic_webhook(session_uuid, project_id, webhook_uri):
+    """Test fixture reused for all BasicWebhookSample tests."""
+    sample = BasicWebhookSample(
+        agent_display_name=f"BasicWebhookSample (test session {session_uuid})",
+        project_id=project_id,
+        quota_project_id=project_id,
+        webhook_uri=webhook_uri,
+    )
+    sample.setup()
+    yield sample
+    sample.tear_down()
+    del sample

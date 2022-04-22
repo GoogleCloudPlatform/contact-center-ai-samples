@@ -167,7 +167,7 @@ class DialogflowSample:
                     print(f"    Text: {reply}")
                 print(f"    Ending Parameters: {parameters}")
                 print(f"    Ending Page: {current_page}")
-            responses.append({'replies':replies, 'parameters':parameters})
+            responses.append({"replies": replies, "parameters": parameters})
         return responses
 
     def create_test_case(self, display_name, test_case_conversation_turns, flow=None):
