@@ -18,12 +18,12 @@
 # pylint: disable=missing-module-docstring,missing-function-docstring
 
 from __future__ import absolute_import
-
 import os
 import pathlib
 import shutil
 
 import nox
+
 
 BLACK_VERSION = "black==22.3.0"
 BLACK_PATHS = ["."]
