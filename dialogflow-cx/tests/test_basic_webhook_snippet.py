@@ -14,7 +14,11 @@
 
 """Dialogflow CX Snippet: Create a cx.Page with an entry webhook fulfillment."""
 
+import pytest
 
+
+@pytest.mark.integration
+@pytest.mark.flaky(max_runs=3, reruns_delay=5)
 def test_page_with_webhook_fulfillment_snippet(basic_webhook_sample):
     """Self-testing snippet that demonstrates a page with a webhook fulfillment."""
     # pylint: disable=C0415,W0404

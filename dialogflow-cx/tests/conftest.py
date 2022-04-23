@@ -20,6 +20,7 @@ from typing import Generator
 import pytest
 from basic_webhook_sample import BasicWebhookSample
 from utilities import RequestMock
+from validate_form_sample import ValidateFormSample
 from webhook.main import get_webhook_uri
 
 
@@ -60,6 +61,21 @@ def fixture_basic_webhook(session_uuid, project_id, webhook_uri):
     """Test fixture reused for all BasicWebhookSample tests."""
     sample = BasicWebhookSample(
         agent_display_name=f"BasicWebhookSample (test session {session_uuid})",
+        project_id=project_id,
+        quota_project_id=project_id,
+        webhook_uri=webhook_uri,
+    )
+    sample.setup()
+    yield sample
+    sample.tear_down()
+    del sample
+
+
+@pytest.fixture(name="validate_form_sample", scope="function")
+def fixture_validate_form_sample(session_uuid, project_id, webhook_uri):
+    """Test fixture reused for all ValidateFormSample tests."""
+    sample = ValidateFormSample(
+        agent_display_name=f"ValidateFormSample (test session {session_uuid})",
         project_id=project_id,
         quota_project_id=project_id,
         webhook_uri=webhook_uri,

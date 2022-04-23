@@ -20,21 +20,6 @@ from utilities import create_conversational_turn, run_hermetic_test
 from validate_form_sample import ValidateFormSample
 
 
-@pytest.fixture(name="sample", scope="function")
-def fixture_sample(session_uuid, project_id, webhook_uri):
-    """Test fixture reused for all ValidateFormSample tests."""
-    sample = ValidateFormSample(
-        agent_display_name=f"ValidateFormSample (test session {session_uuid})",
-        project_id=project_id,
-        quota_project_id=project_id,
-        webhook_uri=webhook_uri,
-    )
-    sample.setup()
-    yield sample
-    sample.tear_down()
-    del sample
-
-
 @pytest.mark.integration
 @pytest.mark.flaky(max_runs=3, reruns_delay=5)
 @pytest.mark.parametrize(
@@ -50,7 +35,7 @@ def fixture_sample(session_uuid, project_id, webhook_uri):
     ],
 )
 def test_validate_form_sample(
-    display_name, user_input, expected_response, exception, sample
+    display_name, user_input, expected_response, exception, validate_form_sample
 ):
     """Test the ValidateFormSample test cases."""
     is_webhook_enabled = True
@@ -58,28 +43,28 @@ def test_validate_form_sample(
         create_conversational_turn(
             "trigger intent",
             ["Entering Main Page", "What is your age?"],
-            sample.intent_delegator.intent,
-            sample.page_delegator.page,
+            validate_form_sample.intent_delegator.intent,
+            validate_form_sample.page_delegator.page,
             is_webhook_enabled,
         ),
         create_conversational_turn(
             user_input,
             ["Form Filled", expected_response],
             None,
-            sample.start_page_delegator.page,
+            validate_form_sample.start_page_delegator.page,
             is_webhook_enabled,
         ),
     ]
     expected_session_parameters = [{}, {"age": float(user_input)}]
-    test_case = sample.create_test_case(
+    test_case = validate_form_sample.create_test_case(
         display_name,
         test_case_conversation_turns,
     )
     if exception:
         with pytest.raises(exception):
-            sample.run_test_case(test_case, expected_session_parameters)
+            validate_form_sample.run_test_case(test_case, expected_session_parameters)
     else:
-        sample.run_test_case(test_case, expected_session_parameters)
+        validate_form_sample.run_test_case(test_case, expected_session_parameters)
 
 
 @pytest.mark.hermetic

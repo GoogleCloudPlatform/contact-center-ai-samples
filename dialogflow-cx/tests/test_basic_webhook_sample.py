@@ -47,7 +47,9 @@ def test_basic_webhook_sample(
         )
     ]
     expected_session_parameters = [{}]
-    test_case = basic_webhook_sample.create_test_case(display_name, test_case_conversation_turns)
+    test_case = basic_webhook_sample.create_test_case(
+        display_name, test_case_conversation_turns
+    )
     if exception:
         with pytest.raises(exception):
             basic_webhook_sample.run_test_case(test_case, expected_session_parameters)

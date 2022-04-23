@@ -63,7 +63,8 @@ class SessionsDelegator(ClientDelegator):
             responses = [
                 x.text.text[0] for x in response.query_result.response_messages
             ]
-            current_page = response.query_result.current_page.display_name
+            current_page = response.query_result.current_page.name
+            current_display_name = response.query_result.current_page.display_name
             parameters = response.query_result.parameters
             if parameters is None:
                 parameters = {}
@@ -78,4 +79,4 @@ class SessionsDelegator(ClientDelegator):
                 key: val for key, val in parameters.items() if val is not None
             }
 
-        return responses, current_page, parameters
+        return responses, current_page, current_display_name, parameters

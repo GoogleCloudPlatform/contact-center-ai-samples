@@ -137,10 +137,18 @@ class DialogflowSample:
         wait=1,
         parameters=None,
         current_page=None,
+        current_display_name=None,
         quiet=False,
     ):
         """Runs a conversation with this agent."""
         time.sleep(wait)
+
+        if not current_page:
+            assert not current_display_name
+            current_page = self.start_flow_delegator.start_page_name
+            current_display_name = "Start Page"
+        else:
+            assert current_display_name
 
         if parameters is None:
             parameters = {}
@@ -154,8 +162,13 @@ class DialogflowSample:
                 print("User: ")
                 print(f"  Text: {text}")
                 print(f"  Starting Parameters: {parameters}")
-                print(f"  Page: {current_page}")
-            replies, current_page, parameters = self.session_delegator.detect_intent(
+                print(f"  Page: {current_display_name}")
+            (
+                replies,
+                current_page,
+                current_display_name,
+                parameters,
+            ) = self.session_delegator.detect_intent(
                 text,
                 parameters=parameters,
                 current_page=current_page,
@@ -166,7 +179,7 @@ class DialogflowSample:
                 for reply in replies:
                     print(f"    Text: {reply}")
                 print(f"    Ending Parameters: {parameters}")
-                print(f"    Ending Page: {current_page}")
+                print(f"    Ending Page: {current_display_name}")
             responses.append({"replies": replies, "parameters": parameters})
         return responses
 
