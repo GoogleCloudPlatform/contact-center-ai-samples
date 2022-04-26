@@ -74,9 +74,7 @@ def test_set_session_param_sample(
                 test_case, expected_session_parameters
             )
     else:
-        set_session_param_sample.run_test_case(
-            test_case, expected_session_parameters
-        )
+        set_session_param_sample.run_test_case(test_case, expected_session_parameters)
 
 
 @pytest.mark.hermetic
