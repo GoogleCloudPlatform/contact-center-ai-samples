@@ -16,7 +16,7 @@
  * Uses a webhook to validate or invalidate form parameters.
  */
 
-// [START dialogflow_v3beta1_webhook_validate_or_invalidate_form_parameter]
+// [START dialogflow_v3beta1_webhook_validate_form_parameter]
 
 // TODO (developer): change entry point to validateParameter in Cloud Function
 
@@ -70,4 +70,4 @@ exports.validateParameter = (request, response) => {
 
   response.send(jsonResponse);
 };
-// [END dialogflow_v3beta1_webhook_validate_or_invalidate_form_parameter]
+// [END dialogflow_v3beta1_webhook_validate_form_parameter]
