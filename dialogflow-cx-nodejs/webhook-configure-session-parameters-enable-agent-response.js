@@ -29,7 +29,7 @@ exports.enableAgentResponse = (request, response) => {
   let text = '';
 
   if (sessionParameter > 15) {
-    text = `${sessionParameter} is too many! Please pick another number.`;
+    text = `${sessionParameter} is a lot!`;
   } else {
     text = `${sessionParameter} is a number I can work with!`;
   }

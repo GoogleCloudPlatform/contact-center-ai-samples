@@ -58,6 +58,7 @@ exports.configureOptionalFormParam = (request, response) => {
         parameterInfo: [
           {
             displayName: formParameter,
+            // if required: false, the agent will not reprompt for this parameter, even if the state is 'INVALID'
             required: isParamRequired,
             state: paramState,
           },

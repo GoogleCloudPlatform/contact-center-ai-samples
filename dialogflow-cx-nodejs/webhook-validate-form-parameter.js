@@ -21,7 +21,7 @@
 // TODO (developer): change entry point to validateParameter in Cloud Function
 
 exports.validateParameter = (request, response) => {
-  // The value of the parameter to validate. Form parameter can be accessed via
+  // The value of the parameter to validate
   const paramToValidate =
     typeof request !== 'undefined'
       ? request.body.pageInfo.formInfo.parameterInfo[0].value
@@ -29,6 +29,7 @@ exports.validateParameter = (request, response) => {
   let text = '';
   let paramState;
 
+  // Webhook will validate or invalidate parameter based on conditions configured by the user
   if (paramToValidate > 15) {
     text = 'That is too many! Please pick another number.';
     paramState = 'INVALID';
@@ -61,7 +62,7 @@ exports.validateParameter = (request, response) => {
     },
     sessionInfo: {
       parameters: {
-        // Set session parameter to null if you want to reprompt the user
+        // Set session parameter to null if your agent needs to reprompt the user
         paramToValidate: null,
       },
     },

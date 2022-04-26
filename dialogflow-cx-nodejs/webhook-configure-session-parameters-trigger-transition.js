@@ -40,6 +40,7 @@ exports.triggerTransition = (request, response) => {
   }
 
   const jsonResponse = {
+    // The target page to transition to
     target_page: targetPage,
     fulfillment_response: {
       messages: [
