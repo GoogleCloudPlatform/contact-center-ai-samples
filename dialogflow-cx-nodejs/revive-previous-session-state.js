@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * Revives the state of a previous session
+ *
+ * See https://cloud.google.com/dialogflow/cx/docs/quick/api before running the code snippet.
+ */
+
 'use strict';
 
 async function main(projectId, location, agentId, query, languageCode) {
@@ -26,13 +32,14 @@ async function main(projectId, location, agentId, query, languageCode) {
   // Imports the Google Cloud Dialogflow CX API library
   const {SessionsClient} = require('@google-cloud/dialogflow-cx');
 
-  /**
-   * Example for regional endpoint:
-   *   const location = 'us-central1'
-   *   const client = new SessionsClient({apiEndpoint: 'us-central1-dialogflow.googleapis.com'})
-   */
-  const client = new SessionsClient();
   const uuid = require('uuid');
+
+  // Example for regional endpoint:
+  // const location = 'us-central1'
+  // const client = new SessionsClient({apiEndpoint: 'us-central1-dialogflow.googleapis.com'})
+
+  // Instantiates the Dialogflow CX Sessions Client
+  const client = new SessionsClient();
 
   // Create a function that can marshal the current session state to JSON:
   function marshalSession(response) {
@@ -44,7 +51,7 @@ async function main(projectId, location, agentId, query, languageCode) {
   }
 
   async function detectFirstSessionIntent() {
-    // Marshal the current state:
+    // Marshalls the current state:
     const sessionId = uuid.v4();
     const sessionPath = client.projectLocationAgentSessionPath(
       projectId,
@@ -54,7 +61,7 @@ async function main(projectId, location, agentId, query, languageCode) {
     );
     console.info(sessionPath);
 
-    // Send request:
+    // Creates a JSON representation of a DetectIntentRequest object
     const request = {
       session: sessionPath,
       queryParams: {
@@ -72,8 +79,12 @@ async function main(projectId, location, agentId, query, languageCode) {
         languageCode,
       },
     };
-    const [response] = await client.detectIntent(request);
     console.log(`User Query: ${query}`);
+
+    // Detects intent of the user query
+    const [response] = await client.detectIntent(request);
+
+    // Processes the DetectIntentResponse
     for (const message of response.queryResult.responseMessages) {
       if (message.text) {
         console.log(`Agent Response: ${message.text.text}`);
@@ -87,18 +98,25 @@ async function main(projectId, location, agentId, query, languageCode) {
     return marshalSession(response);
   }
 
+  // Revives the previous session state
   async function revivePreviousSessionState() {
-    // Unmarshal the saved state:
-    const sessionStateDict = await detectFirstSessionIntent();
-    const currentPage = sessionStateDict['currentPage'];
-    const parameters = sessionStateDict['parameters'];
+    // Unmarshalls the saved state:
+    const firstSessionDict = await detectFirstSessionIntent();
 
+    // Assigns the values of the previous session to the current session
+    const currentPage = firstSessionDict['currentPage'];
+    const parameters = firstSessionDict['parameters'];
+
+    // Creates a JSON representation of a QueryParameters object
     const queryParams = {
       currentPage: currentPage,
       parameters: parameters,
     };
 
+    // Creates a unique session ID
     const sessionId = uuid.v4().toString;
+
+    // Creates a JSON representation of a DetectIntentRequest object
     const secondRequest = {
       session: client.projectLocationAgentSessionPath(
         projectId,
@@ -115,7 +133,10 @@ async function main(projectId, location, agentId, query, languageCode) {
       queryParams: queryParams,
     };
 
+    // Detects intent of the user query
     const [secondResponse] = await client.detectIntent(secondRequest);
+
+    // Previous session parameters are revived in the second session
     console.log(` Revived Session Parameters:
       ${JSON.stringify(secondResponse.queryResult.parameters)}`);
     console.log(` Revived Session Query Text:
