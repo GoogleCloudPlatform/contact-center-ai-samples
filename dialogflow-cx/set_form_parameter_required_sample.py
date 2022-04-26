@@ -21,16 +21,16 @@ from utilities import build_fulfillment
 from webhook.main import get_webhook_uri
 
 
-class ValidateFormSample(ds.DialogflowSample):
+class SetFormParameterRequired(ds.DialogflowSample):
     """Sets up a Dialogflow agent that uses a webhook to validate a form parameter."""
 
-    _WEBHOOK_DISPLAY_NAME = "Validate form"
-    _INTENT_DISPLAY_NAME = "go-to-example-page"
-    _INTENT_TRAINING_PHRASES_TEXT = ["trigger intent", "trigger the intent"]
+    _WEBHOOK_DISPLAY_NAME = "Set Form Parameter as Required"
+    # _INTENT_DISPLAY_NAME = "go-to-example-page"
+    # _INTENT_TRAINING_PHRASES_TEXT = ["trigger intent", "trigger the intent"]
     _PAGE_DISPLAY_NAME = "Main Page"
     _PAGE_ENTRY_FULFILLMENT_TEXT = f"Entering {_PAGE_DISPLAY_NAME}"
-    _PAGE_WEBHOOK_ENTRY_TAG = "validate_form"
-    _PAGE_PROMPT = "What is your age?"
+    _PAGE_WEBHOOK_ENTRY_TAG = "set_form_param_required"
+    # _PAGE_PROMPT = "What is your age?"
 
     def __init__(
         self,
@@ -52,13 +52,38 @@ class ValidateFormSample(ds.DialogflowSample):
         self.set_agent_delegator(
             dg.AgentDelegator(self, display_name=agent_display_name)
         )
+        training_phrases = [
+            cx.Intent.TrainingPhrase(
+                repeat_count=1,
+                parts=[
+                    cx.Intent.TrainingPhrase.Part(text="Set form parameter "),
+                    cx.Intent.TrainingPhrase.Part(
+                        text="parameter_name",
+                        parameter_id="parameter_name",
+                    ),
+                    cx.Intent.TrainingPhrase.Part(text=" as required."),
+                ],
+            )
+        ]
+        parameters = [
+            cx.Intent.Parameter(
+                id="parameter_name",
+                entity_type="projects/-/locations/-/agents/-/entityTypes/sys.any",
+            ),
+        ]
+        self.intent_delegator = dg.AnnotatedIntentDelegator(
+            self,
+            display_name="Set Form Parameter as Required",
+            training_phrases=training_phrases,
+            parameters=parameters,
+        )
         self.webhook_delegator = dg.WebhookDelegator(
             self, display_name=self._WEBHOOK_DISPLAY_NAME, uri=webhook_uri
         )
-        self.intent_delegator = dg.IntentDelegator(
+        self.intent_delegator_main_page = dg.IntentDelegator(
             self,
-            display_name=self._INTENT_DISPLAY_NAME,
-            training_phrases=self._INTENT_TRAINING_PHRASES_TEXT,
+            display_name="go-to-main-page",
+            training_phrases=["trigger intent"],
         )
         self.page_delegator = dg.FulfillmentPageDelegator(
             self,
@@ -69,36 +94,50 @@ class ValidateFormSample(ds.DialogflowSample):
         self.set_session_delegator(dg.SessionsDelegator(self))
         self.start_page_delegator = dg.StartPageDelegator(self)
 
-    def setup(self, wait=1):
+    def setup(self, wait=10):
         """Initializes the sample by communicating with the Dialogflow API."""
         self.agent_delegator.setup()
         self.webhook_delegator.setup()
         self.intent_delegator.setup()
+        self.intent_delegator_main_page.setup()
         self.page_delegator.setup()
         self.start_flow_delegator.setup()
         self.start_flow_delegator.append_transition_route(
-            target_page=self.page_delegator.page.name,
+            target_page=self.start_page_delegator.page.name,
             intent=self.intent_delegator.intent.name,
-        )
-        self.page_delegator.add_parameter(
-            display_name="age",
-            required=True,
-            entity_type="projects/-/locations/-/agents/-/entityTypes/sys.number",
-            fill_behavior=cx.Form.Parameter.FillBehavior(
-                initial_prompt_fulfillment=build_fulfillment(text=[self._PAGE_PROMPT])
-            ),
-            default_value=None,
-            redact=False,
-            is_list=False,
-        )
-        self.page_delegator.append_transition_route(
-            target_page=self.start_flow_delegator.start_page_name,
-            condition="$page.params.status = FINAL",
             trigger_fulfillment=build_fulfillment(
                 webhook=self.webhook_delegator.webhook.name,
                 tag=self._PAGE_WEBHOOK_ENTRY_TAG,
-                text=["Form Filled"],
+                text=["TRIGGERED"],
             ),
+        )
+        self.start_flow_delegator.append_transition_route(
+            target_page=self.page_delegator.page.name,
+            intent=self.intent_delegator_main_page.intent.name,
+        )
+        self.page_delegator.add_parameter(
+            display_name="name",
+            required=False,
+            entity_type="projects/-/locations/-/agents/-/entityTypes/sys.any",
+            fill_behavior=cx.Form.Parameter.FillBehavior(
+                initial_prompt_fulfillment=build_fulfillment(
+                    text=["What is your name?"]
+                )
+            ),
+            default_value="UNKNOWN",
+            redact=False,
+            is_list=False,
+        )
+        self.page_delegator.add_parameter(
+            display_name="age",
+            required=False,
+            entity_type="projects/-/locations/-/agents/-/entityTypes/sys.number",
+            fill_behavior=cx.Form.Parameter.FillBehavior(
+                initial_prompt_fulfillment=build_fulfillment(text=["What is your age?"])
+            ),
+            default_value=25,
+            redact=False,
+            is_list=False,
         )
         super().setup(wait=wait)
 
@@ -106,6 +145,7 @@ class ValidateFormSample(ds.DialogflowSample):
         """Deletes the sample components via the Dialogflow API."""
         self.page_delegator.tear_down()
         self.start_flow_delegator.tear_down()
+        self.intent_delegator_main_page.tear_down()
         self.intent_delegator.tear_down()
         self.webhook_delegator.tear_down()
         self.agent_delegator.tear_down()
@@ -162,7 +202,7 @@ if __name__ == "__main__":
 
     tear_down = args.pop("tear_down")
     user_input = args.pop("user_input", [])
-    sample = ValidateFormSample(**args)
+    sample = SetFormParameterRequired(**args)
     sample.setup()
     sample.run(user_input)
     if tear_down:

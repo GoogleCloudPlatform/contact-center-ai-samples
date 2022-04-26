@@ -16,6 +16,8 @@
 
 import json
 
+import google.cloud.dialogflowcx as cx
+
 
 def basic_webhook(request):
     """Handles a Dialogflow CX webhook request."""
@@ -129,6 +131,61 @@ def set_session_param(request):
     )
 
 
+# [START TODO TAG]
+def set_form_param_required(request):
+    """Sets a form param (detected in the intent) as required."""
+    request_dict = request.get_json()
+    parameters = request_dict["sessionInfo"]["parameters"]
+    last_matched_intent = request_dict["intentInfo"]["lastMatchedIntent"]
+    param_to_set_as_required = parameters["parameter_name"]
+    intent_components = cx.IntentsClient.parse_intent_path(last_matched_intent)
+    project = intent_components["project"]
+    location = intent_components["location"]
+    agent = intent_components["agent"]
+    parent = (
+        f"projects/{project}/locations/{location}/agents/{agent}"
+        "/flows/00000000-0000-0000-0000-000000000000"
+    )
+    request = cx.ListPagesRequest(parent=parent)
+    client_options = {"api_endpoint": f"{location}-dialogflow.googleapis.com"}
+    client = cx.PagesClient(
+        client_options=client_options,
+    )
+    pages_dict = {p.display_name: p for p in client.list_pages(request=request)}
+    page = pages_dict["Main Page"]
+
+    for parameter in page.form.parameters:
+        if parameter.display_name == param_to_set_as_required:
+            parameter.required = True
+            break
+
+    request = cx.UpdatePageRequest(page=page)
+    client.update_page(request)
+    return json.dumps(
+        {
+            "fulfillment_response": {
+                "messages": [
+                    {
+                        "text": {
+                            "text": [
+                                f"Form parameter {param_to_set_as_required} set as required"
+                            ],
+                        }
+                    }
+                ]
+            },
+            "session_info": {
+                "parameters": {
+                    "parameter_name": None,
+                }
+            },
+        }
+    )
+
+
+# [END TODO TAG]
+
+
 def webhook_fcn(request):
     """Delegates a request to an appropriate function, based on tag."""
     request_dict = request.get_json()
@@ -141,6 +198,8 @@ def webhook_fcn(request):
         return validate_form(request)
     if tag == "set_session_param":
         return set_session_param(request)
+    if tag == "set_form_param_required":
+        return set_form_param_required(request)
     raise RuntimeError(f"Unrecognized tag: {tag}")
 
 

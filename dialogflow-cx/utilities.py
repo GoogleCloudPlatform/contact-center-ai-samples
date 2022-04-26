@@ -185,3 +185,12 @@ def create_conversational_turn(
             ),
         ),
     )
+
+
+def build_fulfillment(text=None, webhook=None, tag=None):
+    """Helper method that provides a Fulfillment based on text, webhook and tag."""
+    return cx.Fulfillment(
+        webhook=webhook,
+        tag=tag,
+        messages=[cx.ResponseMessage(text=cx.ResponseMessage.Text(text=text))],
+    )

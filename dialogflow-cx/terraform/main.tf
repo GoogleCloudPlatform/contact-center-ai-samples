@@ -59,6 +59,7 @@ resource "google_cloudfunctions_function" "function" {
   entry_point           = var.webhook_function_entrypoint
   region = "us-central1"
   depends_on = [google_storage_bucket_object.archive]
+  service_account_email = "cloud-function-envoker@${var.project_id}.iam.gserviceaccount.com"
 }
 
 # IAM entry for a single user to invoke the function
@@ -68,4 +69,10 @@ resource "google_cloudfunctions_function_iam_member" "invoker" {
   cloud_function = google_cloudfunctions_function.function.name
   role   = "roles/cloudfunctions.invoker"
   member = "serviceAccount:cloud-function-envoker@${google_cloudfunctions_function.function.project}.iam.gserviceaccount.com"
+}
+
+resource "google_project_iam_member" "DialogflowServiceAccount" {
+  project = var.project_id
+  role    = "roles/dialogflow.admin"
+  member  = google_cloudfunctions_function_iam_member.invoker.member
 }

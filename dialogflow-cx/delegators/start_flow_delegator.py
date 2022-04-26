@@ -41,11 +41,12 @@ class StartFlowDelegator(ClientDelegator):
         flow_name = self.controller.start_flow
         self._flow = self.client.get_flow(name=flow_name)
 
-    def append_transition_route(self, target_page, intent):
+    def append_transition_route(self, target_page, intent, trigger_fulfillment=None):
         """Appends a transition route to the flow."""
         self.flow.transition_routes.append(
             cx.TransitionRoute(
                 intent=intent,
+                trigger_fulfillment=trigger_fulfillment,
                 target_page=target_page,
             )
         )

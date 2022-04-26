@@ -172,7 +172,7 @@ class DialogflowSample:
                 text,
                 parameters=parameters,
                 current_page=current_page,
-                session_id=session_id,
+                session_id=str(uuid.uuid1()),
             )
             if not quiet:
                 print("  Agent:")

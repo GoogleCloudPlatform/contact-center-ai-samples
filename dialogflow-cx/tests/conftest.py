@@ -19,6 +19,8 @@ from typing import Generator
 
 import pytest
 from basic_webhook_sample import BasicWebhookSample
+from set_form_parameter_required_sample import SetFormParameterRequired
+from set_session_param_sample import SetSessionParamSample
 from utilities import RequestMock
 from validate_form_sample import ValidateFormSample
 from webhook.main import get_webhook_uri
@@ -76,6 +78,36 @@ def fixture_validate_form_sample(session_uuid, project_id, webhook_uri):
     """Test fixture reused for all ValidateFormSample tests."""
     sample = ValidateFormSample(
         agent_display_name=f"ValidateFormSample (test session {session_uuid})",
+        project_id=project_id,
+        quota_project_id=project_id,
+        webhook_uri=webhook_uri,
+    )
+    sample.setup()
+    yield sample
+    sample.tear_down()
+    del sample
+
+
+@pytest.fixture(name="set_session_param_sample", scope="function")
+def fixture_set_session_param_sample(session_uuid, project_id, webhook_uri):
+    """Test fixture reused for all SetSessionParamSample tests."""
+    sample = SetSessionParamSample(
+        agent_display_name=f"SetSessionParamSample (test session {session_uuid})",
+        project_id=project_id,
+        quota_project_id=project_id,
+        webhook_uri=webhook_uri,
+    )
+    sample.setup()
+    yield sample
+    sample.tear_down()
+    del sample
+
+
+@pytest.fixture(name="set_form_parameter_required_sample", scope="function")
+def fixture_set_form_parameter_required_sample(session_uuid, project_id, webhook_uri):
+    """Test fixture reused for all SetFormParameterRequired tests."""
+    sample = SetFormParameterRequired(
+        agent_display_name=f"SetFormParameterRequired (test session {session_uuid})",
         project_id=project_id,
         quota_project_id=project_id,
         webhook_uri=webhook_uri,

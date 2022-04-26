@@ -105,6 +105,7 @@ class PageDelegator(ClientDelegator):
                 self.page.form.parameters[page_idx] = parameter
                 return
         self.page.form.parameters.append(parameter)
+        self.client.update_page(page=self.page)
 
 
 class StartPageDelegator(PageDelegator):
