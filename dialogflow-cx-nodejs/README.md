@@ -8,12 +8,12 @@ Prebuilt agents currently only support English (en).
 
 ## Import a prebuilt agent
 
-These samples use the [Telecommunications Agent](https://cloud.google.com/dialogflow/cx/docs/concept/agents-prebuilt#telecommunications). To import the prebuilt agent to your project:
+These samples use the [Order and Account Management Prebuilt Agent](https://cloud.google.com/dialogflow/cx/docs/concept/agents-prebuilt#order-account-management). To import the prebuilt agent to your project:
 
 1. Go to the [Dialogflow CX Console](https://dialogflow.cloud.google.com/cx/projects).
 2. Click the project where you would like to import the prebuilt agent.
 3. Click **Use pre-built agents**.
-4. Click the Telecommunications Agent, then click **Import**.
+4. Click the Order and Account Management Agent, then click **Import**.
 5. Choose your desired [location](/dialogflow/cx/docs/concept/region#avail) and click **Create**.
 6. Some samples require the path to your agent. You can get the path by going to the list of agents in your project, clicking the 3-dot menu next to your selected agent, and clicking "Copy Name".
 
@@ -23,13 +23,10 @@ These samples use the [Telecommunications Agent](https://cloud.google.com/dialog
 
 ## Modifying webhook code
 
-The original webhook source
-code uses Node.js and is hosted in Google's internal Cloud Functions project.
-
-To use and modify this code in your own Cloud Functions project, please follow
+To use and modify the webhook sample code in your own Cloud Functions project, please follow
 the subsequent directions:
 
-1. Go to the [`telecommunications-agent-webhook`](telecommunications-agent-webhook) directory in this repository.
+1. Select a webhook sample (`*.js` files with the `webhook` prefix)
 2. Copy the source code.
 3. Go to the Google Cloud Console and select **Cloud Functions** on the left panel.
 
