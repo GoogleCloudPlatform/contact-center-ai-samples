@@ -1,0 +1,3 @@
+config {
+  module = false
+}
