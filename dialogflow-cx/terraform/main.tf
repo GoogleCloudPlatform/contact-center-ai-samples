@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+terraform {
+  required_providers {
+    archive = "~> 2.2.0"
+    google = "4.16.0"
+  }
+}
+
 variable "project_id" {
   description = "Required uuid for a test build; links apply and destroy"
   type        = string
@@ -28,7 +35,6 @@ variable "webhook_function_entrypoint" {
 }
 
 locals {
-	root_dir = abspath("./")
   archive_path = abspath("./tmp/function.zip")
   region = "us-central1"
 }
@@ -57,7 +63,7 @@ resource "google_cloudfunctions_function" "function" {
   trigger_http          = true
   timeout               = 60
   entry_point           = var.webhook_function_entrypoint
-  region = "us-central1"
+  region = local.region
   depends_on = [google_storage_bucket_object.archive]
 }
 
