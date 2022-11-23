@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+terraform {
+  required_providers {
+    google = "4.16.0"
+  }
+}
+
 variable "project_id" {
   description = "Required uuid for a test build; links apply and destroy"
   type        = string
