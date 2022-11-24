@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+terraform {
+  required_providers {
+    google = "4.16.0"
+  }
+}
+
 variable "project_id" {
   description = "Required uuid for a test build; links apply and destroy"
   type        = string
@@ -80,7 +86,7 @@ resource "google_project_iam_member" "serviceAccountAdmin" {
 
 module "github-actions-runners" {
   source  = "terraform-google-modules/github-actions-runners/google"
-  version = "3.0.0"
+  version = "3.1.0"
 }
 
 module "gh_oidc" {

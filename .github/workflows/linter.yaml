@@ -76,3 +76,5 @@ jobs:
           FILTER_REGEX_EXCLUDE: noxfile.py
           PYTHON_FLAKE8_CONFIG_FILE: .flake8
           VALIDATE_GITHUB_ACTIONS: false
+          TERRAFORM_TFLINT_CONFIG_FILE: .tflint.hcl
+          PYTHON_PYLINT_CONFIG_FILE: .python-lint
