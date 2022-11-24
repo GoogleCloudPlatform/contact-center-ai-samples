@@ -14,7 +14,7 @@
 
 terraform {
   required_providers {
-    google = "4.16.0"
+    google = "4.44.1"
   }
 }
 
@@ -86,7 +86,7 @@ resource "google_project_iam_member" "serviceAccountAdmin" {
 
 module "github-actions-runners" {
   source  = "terraform-google-modules/github-actions-runners/google"
-  version = "3.0.0"
+  version = "3.1.0"
 }
 
 module "gh_oidc" {
