@@ -86,7 +86,7 @@ resource "google_project_iam_member" "serviceAccountAdmin" {
 
 module "github-actions-runners" {
   source  = "terraform-google-modules/github-actions-runners/google"
-  version = "3.0.0"
+  version = "3.1.0"
 }
 
 module "gh_oidc" {
