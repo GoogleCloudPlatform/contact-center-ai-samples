@@ -1,0 +1,12 @@
+name: VPC-SC Auth Server
+on:
+  workflow_run:
+    workflows: [Linting]
+    types:
+      - completed
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - run: echo 'The triggering workflow passed'
