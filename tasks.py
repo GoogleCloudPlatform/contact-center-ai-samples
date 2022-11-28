@@ -18,19 +18,20 @@
 import sys
 
 import yaml
-from invoke import task
+from invoke import task  # type: ignore
 
 with open(".github/workflows/linter.yaml", encoding="utf-8") as file:
     _LINTER_ACTIONS_CONFIG = yaml.safe_load(file)
-_LINTER_ENV = _LINTER_ACTIONS_CONFIG["jobs"]["build"]["steps"][1]["env"]
+_LINTER_ENV = _LINTER_ACTIONS_CONFIG["jobs"]["build"]["steps"][3]["env"]
 _SUPER_LINTER_VERSION = "ghcr.io/github/super-linter:slim-v4.9.7"
 _LINTER_PATTERN = (
     "sudo docker run "
     "--workdir /github/workspace "
     "--rm "
     '-e "{validate}" '
-    '-e "TERRAFORM_TFLINT_CONFIG_FILE={config}" '
+    '-e "{config}" '
     '-e "RUN_LOCAL=true" '
+    '-e PYTHONPATH="/tmp/lint/venv/lib/python3.10/site-packages" '
     f'-e "FILTER_REGEX_EXCLUDE={_LINTER_ENV["FILTER_REGEX_EXCLUDE"]}" '
     f'-e "LINTER_RULES_PATH=./" '
     f"-v $(pwd):/tmp/lint {_SUPER_LINTER_VERSION}"
@@ -38,31 +39,43 @@ _LINTER_PATTERN = (
 _LINTER_CONFIG = {
     "terraform": {
         "validate": "VALIDATE_TERRAFORM_TFLINT=true",
-        "config": _LINTER_ENV["TERRAFORM_TFLINT_CONFIG_FILE"],
+        "config": f'TERRAFORM_TFLINT_CONFIG_FILE={_LINTER_ENV["TERRAFORM_TFLINT_CONFIG_FILE"]}',
     },
     "javascript": {
         "validate": "VALIDATE_JAVASCRIPT_ES=true",
-        "config": _LINTER_ENV["JAVASCRIPT_ES_CONFIG_FILE"],
+        "config": f'JAVASCRIPT_ES_CONFIG_FILE={_LINTER_ENV["JAVASCRIPT_ES_CONFIG_FILE"]}',
     },
     "black": {
         "validate": "VALIDATE_PYTHON_BLACK=true",
-        "config": _LINTER_ENV["PYTHON_BLACK_CONFIG_FILE"],
+        "config": f'PYTHON_BLACK_CONFIG_FILE={_LINTER_ENV["PYTHON_BLACK_CONFIG_FILE"]}',
     },
     "isort": {
         "validate": "VALIDATE_PYTHON_ISORT=true",
-        "config": _LINTER_ENV["PYTHON_BLACK_CONFIG_FILE"],
+        "config": f'PYTHON_ISORT_CONFIG_FILE={_LINTER_ENV["PYTHON_ISORT_CONFIG_FILE"]}',
     },
     "jscpd": {
         "validate": "VALIDATE_JSCPD=true",
-        "config": _LINTER_ENV["JSCPD_CONFIG_FILE"],
+        "config": f'JSCPD_CONFIG_FILE={_LINTER_ENV["JSCPD_CONFIG_FILE"]}',
     },
     "flake8": {
         "validate": "VALIDATE_PYTHON_FLAKE8=true",
-        "config": _LINTER_ENV["PYTHON_FLAKE8_CONFIG_FILE"],
+        "config": f'PYTHON_FLAKE8_CONFIG_FILE={_LINTER_ENV["PYTHON_FLAKE8_CONFIG_FILE"]}',
     },
     "pylint": {
         "validate": "VALIDATE_PYTHON_PYLINT=true",
-        "config": _LINTER_ENV["PYTHON_PYLINT_CONFIG_FILE"],
+        "config": f'PYTHON_PYLINT_CONFIG_FILE={_LINTER_ENV["PYTHON_PYLINT_CONFIG_FILE"]}',
+    },
+    "mypy": {
+        "validate": "VALIDATE_PYTHON_MYPY=true",
+        "config": f'PYTHON_MYPY_CONFIG_FILE={_LINTER_ENV["PYTHON_MYPY_CONFIG_FILE"]}',
+    },
+    "bash": {
+        "validate": "VALIDATE_BASH=true",
+        "config": "BASH_CONFIG_FILE=None",
+    },
+    "hadolint": {
+        "validate": "VALIDATE_DOCKERFILE_HADOLINT=true",
+        "config": f'DOCKERFILE_HADOLINT_FILE_NAME={_LINTER_ENV["DOCKERFILE_HADOLINT_FILE_NAME"]}',
     },
 }
 
