@@ -23,7 +23,7 @@ from zipfile import ZipFile
 import google.auth
 import requests
 import session
-from flask import Flask, redirect, render_template, request, send_file
+from flask import Flask, Response, redirect, request, send_file
 from flask.logging import create_logger  # pylint: disable=ungrouped-imports
 from google.auth.transport import requests as reqs
 from google.oauth2 import id_token
@@ -34,30 +34,28 @@ logger = create_logger(app)
 credentials, project_id = google.auth.default()
 
 
-CLIENT_ID = os.getenv("CLIENT_ID")
-IP_ADDRESS = os.getenv("IP_ADDRESS")
-PROD = os.getenv("PROD") == "true"
-if PROD:
-    REDIRECT_URI = "https://auth.dialogflow-demo.app/callback"
-else:
-    REDIRECT_URI = f'http://localhost:{os.getenv("DEBUG_PORT")}/callback'
+def get_redirect_url():
+    """Get the redirect URL, depending on prod vs dev deployment."""
+    debug_port = os.getenv("DEBUG_PORT")
+    if os.getenv("PROD") == "true":
+        return "https://auth.dialogflow-demo.app/callback"
+    return f"http://localhost:{debug_port}/callback"
 
 
 @app.route("/callback")
 def callback():
     """Callback route, redirects to the user-provided return_to URL."""
-
     args = request.args.to_dict()
     state = json.loads(b64decode(args["state"]))
     redirect_path = state["return_to"]
     session_id = state["session_id"]
     data = {
         "code": args["code"],
-        "client_id": CLIENT_ID,
+        "client_id": os.getenv("CLIENT_ID"),
         "client_secret": access_secret_version(
             project_id, "application-client-secret", "latest"
         )["response"],
-        "redirect_uri": REDIRECT_URI,
+        "redirect_uri": get_redirect_url(),
         "grant_type": "authorization_code",
     }
 
@@ -84,7 +82,7 @@ def callback():
 
     if session_id is None:
         logger.critical("Could not create session")
-        return render_template("errors/403.html"), 403
+        return Response(status=403)
 
     response = redirect(redirect_path)
     return response
@@ -107,8 +105,8 @@ def login_get():
     sign_in_url = "https://accounts.google.com/o/oauth2/v2/auth?"
 
     # Client apps and their callbacks must be registered and supplied here
-    sign_in_url += f"redirect_uri={REDIRECT_URI}&"
-    sign_in_url += f"client_id={CLIENT_ID}&"
+    sign_in_url += f"redirect_uri={get_redirect_url()}&"
+    sign_in_url += f'client_id={os.getenv("CLIENT_ID")}&'
 
     # Asking for user email and any previously granted scopes openid%20email
     sign_in_url += "scope=openid%20"
@@ -131,7 +129,6 @@ def login_get():
 @app.route("/auth", methods=["GET"])
 def auth():
     """Rout for getting authentication information, when session_id is valid."""
-
     session_id = request.args.get("session_id")
 
     session_data = session.read(session_id)
@@ -148,14 +145,13 @@ def auth():
                 os.path.basename(curr_stream_name), curr_stream.getvalue()
             )
     zip_file_stream.seek(0)
-
-    return send_file(  # pylint: disable=unexpected-keyword-arg
+    return send_file(
         zip_file_stream,
         as_attachment=True,
         attachment_filename="encrypted_session.zip",
     )
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=port)

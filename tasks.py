@@ -33,7 +33,7 @@ _LINTER_PATTERN = (
     '-e "RUN_LOCAL=true" '
     '-e PYTHONPATH="/tmp/lint/venv/lib/python3.10/site-packages" '
     f'-e "FILTER_REGEX_EXCLUDE={_LINTER_ENV["FILTER_REGEX_EXCLUDE"]}" '
-    f'-e "LINTER_RULES_PATH=./" '
+    f'-e "LINTER_RULES_PATH=." '
     f"-v $(pwd):/tmp/lint {_SUPER_LINTER_VERSION}"
 )
 _LINTER_CONFIG = {
@@ -77,6 +77,14 @@ _LINTER_CONFIG = {
         "validate": "VALIDATE_DOCKERFILE_HADOLINT=true",
         "config": f'DOCKERFILE_HADOLINT_FILE_NAME={_LINTER_ENV["DOCKERFILE_HADOLINT_FILE_NAME"]}',
     },
+    "markdown": {
+        "validate": "VALIDATE_MARKDOWN=true",
+        "config": f'MARKDOWN_CONFIG_FILE={_LINTER_ENV["MARKDOWN_CONFIG_FILE"]}',
+    },
+    "textlint": {
+        "validate": "VALIDATE_NATURAL_LANGUAGE=true",
+        "config": f'NATURAL_LANGUAGE_CONFIG_FILE={_LINTER_ENV["NATURAL_LANGUAGE_CONFIG_FILE"]}',
+    },
 }
 
 
@@ -90,13 +98,21 @@ def print_result(linter, result, hide):
             print(f'linter "{linter}": OK')
 
 
+def run_autofix(ctx):
+    """Run black and isort before linting."""
+    ctx.run("isort .", warn=False, hide=False)
+    ctx.run("black .", warn=False, hide=False)
+
+
 @task
-def lint(ctx, linter="all", warn=False, hide=False):
+def lint(ctx, linter="all", warn=False, hide=False, autofix=True):
     """Run a linter(s) using pyinvoke."""
     if linter == "all":
+        if autofix:
+            run_autofix(ctx)
         any_failure = False
         for curr_linter in _LINTER_CONFIG:
-            result = lint(ctx, curr_linter, warn=True, hide=True)
+            result = lint(ctx, curr_linter, warn=True, hide=True, autofix=False)
             print_result(curr_linter, result, hide)
             if result.exited:
                 any_failure = result.exited
@@ -104,6 +120,8 @@ def lint(ctx, linter="all", warn=False, hide=False):
             sys.exit(result.exited)
         return result
 
+    if autofix:
+        run_autofix(ctx)
     result = ctx.run(
         _LINTER_PATTERN.format(
             validate=_LINTER_CONFIG[linter]["validate"],

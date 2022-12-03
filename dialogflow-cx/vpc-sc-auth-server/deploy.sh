@@ -69,3 +69,4 @@ gcloud run deploy --allow-unauthenticated "authentication-service" \
   --ingress=all \
   --set-env-vars=CLIENT_ID="${CLIENT_ID?}",SESSION_BUCKET="${SESSION_BUCKET?}",IP_ADDRESS="${DOMAIN?}",PROD=true \
   --tag="${SERVICE_TAG?}"
+  

@@ -50,14 +50,23 @@ import os
 
 import google.api_core.exceptions
 import google.auth
+import google.cloud.storage as storage  # pylint: disable=consider-using-from-import
 from aes_cipher import AESCipher
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 from flask import Response
-from google.cloud import storage
 
 log = logging.getLogger("session")
 credentials, project = google.auth.default()
+
+
+class NoBucketError(Exception):
+    """Exception to throw when environment does not have SESSION_BUCKET set."""
+
+    message = "Environment variable SESSION_BUCKET is required"
+
+    def __init__(self):
+        """Initialize NoBucketError with default message"""
 
 
 def get_session_bucket():
@@ -65,7 +74,7 @@ def get_session_bucket():
     session_bucket_name = os.environ.get("SESSION_BUCKET")
     if session_bucket_name is None:
         log.error("Could not initialize session module.")
-        raise Exception("Environment variable SESSION_BUCKET is required")
+        raise NoBucketError()
     return storage.Client().bucket(session_bucket_name)
 
 

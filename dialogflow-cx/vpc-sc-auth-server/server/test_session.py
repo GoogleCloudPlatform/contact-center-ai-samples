@@ -21,7 +21,6 @@ from unittest.mock import Mock
 import google.api_core.exceptions
 import google.auth
 from Crypto.PublicKey import RSA
-from google.cloud import storage  # pylint: disable=unused-import # noqa: F401
 from mock import patch
 
 
@@ -37,7 +36,9 @@ def test_session_create():
     with patch.object(
         google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
     ):
-        with patch.object(google.cloud.storage.blob, "Blob", return_value=mock_blob):
+        from google.cloud import storage  # pylint: disable=import-outside-toplevel
+
+        with patch.object(storage.blob, "Blob", return_value=mock_blob):
             import session  # pylint: disable=import-outside-toplevel
 
             private_key = RSA.generate(1024)
@@ -56,7 +57,9 @@ def get_session_data(download_as_bytes_mock):
     with patch.object(
         google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
     ):
-        with patch.object(google.cloud.storage.blob, "Blob", return_value=mock_blob):
+        from google.cloud import storage  # pylint: disable=import-outside-toplevel
+
+        with patch.object(storage.blob, "Blob", return_value=mock_blob):
             import session  # pylint: disable=import-outside-toplevel
 
             with mock.patch.dict(os.environ, {"SESSION_BUCKET": "MOCK_SESSION_BUCKET"}):
@@ -85,3 +88,13 @@ def test_session_read_xfail():
     session_data = get_session_data(download_as_bytes_mock)
     assert len(session_data) == 1
     assert session_data["error"].status == "401 UNAUTHORIZED"
+
+
+def test_get_session_bucket_none():
+    "Test additional code path where SESSION_BUCKET is not provided"
+    import session  # pylint: disable=import-outside-toplevel
+
+    try:
+        session.get_session_bucket()
+    except session.NoBucketError as exc:
+        assert exc.message == session.NoBucketError.message

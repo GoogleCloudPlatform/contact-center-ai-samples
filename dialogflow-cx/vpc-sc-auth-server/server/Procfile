@@ -13,4 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-web: gunicorn --bind 0.0.0.0:5000 --workers 1 --threads 8 --timeout 0 app:app 
+web: gunicorn --bind 0.0.0.0:5000 --workers 1 --threads 8 --timeout 0 app:app

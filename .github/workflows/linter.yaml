@@ -40,7 +40,7 @@ on:
 jobs:
   build:
     # Name the Job
-    name: Lint Code Base
+    name: Linting
     # Set the agent to run on
     runs-on: ubuntu-latest
     strategy:
@@ -88,4 +88,6 @@ jobs:
           PYTHON_PYLINT_CONFIG_FILE: .python-lint
           PYTHON_MYPY_CONFIG_FILE: .mypy.ini
           DOCKERFILE_HADOLINT_FILE_NAME: .hadolint.yaml
-          PYTHONPATH: "/github/workspace:/github/workflow/.venv/lib/python3.8/site-packages"
+          MARKDOWN_CONFIG_FILE: .markdowmlint.jsonc
+          NATURAL_LANGUAGE_CONFIG_FILE: .textlintrc
+          PYTHONPATH: "/github/workspace:/github/workflow/.venv/lib/python3.10/site-packages"
