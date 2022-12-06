@@ -15,18 +15,17 @@
 
 name: VPC-SC Auth Server Workflow
 on:
-  workflow_run:
-    workflows: [Linting]
-    types:
-      - completed
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
 
 jobs:
   pytest:
-    name: VPC-SC Auth Server Job
+    name: VPC-SC Auth Server Pytest
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     defaults:
       run:
         working-directory: dialogflow-cx/vpc-sc-auth-server/server

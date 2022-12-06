@@ -29,8 +29,7 @@ name: Linting
 #############################
 on:
   push:
-    branches-ignore: [main]
-    # Remove the line above to run when pushing to main
+    branches: [main]
   pull_request:
     branches: [main]
 
