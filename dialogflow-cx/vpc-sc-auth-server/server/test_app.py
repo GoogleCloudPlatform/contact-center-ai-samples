@@ -23,11 +23,9 @@ from unittest import mock
 from unittest.mock import Mock
 from urllib.parse import parse_qs, urlparse
 
-import app
 import google.api_core.exceptions
 import pytest
 import requests
-import session
 from google.oauth2 import id_token
 from mock import patch
 
@@ -35,9 +33,15 @@ from mock import patch
 @pytest.fixture
 def client():
     """Client fixture for testing a flask app."""
-    app.app.config["TESTING"] = True
-    with app.app.test_client() as curr_client:
-        yield curr_client
+
+    with patch.object(
+        google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
+    ):
+        import app  # pylint: disable=import-outside-toplevel
+
+        app.app.config["TESTING"] = True
+        with app.app.test_client() as curr_client:
+            yield curr_client
 
 
 class MockOAuthRequestReturnObj:  # pylint: disable=too-few-public-methods
@@ -72,28 +76,39 @@ def test_callback(
     }
     mock_state_encode = base64.b64encode(json.dumps(mock_state).encode())
     with patch.object(
-        app, "access_secret_version", return_value={"response": "MOCK_SECRET"}
+        google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
     ):
-        with patch.object(requests, "post", return_value=MockOAuthRequestReturnObj()):
+        import app  # pylint: disable=import-outside-toplevel
+
+        with patch.object(
+            app, "access_secret_version", return_value={"response": "MOCK_SECRET"}
+        ):
             with patch.object(
-                id_token,
-                "verify_oauth2_token",
-                return_value={
-                    "email": "MOCK_EMAIL",
-                    "exp": "MOCK_EXPIRATION",
-                },
+                requests, "post", return_value=MockOAuthRequestReturnObj()
             ):
-                with patch.dict(os.environ, {"SESSION_BUCKET": "MOCK_SESSION_BUCKET"}):
-                    with patch.object(
-                        session, "create", return_value="MOCK_SESSION_ID"
+                with patch.object(
+                    id_token,
+                    "verify_oauth2_token",
+                    return_value={
+                        "email": "MOCK_EMAIL",
+                        "exp": "MOCK_EXPIRATION",
+                    },
+                ):
+                    import session  # pylint: disable=import-outside-toplevel
+
+                    with patch.dict(
+                        os.environ, {"SESSION_BUCKET": "MOCK_SESSION_BUCKET"}
                     ):
-                        return_value = client.get(
-                            "/callback",
-                            query_string={
-                                "state": mock_state_encode,
-                                "code": mock_code,
-                            },
-                        )
+                        with patch.object(
+                            session, "create", return_value="MOCK_SESSION_ID"
+                        ):
+                            return_value = client.get(
+                                "/callback",
+                                query_string={
+                                    "state": mock_state_encode,
+                                    "code": mock_code,
+                                },
+                            )
     parsed_url = urlparse(return_value.request.url)
     assert parse_qs(parsed_url.query)["state"][0].encode() == mock_state_encode
     assert parse_qs(parsed_url.query)["code"][0] == mock_code
@@ -152,10 +167,15 @@ def test_login(client):  # pylint: disable=redefined-outer-name
 def test_get_redirect_url(prod, expected):
     """Test test_get_redirect_url under prod and dev behavior."""
     mock_debug_port = "MOCK_DEBUG_PORT"
-    with mock.patch.dict(os.environ, {"PROD": prod, "DEBUG_PORT": mock_debug_port}):
-        assert app.get_redirect_url() == expected.format(
-            mock_debug_port=mock_debug_port
-        )
+    with patch.object(
+        google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
+    ):
+        import app  # pylint: disable=import-outside-toplevel
+
+        with mock.patch.dict(os.environ, {"PROD": prod, "DEBUG_PORT": mock_debug_port}):
+            assert app.get_redirect_url() == expected.format(
+                mock_debug_port=mock_debug_port
+            )
 
 
 def get_aut_endpoint_response(curr_client, mock_blob, mock_session_id):
