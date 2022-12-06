@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: VPC-SC Auth Server
+name: VPC-SC Auth Server Workflow
 on:
   workflow_run:
     workflows: [Linting]
@@ -24,6 +24,7 @@ permissions:  # added using https://github.com/step-security/secure-workflows
 
 jobs:
   pytest:
+    name: VPC-SC Auth Server Job
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     defaults:
