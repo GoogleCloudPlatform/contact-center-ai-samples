@@ -14,12 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License. 
 -->
 
-# Security Policy
+# Developer Instructions
 
-To report a security issue, please use [g.co/vulnz](https://g.co/vulnz).
-
-The Google Security Team will respond within 5 working days of your report on
-g.co/vulnz.
-
-We use g.co/vulnz for our intake, and do coordination and disclosure here using
-GitHub Security Advisory to privately discuss and fix the issue.
+- Run all linters: `inv lint`
+- Run one specific linter:
+  - `inv lint --linter=terraform`
+  - `inv lint --linter=javascript`
+  - `inv lint --linter=black`
+  - `inv lint --linter=isort`
+  - `inv lint --linter=jscpd`
+  - `inv lint --linter=flake8`
+  - `inv lint --linter=pylint`
+  - `inv lint --linter=mypy`
+  - `inv lint --linter=bash`
+  - `inv lint --linter=hadolint`
+- Run automatic fix of lint improvements: `black . && isort .`

@@ -29,7 +29,10 @@ class IntentDelegator(ClientDelegator):
     _CLIENT_CLASS = cx.IntentsClient
 
     def __init__(
-        self, controller: ds.DialogflowSample, training_phrases: List[str], **kwargs
+        self,
+        controller: ds.DialogflowSample,
+        training_phrases: List[cx.Intent.TrainingPhrase.Part],
+        **kwargs,
     ) -> None:
         self._intent = None
         self.training_phrases = training_phrases

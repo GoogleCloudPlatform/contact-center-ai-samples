@@ -14,8 +14,8 @@
 
 """Owlbot code patching and code formatting configuration module."""
 
-import synthtool as s
-from synthtool import gcp
+import synthtool as s  # type: ignore
+from synthtool import gcp  # type: ignore
 
 # pylint: disable=line-too-long
 

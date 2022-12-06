@@ -66,8 +66,8 @@ please reach out to the `@GoogleCloudPlatform/ml-apis`.
 
 If you would like to add a new sample to this repository please follow these
 instructions. If your sample is large, complex, or you would like feedback
-before adding a sample to this repository please open a issue with your question or
-request and assign it to `@GoogleCloudPlatform/ml-apis`
+before adding a sample to this repository please open a issue with your question
+or request and assign it to `@GoogleCloudPlatform/ml-apis`
 
 1. Determine the name for your sample.
 
@@ -98,10 +98,12 @@ request and assign it to `@GoogleCloudPlatform/ml-apis`
     * Detailed instructions on how to setup and run the sample
     * [Community samples only] Add the following disclaimer to your sample's
         README.md file:
+
         ```bash
-        ## Disclaimer
+        # Disclaimer
         This community sample is not officially maintained by Google.
         ```
+
     * Detail instructions on how to run tests (if present)
 
 1. Update the repo's README with a link to your sample
@@ -128,6 +130,7 @@ request and assign it to `@GoogleCloudPlatform/ml-apis`
         Use GitHub Action's triggers to run your tests on a pull request for the
         `main` branch and use `path` config to scope your tests to run only on
         pull requests that change your sample's code. For example:
+
         ```yaml
         name: Dialogflow Webhook Python Sample
         on:
@@ -139,12 +142,14 @@ request and assign it to `@GoogleCloudPlatform/ml-apis`
         jobs:
             ...
         ```
+
         See
         [GitHub's Actions trigger documentation](https://docs.github.com/en/actions/using-workflows/triggering-a-workflow)
         for more information.
 
     1. Connect your tests to GitHub Actions Use GitHub Actions' `jobs` feature
         to define a test environment and run your tests. For example:
+
         ```yaml
         ...
         jobs:
@@ -170,6 +175,7 @@ request and assign it to `@GoogleCloudPlatform/ml-apis`
                     run |
                         python main_test.py
          ```
+
         See
         [GitHub's Actions job documentation](https://docs.github.com/en/actions/using-jobs/using-jobs-in-a-workflow)
         for more information.
@@ -180,6 +186,7 @@ request and assign it to `@GoogleCloudPlatform/ml-apis`
     community samples) for your sample folder and add the GitHub usernames of
     the owners. Please include a comment indicating the owner of the sample. For
     example:
+
     ```bash
     # @matthewayne is the default owner for PDF splitter sample changes
     /dialogflow-webhook-python/ @matthewayne

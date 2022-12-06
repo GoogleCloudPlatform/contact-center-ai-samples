@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,5 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-pytest==7.2.0
-pytest-rerunfailures==10.2
+source config.env
+
+export GCP_PROJECT="${PROJECT_ID?}"
+export FLASK_DEBUG=1 
+export IP_ADDRESS="http://localhost:${DEBUG_PORT?}"
+export PROD=false
+
+cd server && flask run --port="${DEBUG_PORT?}"

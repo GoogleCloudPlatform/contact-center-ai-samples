@@ -17,7 +17,7 @@
 ## Super Linter GitHub Actions ##
 #################################
 #################################
-name: Lint Code Base
+name: Linting
 
 #
 # Documentation:
@@ -40,10 +40,12 @@ on:
 jobs:
   build:
     # Name the Job
-    name: Lint Code Base
+    name: Linting
     # Set the agent to run on
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        python: ["3.10"]
     ##################
     # Load all steps #
     ##################
@@ -54,13 +56,19 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
-          # Full git history is needed to get a proper 
-          # list of changed files within `super-linter`
           fetch-depth: 0
-
-      ################################
-      # Run Linter against code base #
-      ################################
+      - name: Install missing python packages
+        run: sudo apt-get install -y --no-install-recommends python3-venv python3-setuptools
+      - name: Install Requirements
+        run: |-
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install -r dialogflow-cx/requirements.txt
+          pip install -r dialogflow-cx/requirements-test.txt
+          pip install -r dialogflow-cx/vpc-sc-auth-server/server/requirements.txt
+          pip install -r dialogflow-cx/vpc-sc-auth-server/server/requirements-test.txt
+          mv .venv /home/runner/work/_temp/_github_workflow
       - name: Lint Code Base
         uses: github/super-linter/slim@v4
         env:
@@ -78,3 +86,8 @@ jobs:
           VALIDATE_GITHUB_ACTIONS: false
           TERRAFORM_TFLINT_CONFIG_FILE: .tflint.hcl
           PYTHON_PYLINT_CONFIG_FILE: .python-lint
+          PYTHON_MYPY_CONFIG_FILE: .mypy.ini
+          DOCKERFILE_HADOLINT_FILE_NAME: .hadolint.yaml
+          MARKDOWN_CONFIG_FILE: .markdowmlint.jsonc
+          NATURAL_LANGUAGE_CONFIG_FILE: .textlintrc
+          PYTHONPATH: "/github/workspace:/github/workflow/.venv/lib/python3.10/site-packages"
