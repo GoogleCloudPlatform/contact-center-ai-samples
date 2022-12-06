@@ -101,4 +101,5 @@ jobs:
           DOCKERFILE_HADOLINT_FILE_NAME: .hadolint.yaml
           MARKDOWN_CONFIG_FILE: .markdowmlint.jsonc
           NATURAL_LANGUAGE_CONFIG_FILE: .textlintrc
+          YAML_CONFIG_FILE: .yaml-lint.yml
           PYTHONPATH: "/github/workspace:/github/workflow/.venv/lib/python3.10/site-packages"

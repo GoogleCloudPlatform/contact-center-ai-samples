@@ -52,23 +52,19 @@ updates:
     interval: daily
   commit-message:
       prefix: ":seedling:"
-
-  - package-ecosystem: npm
-    directory: /dialogflow-cx-nodejs
-    schedule:
-      interval: daily
-
-  - package-ecosystem: pip
-    directory: /dialogflow-cx
-    schedule:
-      interval: daily
-
-  - package-ecosystem: pip
-    directory: /dialogflow-cx/vpc-sc-auth-server/server
-    schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /
-    schedule:
-      interval: daily
+- package-ecosystem: npm
+  directory: /dialogflow-cx-nodejs
+  schedule:
+    interval: daily
+- package-ecosystem: pip
+  directory: /dialogflow-cx
+  schedule:
+    interval: daily
+- package-ecosystem: pip
+  directory: /dialogflow-cx/vpc-sc-auth-server/server
+  schedule:
+    interval: daily
+- package-ecosystem: npm
+  directory: /
+  schedule:
+    interval: daily

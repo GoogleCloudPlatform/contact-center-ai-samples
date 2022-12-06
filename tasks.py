@@ -22,7 +22,7 @@ from invoke import task  # type: ignore
 
 with open(".github/workflows/linter.yaml", encoding="utf-8") as file:
     _LINTER_ACTIONS_CONFIG = yaml.safe_load(file)
-_LINTER_ENV = _LINTER_ACTIONS_CONFIG["jobs"]["build"]["steps"][3]["env"]
+_LINTER_ENV = _LINTER_ACTIONS_CONFIG["jobs"]["build"]["steps"][4]["env"]
 _SUPER_LINTER_VERSION = "ghcr.io/github/super-linter:slim-v4.9.7"
 _LINTER_PATTERN = (
     "sudo docker run "
@@ -84,6 +84,10 @@ _LINTER_CONFIG = {
     "textlint": {
         "validate": "VALIDATE_NATURAL_LANGUAGE=true",
         "config": f'NATURAL_LANGUAGE_CONFIG_FILE={_LINTER_ENV["NATURAL_LANGUAGE_CONFIG_FILE"]}',
+    },
+    "yaml": {
+        "validate": "VALIDATE_YAML=true",
+        "config": f'YAML_CONFIG_FILE={_LINTER_ENV["YAML_CONFIG_FILE"]}',
     },
 }
 
