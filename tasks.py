@@ -34,6 +34,7 @@ _LINTER_PATTERN = (
     '-e PYTHONPATH="/tmp/lint/venv/lib/python3.10/site-packages" '
     f'-e "FILTER_REGEX_EXCLUDE={_LINTER_ENV["FILTER_REGEX_EXCLUDE"]}" '
     f'-e "LINTER_RULES_PATH=." '
+    f'-e YAML_ERROR_ON_WARNING={_LINTER_ENV["YAML_ERROR_ON_WARNING"]} '
     f"-v $(pwd):/tmp/lint {_SUPER_LINTER_VERSION}"
 )
 _LINTER_CONFIG = {

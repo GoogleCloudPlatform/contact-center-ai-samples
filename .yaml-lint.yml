@@ -1,4 +1,19 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 ---
+ignore: '**/.github/workflows/inactive/*.yaml'
+
 ###########################################
 # These are the rules used for            #
 # linting all the yaml files in the stack #
@@ -30,12 +45,14 @@ rules:
     max-spaces-after: 1
   comments: disable
   comments-indentation: disable
-  document-end: disable
+  document-end:
+    level: error
+    present: true
   document-start:
-    level: warning
+    level: error
     present: true
   empty-lines:
-    level: warning
+    level: error
     max: 2
     max-start: 0
     max-end: 0
@@ -49,11 +66,12 @@ rules:
     check-multi-line-strings: false
   key-duplicates: enable
   line-length:
-    level: warning
-    max: 80
+    level: error
+    max: 120
     allow-non-breakable-words: true
     allow-non-breakable-inline-mappings: true
-  new-line-at-end-of-file: disable
+  new-line-at-end-of-file: enable
   new-lines:
     type: unix
-  trailing-spaces: disable
+  trailing-spaces: enable
+...
