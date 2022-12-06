@@ -79,10 +79,13 @@ def test_callback(
         google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
     ):
         import app
+
         with patch.object(
             app, "access_secret_version", return_value={"response": "MOCK_SECRET"}
         ):
-            with patch.object(requests, "post", return_value=MockOAuthRequestReturnObj()):
+            with patch.object(
+                requests, "post", return_value=MockOAuthRequestReturnObj()
+            ):
                 with patch.object(
                     id_token,
                     "verify_oauth2_token",
@@ -92,7 +95,10 @@ def test_callback(
                     },
                 ):
                     import session
-                    with patch.dict(os.environ, {"SESSION_BUCKET": "MOCK_SESSION_BUCKET"}):
+
+                    with patch.dict(
+                        os.environ, {"SESSION_BUCKET": "MOCK_SESSION_BUCKET"}
+                    ):
                         with patch.object(
                             session, "create", return_value="MOCK_SESSION_ID"
                         ):
@@ -165,6 +171,7 @@ def test_get_redirect_url(prod, expected):
         google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
     ):
         import app
+
         with mock.patch.dict(os.environ, {"PROD": prod, "DEBUG_PORT": mock_debug_port}):
             assert app.get_redirect_url() == expected.format(
                 mock_debug_port=mock_debug_port
