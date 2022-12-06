@@ -37,7 +37,7 @@ def client():
     with patch.object(
         google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
     ):
-        import app
+        import app  # pylint: disable=import-outside-toplevel
 
         app.app.config["TESTING"] = True
         with app.app.test_client() as curr_client:
@@ -78,11 +78,14 @@ def test_callback(
     with patch.object(
         google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
     ):
-        import app
+        import app  # pylint: disable=import-outside-toplevel
+
         with patch.object(
             app, "access_secret_version", return_value={"response": "MOCK_SECRET"}
         ):
-            with patch.object(requests, "post", return_value=MockOAuthRequestReturnObj()):
+            with patch.object(
+                requests, "post", return_value=MockOAuthRequestReturnObj()
+            ):
                 with patch.object(
                     id_token,
                     "verify_oauth2_token",
@@ -91,8 +94,11 @@ def test_callback(
                         "exp": "MOCK_EXPIRATION",
                     },
                 ):
-                    import session
-                    with patch.dict(os.environ, {"SESSION_BUCKET": "MOCK_SESSION_BUCKET"}):
+                    import session  # pylint: disable=import-outside-toplevel
+
+                    with patch.dict(
+                        os.environ, {"SESSION_BUCKET": "MOCK_SESSION_BUCKET"}
+                    ):
                         with patch.object(
                             session, "create", return_value="MOCK_SESSION_ID"
                         ):
@@ -164,7 +170,8 @@ def test_get_redirect_url(prod, expected):
     with patch.object(
         google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
     ):
-        import app
+        import app  # pylint: disable=import-outside-toplevel
+
         with mock.patch.dict(os.environ, {"PROD": prod, "DEBUG_PORT": mock_debug_port}):
             assert app.get_redirect_url() == expected.format(
                 mock_debug_port=mock_debug_port
