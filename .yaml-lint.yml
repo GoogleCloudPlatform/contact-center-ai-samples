@@ -1,0 +1,77 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+ignore: '**/.github/workflows/inactive/*.yaml'
+
+###########################################
+# These are the rules used for            #
+# linting all the yaml files in the stack #
+# NOTE:                                   #
+# You can disable line with:              #
+# # yamllint disable-line                 #
+###########################################
+rules:
+  braces:
+    level: warning
+    min-spaces-inside: 0
+    max-spaces-inside: 0
+    min-spaces-inside-empty: 1
+    max-spaces-inside-empty: 5
+  brackets:
+    level: warning
+    min-spaces-inside: 0
+    max-spaces-inside: 0
+    min-spaces-inside-empty: 1
+    max-spaces-inside-empty: 5
+  colons:
+    level: warning
+    max-spaces-before: 0
+    max-spaces-after: 1
+  commas:
+    level: warning
+    max-spaces-before: 0
+    min-spaces-after: 1
+    max-spaces-after: 1
+  comments: disable
+  comments-indentation: disable
+  document-end:
+    level: error
+    present: true
+  document-start:
+    level: error
+    present: true
+  empty-lines:
+    level: error
+    max: 2
+    max-start: 0
+    max-end: 0
+  hyphens:
+    level: warning
+    max-spaces-after: 1
+  indentation:
+    level: warning
+    spaces: consistent
+    indent-sequences: true
+    check-multi-line-strings: false
+  key-duplicates: enable
+  line-length:
+    level: error
+    max: 120
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
+  new-line-at-end-of-file: enable
+  new-lines:
+    type: unix
+  trailing-spaces: enable
+...

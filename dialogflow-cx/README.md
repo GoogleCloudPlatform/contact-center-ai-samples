@@ -48,14 +48,17 @@ to create a webhook for a
 1. Setup application default authentication, run: `gcloud auth
    application-default login`
 1. Clone this repository and enter the folder containing the sample code:
+
    ```bash
    git clone https://github.com/GoogleCloudPlatform/contact-center-ai-samples.git
    cd contact-center-ai-samples/dialogflow-cx
    ```
+
 1. Deploy the Cloud Function:
    Here `<REGION>` is the Google Cloud region of your function and
    `<PROJECT_ID>` is the Google Cloud project ID that contains your Cloud
    Function.
+
    ```bash
    gcloud functions deploy dialogflow_webhook \
      --runtime python39 \
@@ -66,16 +69,22 @@ to create a webhook for a
      --trigger-http \
      --allow-unauthenticated
    ```
+
 1. Run the sample:
+
    ```bash
    python main.py --webhook-url ${CLOUD_FUNCTION_URL?}
    ```
+
    where `<CLOUD_FUNCTION_URL>` is the URL of the Cloud Function you deployed
    in the previous step. The URL should take the following form:
+
    ```bash
    CLOUD_FUNCTION_URL="https://${REGION?}-${PROJECT_ID?}.cloudfunctions.net/webhook_fcn"
    ```
+
    For example:
+
    ```bash
    https://us-central1-my-project-id.cloudfunctions.net/webhook_fcn
    ```
@@ -85,5 +94,8 @@ to create a webhook for a
 1. Run a Dialog flow agent sample:
 
 ```bash
-python basic_webhook_sample.py --webhook-uri=${CLOUD_FUNCTION_URL?} --project-id=${PROJECT_ID?} --agent-display-name=example_agent
+python basic_webhook_sample.py \
+  --webhook-uri=${CLOUD_FUNCTION_URL?} \
+  --project-id=${PROJECT_ID?} \
+  --agent-display-name=example_agent
 ```

@@ -17,7 +17,7 @@
 ## Super Linter GitHub Actions ##
 #################################
 #################################
-name: Lint Code Base
+name: Linting
 
 #
 # Documentation:
@@ -29,21 +29,28 @@ name: Lint Code Base
 #############################
 on:
   push:
-    branches-ignore: [main]
-    # Remove the line above to run when pushing to main
+    branches: [main]
   pull_request:
     branches: [main]
 
 ###############
 # Set the Job #
 ###############
+permissions:  # added using https://github.com/step-security/secure-workflows
+  contents: read
+
 jobs:
   build:
     # Name the Job
-    name: Lint Code Base
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      statuses: write  # for github/super-linter/slim to mark status of each linter run
+    name: Linting
     # Set the agent to run on
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        python: ["3.10"]
     ##################
     # Load all steps #
     ##################
@@ -51,18 +58,29 @@ jobs:
       ##########################
       # Checkout the code base #
       ##########################
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Harden Runner
+        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # v2.0.0
         with:
-          # Full git history is needed to get a proper 
-          # list of changed files within `super-linter`
-          fetch-depth: 0
+          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
 
-      ################################
-      # Run Linter against code base #
-      ################################
+      - name: Checkout Code
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        with:
+          fetch-depth: 0
+      - name: Install missing python packages
+        run: sudo apt-get install -y --no-install-recommends python3-venv python3-setuptools
+      - name: Install Requirements
+        run: |-
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install -r dialogflow-cx/requirements.txt
+          pip install -r dialogflow-cx/requirements-test.txt
+          pip install -r dialogflow-cx/vpc-sc-auth-server/server/requirements.txt
+          pip install -r dialogflow-cx/vpc-sc-auth-server/server/requirements-test.txt
+          mv .venv /home/runner/work/_temp/_github_workflow
       - name: Lint Code Base
-        uses: github/super-linter/slim@v4
+        uses: github/super-linter/slim@bb2d833b08b6c288608686672b93a8a4589cdc49 # v4.9.7
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -78,3 +96,11 @@ jobs:
           VALIDATE_GITHUB_ACTIONS: false
           TERRAFORM_TFLINT_CONFIG_FILE: .tflint.hcl
           PYTHON_PYLINT_CONFIG_FILE: .python-lint
+          PYTHON_MYPY_CONFIG_FILE: .mypy.ini
+          DOCKERFILE_HADOLINT_FILE_NAME: .hadolint.yaml
+          MARKDOWN_CONFIG_FILE: .markdowmlint.jsonc
+          NATURAL_LANGUAGE_CONFIG_FILE: .textlintrc
+          YAML_CONFIG_FILE: .yaml-lint.yml
+          PYTHONPATH: "/github/workspace:/github/workflow/.venv/lib/python3.10/site-packages"
+          YAML_ERROR_ON_WARNING: true
+...

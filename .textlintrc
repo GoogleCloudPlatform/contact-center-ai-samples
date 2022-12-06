@@ -11,6 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-pytest==7.2.0
-pytest-rerunfailures==10.2
+{
+  "filters": {
+    "comments": true
+  },
+  "rules": {
+    "terminology": true
+  }
+}
