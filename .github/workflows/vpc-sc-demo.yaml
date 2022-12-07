@@ -18,10 +18,12 @@ on:
   push:
     branches:
       - main
+    paths:
       - 'dialogflow-cx/vpc-sc-demo/**'
   pull_request:
     branches:
       - main
+    paths:
       - 'dialogflow-cx/vpc-sc-demo/**'
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
