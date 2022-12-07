@@ -82,8 +82,10 @@ def test_session_read():
 def test_session_read_xfail():
     """Test session.py:read, expected to fail because of blob not found."""
 
+    import session  # pylint: disable=import-outside-toplevel
+
     def download_as_bytes_mock():
-        raise google.api_core.exceptions.NotFound("MOCK_ERROR_MESSAGE")
+        raise google.api_core.exceptions.NotFound(session.NOT_FOUND_ERROR_MESSAGE)
 
     session_data = get_session_data(download_as_bytes_mock)
     assert len(session_data) == 1
