@@ -57,9 +57,16 @@ done
 
 source config.env
 
+if [[ $(git diff --stat) != '' ]]; then 
+  echo 'Deployment cancelled: dirty repository' 
+  exit 0
+fi
+
 gcloud --quiet auth login "${PRINCIPAL?}" --no-launch-browser
 gcloud config set project "${PROJECT_ID?}"
 
+# Revision in Cloud Run tagged with current repo hash
+REVISION_SUFFIX="$(git rev-parse --short HEAD)"
 gcloud builds submit server --tag="${IMAGE_URI?}" --gcs-log-dir=gs://"${PROJECT_ID?}"
 gcloud run deploy --allow-unauthenticated "authentication-service" \
   --image "${IMAGE_URI?}" \
@@ -68,5 +75,7 @@ gcloud run deploy --allow-unauthenticated "authentication-service" \
   --port=5000 \
   --ingress=all \
   --set-env-vars=CLIENT_ID="${CLIENT_ID?}",SESSION_BUCKET="${SESSION_BUCKET?}",IP_ADDRESS="${DOMAIN?}",PROD=true \
-  --tag="${SERVICE_TAG?}"
-  
+  --tag="${SERVICE_TAG?}" \
+  --revision-suffix="${REVISION_SUFFIX?}"
+gcloud run services update-traffic authentication-service \
+  --update-tags="${REVISION_SUFFIX?}=authentication-service-${REVISION_SUFFIX?}"
