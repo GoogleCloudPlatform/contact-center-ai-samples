@@ -32,5 +32,7 @@ EXPOSE 5000
 # Copy every content from the local file to the image
 COPY app.py /app/app.py
 COPY ./session.py /app/session.py
+COPY ./utilities.py /app/utilities.py
+COPY ./aes_cipher.py /app/aes_cipher.py
 
-CMD ["exec", "gunicorn", "--bind=0.0.0.0:5000", "--workers=1", "--threads=8", "--log-level=info", "app:app"]
+CMD ["gunicorn", "--bind=0.0.0.0:5000", "--workers=1", "--threads=8", "--log-level=info", "app:app"]
