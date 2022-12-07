@@ -13,29 +13,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: VPC-SC Auth Server Workflow
+name: VPC-SC Demo Workflow
 on:
   push:
     branches:
       - main
-      - 'dialogflow-cx/vpc-sc-auth-server/server/**'
+      - 'dialogflow-cx/vpc-sc-demo/**'
   pull_request:
     branches:
       - main
-      - 'dialogflow-cx/vpc-sc-auth-server/server/**'
+      - 'dialogflow-cx/vpc-sc-demo/**'
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
 
 jobs:
   pytest:
-    name: VPC-SC Auth Server Pytest
+    name: VPC-SC Demo Webhook Pytest
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dialogflow-cx/vpc-sc-auth-server/server
+        working-directory: dialogflow-cx/vpc-sc-demo/components/webhook/telecom-webhook-src
     strategy:
       matrix:
-        python: ["3.10"]
+        python: ["3.9"]
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # v2.0.0
@@ -48,5 +48,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-test.txt
-      - run: pytest
+      - name: Run Webhook Tests
+        run: pytest
 ...
