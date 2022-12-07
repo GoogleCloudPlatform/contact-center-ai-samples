@@ -16,9 +16,13 @@
 name: VPC-SC Auth Server Workflow
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'dialogflow-cx/vpc-sc-auth-server/server/**'
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - 'dialogflow-cx/vpc-sc-auth-server/server/**'
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
 
