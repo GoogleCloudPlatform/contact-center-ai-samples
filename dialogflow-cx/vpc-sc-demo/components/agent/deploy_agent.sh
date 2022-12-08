@@ -22,7 +22,7 @@ export TF_PLAN_STORAGE_BUCKET= # Fill in an existing bucket name
 # Settings (Defaults):
 export BASE_TERRAFORM_IMAGE="hashicorp/terraform:1.3.6"
 export PREFIX="terraform/${PROJECT_ID?}/agent"
-export TERRAFORM_IMAGE="local/terraform:latest"
+export TERRAFORM_IMAGE="local/terraform_agent:latest"
 ACCESS_TOKEN="$(gcloud auth print-access-token)"
 export ACCESS_TOKEN  # Declare and assign separately to avoid masking return values.
 
@@ -31,7 +31,7 @@ gcloud --quiet auth login "${PRINCIPAL?}" --no-launch-browser
 gcloud config set project "${PROJECT_ID?}"
 
 # Build a local terraform with a few more dependencies so that provision_agent.sh succeeds:
-sudo docker build --build-arg BASE_IMAGE="${BASE_TERRAFORM_IMAGE?}" -t local/terraform:latest .
+sudo docker build --build-arg BASE_IMAGE="${BASE_TERRAFORM_IMAGE?}" -t ${TERRAFORM_IMAGE?} .
 
 sudo docker run -w /app -v "$(pwd)":/app "${TERRAFORM_IMAGE?}" init -reconfigure -backend-config="access_token=$(gcloud auth print-access-token)" -backend-config="bucket=${TF_PLAN_STORAGE_BUCKET?}" -backend-config="prefix=${PREFIX?}"
 
