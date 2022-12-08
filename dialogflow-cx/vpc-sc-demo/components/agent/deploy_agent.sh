@@ -15,13 +15,9 @@
 
 
 # Settings (Required):
-# export PROJECT_ID= # Fill in an existing project_id, with enabled billing info
-# export PRINCIPAL= # Fill in an existing account with sufficient IAM permissions to deploy
-# export TF_PLAN_STORAGE_BUCKET= # Fill in an existing bucket name
-
-export PROJECT_ID="vpc-sc-demo-nicholascain19"
-export PRINCIPAL="nicholascain@cloudadvocacyorg.joonix.net"
-export TF_PLAN_STORAGE_BUCKET="tf_test_nicholascain"
+export PROJECT_ID= # Fill in an existing project_id, with enabled billing info
+export PRINCIPAL= # Fill in an existing account with sufficient IAM permissions to deploy
+export TF_PLAN_STORAGE_BUCKET= # Fill in an existing bucket name
 
 # Settings (Defaults):
 export BASE_TERRAFORM_IMAGE="hashicorp/terraform:1.3.6"
