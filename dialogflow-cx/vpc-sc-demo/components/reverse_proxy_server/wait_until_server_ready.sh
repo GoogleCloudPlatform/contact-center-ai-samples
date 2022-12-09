@@ -51,12 +51,12 @@ do
 done
 
 export CLOUDSDK_AUTH_ACCESS_TOKEN=${TOKEN?}
-gcloud config set project ${PROJECT_ID?}
+gcloud config set project "${PROJECT_ID?}"
 
 READY=false
 until [ ${READY?} = true ]
 do
-  if ` gcloud compute instances get-serial-port-output --start=0 webhook-server --zone ${ZONE?} | grep -q "google-startup-scripts.service: Succeeded" `; then
+  if gcloud compute instances get-serial-port-output --start=0 webhook-server --zone "${ZONE?}" | grep -q "google-startup-scripts.service: Succeeded"; then
     READY=true
   fi
   sleep 1

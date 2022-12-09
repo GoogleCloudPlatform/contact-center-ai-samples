@@ -13,24 +13,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: VPC-SC Demo Workflow
+name: VPC-SC Demo Workflow Telecom Source Test
 on:
   push:
     branches:
       - main
     paths:
-      - 'dialogflow-cx/vpc-sc-demo/**'
+      - 'dialogflow-cx/vpc-sc-demo/components/webhook/telecom-webhook-src/**'
   pull_request:
     branches:
       - main
     paths:
-      - 'dialogflow-cx/vpc-sc-demo/**'
+      - 'dialogflow-cx/vpc-sc-demo/components/webhook/telecom-webhook-src/**'
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
 
 jobs:
   pytest:
-    name: VPC-SC Demo Webhook Pytest
+    name: VPC-SC Demo Telecom Source Test Job
     runs-on: ubuntu-latest
     defaults:
       run:

@@ -1,4 +1,4 @@
-# Copyright 2021 Google LLC
+# Copyright 2022 Google LLC
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -21,7 +21,7 @@ WORKDIR /usr/src/app
 COPY requirements.txt ./
 
 # Install dependencies.
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy local code to the container image.
 COPY app.py ./
@@ -32,4 +32,4 @@ EXPOSE 8080
 # Use gunicorn webserver with one worker process and 8 threads.
 # For environments with multiple CPU cores, increase the number of workers
 # to be equal to the cores available.
-CMD exec gunicorn --bind=0.0.0.0:8080 --workers=1 --threads=8 --log-level=info app:app
+CMD ["gunicorn", "--bind=0.0.0.0:8080", "--workers=1", "--threads=8", "--log-level=info", "app:app"]
