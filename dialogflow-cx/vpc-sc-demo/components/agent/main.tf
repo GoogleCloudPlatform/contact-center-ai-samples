@@ -92,7 +92,10 @@ resource "google_dialogflow_cx_agent" "full_agent" {
   enable_spell_correction = true
 
   provisioner "local-exec" {
-    command = "/app/provision_agent.sh --region=${var.region} --project_id=${var.project_id} --webhook_name=${var.webhook_name} --token=${var.access_token}"
+    interpreter = [
+      "/bin/bash", "-c"
+    ]
+    command = "source /root/.bashrc && /app/provision_agent.sh --region=${var.region} --project_id=${var.project_id} --webhook_name=${var.webhook_name} --token=${var.access_token}"
   }
 
   depends_on = [
