@@ -19,7 +19,7 @@ variable "project_id" {
 
 terraform {
   required_providers {
-    google = "~> 4.37.0"
+    google = "~> 4.45.0"
   }
   backend "gcs" {
     bucket  = null
