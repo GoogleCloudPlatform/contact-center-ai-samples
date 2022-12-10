@@ -90,6 +90,10 @@ _LINTER_CONFIG = {
         "validate": "VALIDATE_YAML=true",
         "config": f'YAML_CONFIG_FILE={_LINTER_ENV["YAML_CONFIG_FILE"]}',
     },
+    "terrascan": {
+        "validate": "VALIDATE_TERRAFORM_TERRASCAN=true",
+        "config": f'TERRAFORM_TERRASCAN_CONFIG_FILE={_LINTER_ENV["TERRAFORM_TERRASCAN_CONFIG_FILE"]}',
+    },
 }
 
 
