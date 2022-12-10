@@ -19,10 +19,11 @@ import logging
 import os
 import signal
 
-import google.oauth2
+import google.auth
 import requests
-from flask import Flask, abort, request
+from flask import Flask, Response, abort, request
 from google.auth.transport import requests as reqs
+from google.oauth2 import id_token
 
 app = Flask(__name__)
 gunicorn_logger = logging.getLogger("gunicorn.error")
@@ -56,13 +57,13 @@ def check_user_authentication():  # pylint: disable=R1710
 
     info = None
     try:
-        info = google.oauth2.id_token.verify_firebase_token(token, reqs.Request())
+        info = id_token.verify_firebase_token(token, reqs.Request())
     except ValueError:
         pass
 
     try:
         if info is None:
-            info = google.oauth2.id_token.verify_oauth2_token(token, reqs.Request())
+            info = id_token.verify_oauth2_token(token, reqs.Request())
     except ValueError:
         pass
 
@@ -79,19 +80,26 @@ def check_user_authentication():  # pylint: disable=R1710
 
 
 @app.post("/")
-def root() -> str:
+def root() -> Response:
     """Redirect request to webhook trigger."""
     app.logger.info('Endpoint "webhook" triggered')
     audience = os.environ["WEBHOOK_TRIGGER_URI"]
+    app.logger.info("WEBHOOK_TRIGGER_URI: %s", audience)
     auth_req = google.auth.transport.requests.Request()
-    token = google.oauth2.id_token.fetch_id_token(auth_req, audience)
+    token = id_token.fetch_id_token(auth_req, audience)
     new_headers = {}
     new_headers["Content-type"] = "application/json"
     new_headers["Authorization"] = f"Bearer {token}"
     result = requests.post(
         audience, json=request.get_json(), headers=new_headers, timeout=10
     )
-    return result.text
+    if result.status_code != 200:
+        app.logger.info("Webhook Response error code: %s", result.status_code)
+        app.logger.info("Webhook Response error %s", result.text)
+    else:
+        app.logger.info("Webhook Response: %s", result.status_code)
+
+    return Response(status=result.status_code, response=result.text)
 
 
 def shutdown_handler(signal_int, frame) -> None:

@@ -282,6 +282,28 @@ resource "google_project_iam_member" "dfsa_sd_pscAuthorizedService" {
   member = "serviceAccount:${google_project_service_identity.dfsa.email}"
 }
 
+resource "google_service_account" "rpcsa_service_account" {
+  account_id   = "rps-sa"
+  display_name = "Reverse Proxy Server Service Account"
+  depends_on = [
+    google_project_service.iam,
+  ]
+}
+
+resource "google_project_iam_member" "rpcsa_artifactregistry" {
+  project = var.project_id
+
+  role               = "roles/artifactregistry.reader"
+  member = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
+}
+
+resource "google_project_iam_member" "rpcsa_cfinvoker" {
+  project = var.project_id
+
+  role               = "roles/cloudfunctions.invoker"
+  member = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
+}
+
 resource "google_compute_instance" "reverse_proxy_server" {
   name         = "webhook-server"
   project      =  var.project_id
@@ -289,7 +311,14 @@ resource "google_compute_instance" "reverse_proxy_server" {
   machine_type = "n1-standard-1"
   tags = ["webhook-reverse-proxy-vm"]
   service_account {
-    scopes = ["cloud-platform"]
+    scopes = [
+      "compute-ro",
+      "logging-write",
+      "monitoring-write",
+      "storage-ro",
+      "trace",
+    ]
+    email  = google_service_account.rpcsa_service_account.email
   }
 
   boot_disk {
@@ -328,5 +357,7 @@ resource "google_compute_instance" "reverse_proxy_server" {
     var.bucket,
     google_project_iam_member.dfsa_sd_viewer,
     google_project_iam_member.dfsa_sd_pscAuthorizedService,
+    google_project_iam_member.rpcsa_artifactregistry,
+    google_project_iam_member.rpcsa_cfinvoker,
   ]
 }

@@ -34,6 +34,7 @@ class CustomClient(FlaskClient):
 
     def __init__(self, *args, **kwargs):
         self.headers = kwargs.pop("headers", {})
+        self.status_code = kwargs.pop("status_code", {})
         super().__init__(*args, **kwargs)
 
     def open(self, *args, **kwargs):
@@ -48,8 +49,10 @@ class MockRequestReturnObj:  # pylint: disable=too-few-public-methods
 
     text = "MOCK_TEXT"
 
-    def __init__(self) -> None:
+    def __init__(self, status_code, text) -> None:
         """Create a mock request return, OAuth API."""
+        self.status_code = status_code
+        self.text = text
 
 
 @pytest.fixture
@@ -71,13 +74,19 @@ def client(request):
             request.param.get("verify_token_method", _DEFAULT_VERIFY_TOKEN_METHOD),
             return_value={"email": mock_allowed_user},
         ):
-            with patch.object(requests, "post", return_value=MockRequestReturnObj()):
+            return_value = MockRequestReturnObj(
+                request.param.get("status_code", 200),
+                request.param.get("text", "MOCK_TEXT"),
+            )
+            with patch.object(requests, "post", return_value=return_value):
 
                 import app  # pylint: disable=import-outside-toplevel
 
                 app.app.config["TESTING"] = True
                 with CustomClient(
-                    app.app, headers=request.param["headers"]
+                    app.app,
+                    headers=request.param["headers"],
+                    status_code=request.param["status_code"],
                 ) as curr_client:
                     yield curr_client
 
@@ -88,10 +97,17 @@ def client(request):
         {
             "headers": {"AUTHORIZATION": "Bearer MOCK_AUTHORIZATION"},
             "verify_token_method": "verify_oauth2_token",
+            "status_code": 200,
+        },
+        {
+            "headers": {"AUTHORIZATION": "Bearer MOCK_AUTHORIZATION"},
+            "verify_token_method": "verify_oauth2_token",
+            "status_code": 401,
         },
         {
             "headers": {"AUTHORIZATION": "Bearer MOCK_AUTHORIZATION"},
             "verify_token_method": "verify_firebase_token",
+            "status_code": 200,
         },
     ],
     indirect=True,
@@ -106,7 +122,7 @@ def test_root(client):  # pylint: disable=redefined-outer-name
     assert parsed_url.scheme == "http"
     assert parsed_url.netloc == "localhost"
     assert return_value.headers["Content-Type"] == "text/html; charset=utf-8"
-    assert return_value.status_code == 200
+    assert return_value.status_code == client.status_code
     for curr_response in return_value.response:
         assert curr_response.decode() == MockRequestReturnObj.text
 
@@ -114,10 +130,8 @@ def test_root(client):  # pylint: disable=redefined-outer-name
 def test_shutdown_handler(caplog):
     """Test shutdown_handler function."""
 
-    def mock_signal_handler(*args, **kwargs):
+    def mock_signal_handler(*args, **kwargs):  # pylint: disable=unused-argument
         """Mock signal handler for testing shutdown handler."""
-        del args
-        del kwargs
 
     with patch.dict(
         os.environ,
@@ -138,8 +152,6 @@ def test_shutdown_handler(caplog):
 
 def raise_value_error(*args, **kwargs):
     """Function to patch id_token.verify_oauth2_token, to expliciylt test try-catch."""
-    del args
-    del kwargs
     raise ValueError
 
 
