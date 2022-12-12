@@ -37,6 +37,7 @@ _LINTER_PATTERN = (
     f'-e YAML_ERROR_ON_WARNING={_LINTER_ENV["YAML_ERROR_ON_WARNING"]} '
     f"-v $(pwd):/tmp/lint {_SUPER_LINTER_VERSION}"
 )
+_TERRASCAN_CONFIG = "TERRAFORM_TERRASCAN_CONFIG_FILE"
 _LINTER_CONFIG = {
     "terraform": {
         "validate": "VALIDATE_TERRAFORM_TFLINT=true",
@@ -89,6 +90,10 @@ _LINTER_CONFIG = {
     "yaml": {
         "validate": "VALIDATE_YAML=true",
         "config": f'YAML_CONFIG_FILE={_LINTER_ENV["YAML_CONFIG_FILE"]}',
+    },
+    "terrascan": {
+        "validate": "VALIDATE_TERRAFORM_TERRASCAN=true",
+        "config": f"TERRAFORM_TERRASCAN_CONFIG_FILE={_LINTER_ENV[_TERRASCAN_CONFIG]}",
     },
 }
 

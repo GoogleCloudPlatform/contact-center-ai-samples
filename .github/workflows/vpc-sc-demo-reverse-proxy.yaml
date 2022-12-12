@@ -13,28 +13,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: VPC-SC Demo Workflow
+name: VPC-SC Demo Workflow Reverse Proxy Source Test
 on:
   push:
     branches:
       - main
     paths:
-      - 'dialogflow-cx/vpc-sc-demo/**'
+      - 'dialogflow-cx/vpc-sc-demo/components/webhook/telecom-webhook-src/**'
   pull_request:
     branches:
       - main
     paths:
-      - 'dialogflow-cx/vpc-sc-demo/**'
+      - 'dialogflow-cx/vpc-sc-demo/components/webhook/telecom-webhook-src/**'
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
 
 jobs:
   pytest:
-    name: VPC-SC Demo Webhook Pytest
+    name: VPC-SC Demo Reverse Proxy Source Test Job
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dialogflow-cx/vpc-sc-demo/components/webhook/telecom-webhook-src
+        working-directory: dialogflow-cx/vpc-sc-demo/components/reverse_proxy_server/proxy-server-src
     strategy:
       matrix:
         python: ["3.9"]
@@ -56,5 +56,5 @@ jobs:
           pip install pytest-cov==4.0.0
           coverage run -m pytest --cov=./ --cov-report=xml
       - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v2
 ...
