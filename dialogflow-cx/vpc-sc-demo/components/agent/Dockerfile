@@ -1,27 +1,18 @@
-#!/bin/bash
 # Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# shellcheck disable=SC1000-SC9999
 
-Flask==2.0.2
-werkzeug==2.0.3
-types-Flask==1.1.6
-Flask-Logging==0.1.3
-gunicorn==20.1.0
-requests==2.28.1
-google-auth==2.14.1
-google-cloud-secret-manager==2.12.3
-google-cloud-storage==2.7.0
-google-crc32c==1.3.0
-pycryptodome==3.15.0
+ARG BASE_IMAGE
+# hadolint ignore=DL3006
+FROM ${BASE_IMAGE}
+RUN apk add --no-cache bash==5.2.12-r0 curl==7.86.0-r1 jq==1.6-r2
