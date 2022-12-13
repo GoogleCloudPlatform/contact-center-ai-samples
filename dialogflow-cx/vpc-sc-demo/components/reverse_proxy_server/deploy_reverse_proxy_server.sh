@@ -35,6 +35,6 @@ gcloud services enable cloudresourcemanager.googleapis.com
 # Build a local terraform with a few more dependencies so that provision_agent.sh succeeds:
 sudo docker build --build-arg BASE_IMAGE="${BASE_TERRAFORM_IMAGE?}" -t ${TERRAFORM_IMAGE?} .
 
-sudo docker run -w /app -v "$(pwd)":/app "${TERRAFORM_IMAGE?}" init -reconfigure -backend-config="access_token=$(gcloud auth print-access-token)" -backend-config="bucket=${TF_PLAN_STORAGE_BUCKET?}" -backend-config="prefix=${PREFIX?}"
+sudo docker run -w /app -v "$(pwd)":/app "${TERRAFORM_IMAGE?}" init -upgrade -reconfigure -backend-config="access_token=$(gcloud auth print-access-token)" -backend-config="bucket=${TF_PLAN_STORAGE_BUCKET?}" -backend-config="prefix=${PREFIX?}"
 
 sudo docker run -w /app -v "$(pwd)":/app -e GOOGLE_OAUTH_ACCESS_TOKEN="${ACCESS_TOKEN?}" "${TERRAFORM_IMAGE?}" apply --auto-approve -var project_id="${PROJECT_ID?}" -var access_token="${ACCESS_TOKEN?}" -var bucket="${TF_PLAN_STORAGE_BUCKET?}"

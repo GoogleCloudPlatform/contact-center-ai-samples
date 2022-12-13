@@ -30,6 +30,6 @@ gcloud config set project "${PROJECT_ID?}"
 gcloud services enable cloudresourcemanager.googleapis.com
 
 
-sudo docker run -w /app -v "$(pwd)":/app "${TERRAFORM_IMAGE?}" init -reconfigure -backend-config="access_token=$(gcloud auth print-access-token)" -backend-config="bucket=${TF_PLAN_STORAGE_BUCKET?}" -backend-config="prefix=${PREFIX?}"
+sudo docker run -w /app -v "$(pwd)":/app "${TERRAFORM_IMAGE?}" init -upgrade -reconfigure -backend-config="access_token=$(gcloud auth print-access-token)" -backend-config="bucket=${TF_PLAN_STORAGE_BUCKET?}" -backend-config="prefix=${PREFIX?}"
 
 sudo docker run -w /app -v "$(pwd)":/app -e GOOGLE_OAUTH_ACCESS_TOKEN="$(gcloud auth print-access-token)" "${TERRAFORM_IMAGE?}" apply --auto-approve -var project_id="${PROJECT_ID?}" -var bucket="${TF_PLAN_STORAGE_BUCKET?}"
