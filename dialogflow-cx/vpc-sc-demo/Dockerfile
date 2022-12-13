@@ -13,12 +13,20 @@
 # limitations under the License.
 
 FROM gcr.io/google.com/cloudsdktool/google-cloud-cli:alpine
-RUN apk add --no-cache bash py3-pip build-base python3-dev nodejs npm jq openssl
+RUN apk add --no-cache \
+  bash==5.1.16-r0 \
+  py3-pip==20.3.4-r1 \
+  build-base==0.5-r3 \
+  python3-dev==3.9.16-r0 \
+  nodejs==16.17.1-r0 \
+  npm==8.1.3-r0 \
+  jq==1.6-r1 \
+  openssl==1.1.1s-r1
 
 ARG PROD
 ENV PROD=${PROD:-true}
 
-RUN wget https://releases.hashicorp.com/terraform/1.2.9/terraform_1.2.9_linux_amd64.zip
+RUN wget -nv https://releases.hashicorp.com/terraform/1.2.9/terraform_1.2.9_linux_amd64.zip
 RUN unzip terraform_1.2.9_linux_amd64.zip
 RUN mv terraform /usr/bin/terraform
 
@@ -26,15 +34,14 @@ RUN mv terraform /usr/bin/terraform
 WORKDIR /app/frontend
 
 COPY frontend/ /app/frontend/
-RUN npm install react-scripts
-RUN npm run build
+RUN npm install react-scripts@5.0.1 && npm run build
 
 # Backend
 WORKDIR /app
 
 COPY backend/requirements.txt /app/requirements.txt
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip==22.3.1
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/create_keys.py /app/create_keys.py
 RUN python3 create_keys.py
@@ -47,4 +54,4 @@ RUN mkdir -p /app/.terraform.d/plugin-cache
 COPY components /app/components
 
 EXPOSE 8080
-CMD exec gunicorn --bind=0.0.0.0:8080 --workers=1 --threads=8 --log-level=info app:app
+CMD ["gunicorn", "--bind=0.0.0.0:8080", "--workers=1", "--threads=8", "--log-level=info", "app:app"]

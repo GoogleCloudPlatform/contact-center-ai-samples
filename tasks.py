@@ -110,7 +110,7 @@ def print_result(linter, result, hide):
 
 def run_autofix(ctx):
     """Run black and isort before linting."""
-    ctx.run("isort .", warn=False, hide=False)
+    ctx.run("isort --skip=noxfile.py .", warn=False, hide=False)
     ctx.run("black .", warn=False, hide=False)
 
 
