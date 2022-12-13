@@ -196,3 +196,6 @@ package-lock.json
 dialogflow-cx/vpc-sc-auth-server/application-client-id
 dialogflow-cx/vpc-sc-auth-server/application-client-secret
 dialogflow-cx/vpc-sc-auth-server/auth-server-project
+
+# VPC-SC Demo:
+dialogflow-cx/vpc-sc-demo/backend/demo-server-key.json
