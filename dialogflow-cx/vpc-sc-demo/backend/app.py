@@ -19,8 +19,10 @@ import logging
 from flask import Flask
 from flask.logging import create_logger
 from frontend_blueprint import frontend
+from session_blueprint import session
 
 app = Flask(__name__)
 app.register_blueprint(frontend)
+app.register_blueprint(session)
 logger = create_logger(app)
 logger.setLevel(logging.INFO)
