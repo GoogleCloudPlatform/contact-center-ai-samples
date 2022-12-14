@@ -14,7 +14,6 @@
 
 """Unit tests for create_keys.py."""
 
-import os
 from unittest import mock
 from unittest.mock import mock_open, patch
 
@@ -34,7 +33,7 @@ def test_generate_key_pair():
     assert mocked_file.mock_calls[0] == mock.call(
         "private_key.pem", "w", encoding="utf-8"
     )
-    for name, args, kwargs in mocked_file.mock_calls:
+    for name, args, _ in mocked_file.mock_calls:
         if name == "().write":
             if "PUBLIC" in args[0]:
                 public_pem = args[0]
