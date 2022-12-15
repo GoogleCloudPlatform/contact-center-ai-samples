@@ -18,6 +18,7 @@ import io
 import json
 import zipfile
 
+import get_token
 import pytest
 import requests
 from Crypto.Cipher import PKCS1_OAEP
@@ -25,8 +26,6 @@ from Crypto.PublicKey import RSA
 from google.oauth2 import id_token
 from mock import mock_open, patch
 from werkzeug.test import EnvironBuilder
-
-import get_token
 
 
 @pytest.fixture

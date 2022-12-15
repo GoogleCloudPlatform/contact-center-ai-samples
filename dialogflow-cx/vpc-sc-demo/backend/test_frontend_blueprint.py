@@ -18,10 +18,9 @@ import os
 
 import flask
 import pytest
-from mock import patch
-
-from frontend_blueprint import frontend as blueprint
 from frontend_blueprint import STATIC_FOLDER
+from frontend_blueprint import frontend as blueprint
+from mock import patch
 
 
 def send_from_directory_mock(directory, filename):

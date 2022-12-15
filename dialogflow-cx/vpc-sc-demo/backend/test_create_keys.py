@@ -17,11 +17,10 @@
 from unittest import mock
 from unittest.mock import mock_open, patch
 
+import create_keys
 import pytest
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
-
-import create_keys
 
 
 @pytest.mark.hermetic

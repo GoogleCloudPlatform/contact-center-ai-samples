@@ -14,9 +14,8 @@
 
 """Unit tests for app.py."""
 
-import pytest
-
 import app
+import pytest
 
 
 def get_url_map(curr_app):
