@@ -44,7 +44,7 @@ def app():
             "https://MOCK_PRODUCTION_DOMAIN/",
             "https://MOCK_PRODUCTION_DOMAIN",
             "true",
-            {},
+            None,
         ),
         (
             "https://MOCK_PRODUCTION_DOMAIN/",

@@ -15,40 +15,55 @@
 
 """Blueprint for launchpad services."""
 
+import json
 import logging
 
 import flask
+import get_token
+import requests
 
 launchpad = flask.Blueprint("launchpad", __name__)
 logger = logging.getLogger(__name__)
 
-@launchpad.route('/get_principal', methods=['GET'])
+
+@launchpad.route("/get_principal", methods=["GET"])
 def get_principal():
-  token_dict = get_token(request, token_type='email')
-  if 'response' in token_dict:
-    return redirect(url_for('logout'))
-  return Response(status=200, response=json.dumps({'principal': token_dict['email']}))
-  
+    """Get the email of the current principal for the session."""
+    token_dict = get_token.get_token(flask.request, token_type="email")
+    if "response" in token_dict:
+        return flask.redirect(flask.url_for("session.logout"))
+    return flask.Response(
+        status=200, response=json.dumps({"principal": token_dict["email"]})
+    )
 
-@launchpad.route('/validate_project_id', methods=['GET'])
+
+@launchpad.route("/validate_project_id", methods=["GET"])
 def validate_project_id():
-  project_id = request.args.get('project_id', None)
-  app.logger.info(f'project_id to validate: "{project_id}"')
-  if not project_id:
-    app.logger.info(f'project_id empty')
-    return Response(status=200, response=json.dumps({'status':False}, indent=2))
-  token_dict = get_token(request, token_type='access_token')
-  if 'response' in token_dict:
-    app.logger.info(f'ERROR TO DEBUG: {token_dict["response"]}')
-    return token_dict['response']
-  access_token = token_dict['access_token']
+    """Confirm if the current project_id is valid for current user."""
+    project_id = flask.request.args.get("project_id", None)
+    logger.info("project_id to validate: %s", project_id)
+    if not project_id:
+        logger.info("project_id empty")
+        return flask.Response(
+            status=200, response=json.dumps({"status": False}, indent=2)
+        )
+    token_dict = get_token.get_token(flask.request, token_type="access_token")
+    if "response" in token_dict:
+        logger.info("ERROR TO DEBUG: %s", token_dict["response"])
+        return token_dict["response"]
+    access_token = token_dict["access_token"]
 
-  headers = {}
-  headers['Authorization'] = f'Bearer {access_token}'
-  r = requests.get(f'https://cloudresourcemanager.googleapis.com/v1/projects/{project_id}', headers=headers)
+    headers = {}
+    headers["Authorization"] = f"Bearer {access_token}"
+    req = requests.get(
+        f"https://cloudresourcemanager.googleapis.com/v1/projects/{project_id}",
+        headers=headers,
+        timeout=10,
+    )
 
-  if r.status_code == 200:
-    return Response(status=200, response=json.dumps({'status':True}, indent=2))
-  else:
-    app.logger.info(f'cloudresourcemanager request not 200: {r.text}')
-    return Response(status=200, response=json.dumps({'status':False}, indent=2))
+    if req.status_code == 200:
+        return flask.Response(
+            status=200, response=json.dumps({"status": True}, indent=2)
+        )
+    logger.info("cloudresourcemanager request not 200: %s", req.text)
+    return flask.Response(status=200, response=json.dumps({"status": False}, indent=2))

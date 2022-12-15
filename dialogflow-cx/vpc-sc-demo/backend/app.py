@@ -18,8 +18,8 @@ import logging
 
 from flask import Flask
 from frontend_blueprint import frontend
-from session_blueprint import session
 from launchpad_blueprint import launchpad
+from session_blueprint import session
 
 
 def configure_logging():
@@ -41,5 +41,5 @@ def create_app():
 app = create_app()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     app.run()

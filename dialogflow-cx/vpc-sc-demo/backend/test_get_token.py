@@ -155,7 +155,7 @@ def test_get_token_no_session_id():
 
 
 @pytest.mark.hermetic
-@pytest.mark.parametrize('precache',[False,True])
+@pytest.mark.parametrize("precache", [False, True])
 def test_get_token_cached(precache):
     """Test get_token when response is cached."""
 
