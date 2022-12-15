@@ -146,7 +146,7 @@ def get_token(
 
     response = cache(session_id)
     if "response" in response:
-        cache.cache.pop((session_id))
+        cache.cache.pop(session_id, None)
         return response
     auth_data = response["auth_data"]
 
