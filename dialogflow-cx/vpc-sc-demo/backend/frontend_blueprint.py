@@ -32,6 +32,8 @@ logger = logging.getLogger(__name__)
 def root(path):
     """Serve static frontend."""
     secure_path = werkzeug.utils.secure_filename(path)
-    if secure_path != "" and os.path.exists(os.path.join(frontend.static_folder, secure_path)):
+    if secure_path != "" and os.path.exists(
+        os.path.join(frontend.static_folder, secure_path)
+    ):
         return flask.send_from_directory(frontend.static_folder, secure_path)
     return flask.send_from_directory(frontend.static_folder, "index.html")
