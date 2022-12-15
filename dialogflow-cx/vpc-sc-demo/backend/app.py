@@ -17,12 +17,27 @@
 import logging
 
 from flask import Flask
-from flask.logging import create_logger
 from frontend_blueprint import frontend
 from session_blueprint import session
 
-app = Flask(__name__)
-app.register_blueprint(frontend)
-app.register_blueprint(session)
-logger = create_logger(app)
-logger.setLevel(logging.INFO)
+
+def configure_logging():
+    """Set up logging for webserver."""
+    logging.basicConfig(level=logging.INFO)
+    logging.getLogger("werkzeug").setLevel(logging.INFO)
+
+
+def create_app():
+    """Create the webserver, register blueprints."""
+    curr_app = Flask(__name__)
+    curr_app.register_blueprint(frontend)
+    curr_app.register_blueprint(session)
+    configure_logging()
+    return curr_app
+
+
+app = create_app()
+
+
+if __name__ == "__main__":
+    app.run()

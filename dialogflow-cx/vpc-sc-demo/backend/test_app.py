@@ -14,9 +14,9 @@
 
 """Unit tests for app.py."""
 
+import pytest
 
 import app
-import pytest
 
 
 def get_url_map(curr_app):
@@ -24,6 +24,7 @@ def get_url_map(curr_app):
     return {str(rule): rule for rule in curr_app.url_map.iter_rules()}
 
 
+@pytest.mark.hermetic
 @pytest.mark.parametrize(
     "route",
     [

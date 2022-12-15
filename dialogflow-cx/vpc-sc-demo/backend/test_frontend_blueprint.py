@@ -18,12 +18,14 @@ import os
 
 import flask
 import pytest
-from frontend_blueprint import STATIC_FOLDER
-from frontend_blueprint import frontend as blueprint
 from mock import patch
+
+from frontend_blueprint import frontend as blueprint
+from frontend_blueprint import STATIC_FOLDER
 
 
 def send_from_directory_mock(directory, filename):
+    """Mock out send_from_directory method."""
     assert directory.endswith(STATIC_FOLDER)
     return filename
 
@@ -41,13 +43,17 @@ def client():
             yield curr_client
 
 
-def test_frontend_blueprint_no_path(client):
+@pytest.mark.hermetic
+def test_frontend_blueprint_no_path(client):  # pylint: disable=redefined-outer-name
+    """Test frontent without path."""
     return_value = client.get("/")
     for curr_response in return_value.response:
         assert curr_response.decode() == "index.html"
 
 
-def test_frontend_blueprint(client):
+@pytest.mark.hermetic
+def test_frontend_blueprint(client):  # pylint: disable=redefined-outer-name
+    """Test frontent with path."""
 
     mock_path = "MOCK_PATH"
 

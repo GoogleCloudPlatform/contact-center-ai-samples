@@ -15,6 +15,7 @@
 
 """Blueprint for serving static frontend."""
 
+import logging
 import os
 
 import flask
@@ -22,6 +23,7 @@ import flask
 STATIC_FOLDER = "frontend/build"
 
 frontend = flask.Blueprint("frontend", __name__, static_folder=STATIC_FOLDER)
+logger = logging.getLogger(__name__)
 
 
 @frontend.route("/", defaults={"path": ""})
