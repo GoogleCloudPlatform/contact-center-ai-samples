@@ -17,9 +17,9 @@
 
 import logging
 import os
-import werkzeug
 
 import flask
+import werkzeug
 
 STATIC_FOLDER = "frontend/build"
 
