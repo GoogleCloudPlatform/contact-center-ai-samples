@@ -184,8 +184,7 @@ def test_rejection_modes(headers, patch_kwargs):
                 with patch.object(
                     id_token,
                     _DEFAULT_VERIFY_TOKEN_METHOD,
-                    **patch_kwargs
-                    # return_value=info,
+                    **patch_kwargs,
                 ):
                     app.check_user_authentication()
     assert pytest_wrapped_e.value.response is None

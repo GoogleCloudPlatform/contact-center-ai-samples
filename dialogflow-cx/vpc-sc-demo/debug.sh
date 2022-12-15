@@ -12,10 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# shellcheck disable=SC1000-SC9999
+set -e
 
-pytest==7.2.0
-pytest-mypy==0.10.2
-mock==4.0.3
-invoke==1.7.3
-pyyaml==6.0
+export USER_SERVICE_IMAGE='vpc-sc-demo'
+export USER_SERVICE_TAG_BASE='latest'
+export USER_SERVICE_TAG='dev'
+
+sudo docker build --build-arg PROD=false -t ${USER_SERVICE_IMAGE?}:${USER_SERVICE_TAG_BASE?} .
+sudo docker build -t ${USER_SERVICE_IMAGE?}:${USER_SERVICE_TAG?} -f Dockerfile.dev .
+
+sudo docker run -it -p 5001:5001 -p 3001:3001 --rm --entrypoint=/app/debug_runner.sh -v "$(pwd)"/backend:/app -v "$(pwd)"/frontend:/frontend vpc-sc-demo:dev

@@ -1,4 +1,3 @@
-#!/bin/bash
 # Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +11,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# shellcheck disable=SC1000-SC9999
 
-pytest==7.2.0
-pytest-mypy==0.10.2
-mock==4.0.3
-invoke==1.7.3
-pyyaml==6.0
+"""Unit tests for app.py."""
+
+import app
+import pytest
+
+
+def get_url_map(curr_app):
+    """Get a map of all endpoints."""
+    return {str(rule): rule for rule in curr_app.url_map.iter_rules()}
+
+
+@pytest.mark.hermetic
+@pytest.mark.parametrize(
+    "route",
+    [
+        "/static/<path:filename>",
+        "/build/<path:filename>",
+        "/",
+        "/<path:path>",
+    ],
+)
+def test_root_routes(route):
+    """Assert frontend endpoints are configured for GET."""
+    url_map = get_url_map(app.app)
+    assert "GET" in url_map[route].methods

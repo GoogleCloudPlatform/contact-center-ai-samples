@@ -12,10 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# shellcheck disable=SC1000-SC9999
 
-pytest==7.2.0
-pytest-mypy==0.10.2
-mock==4.0.3
-invoke==1.7.3
-pyyaml==6.0
+nginx &
+cd /frontend && npm start &
+
+export FLASK_DEBUG=1 && export PROD=false && flask run --port 5001 --host=0.0.0.0
