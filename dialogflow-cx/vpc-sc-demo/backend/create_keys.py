@@ -22,7 +22,7 @@ from Crypto.PublicKey import RSA
 def generate_key_pair(filename_pattern="{key}.pem"):
     """Create public/private RSA key pair files."""
 
-    private_key = RSA.generate(1024)
+    private_key = RSA.generate(2048)
     public_key = private_key.publickey()
 
     for key, val in {"private_key": private_key, "public_key": public_key}.items():

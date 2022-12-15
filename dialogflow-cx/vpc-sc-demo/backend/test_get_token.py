@@ -84,7 +84,7 @@ def test_encryption_e2e():
     """Round-trip a plaintext message through AES/RSA."""
 
     plaintext = "Hello World"
-    private_key = RSA.generate(1024)
+    private_key = RSA.generate(2048)
     public_key = private_key.publickey()
     public_pem = public_key.export_key().decode()
     private_pem = private_key.export_key().decode()
