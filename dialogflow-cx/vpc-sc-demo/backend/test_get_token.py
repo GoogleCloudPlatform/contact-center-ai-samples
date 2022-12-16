@@ -155,14 +155,16 @@ def test_get_token_no_session_id():
 
 
 @pytest.mark.hermetic
-def test_get_token_cached():
+@pytest.mark.parametrize("precache", [False, True])
+def test_get_token_cached(precache):
     """Test get_token when response is cached."""
 
     mock_session_id = "MOCK_SESSION_ID"
     mock_cache_response = {"response": {"MOCK_TOKEN_KEY": "MOCK_TOKEN_VAL"}}
 
     cache = get_token.LruCache(lambda _: mock_cache_response)
-    cache.cache[mock_session_id] = mock_cache_response
+    if precache:
+        cache.cache[mock_session_id] = mock_cache_response
 
     builder = EnvironBuilder()
     request = builder.get_request()
@@ -316,25 +318,3 @@ def test_get_token_failure_success(token_type, expected):
                 ),
             }
         )
-
-    # environ = builder.get_environ()
-    # build an environ dict wrapped in a request
-
-    # app = flask.Flask(__name__)
-    # c = Client(app)
-    # request = flask.Request(environ=c)
-
-    # app = flask.Flask(__name__)
-    # app.config["TESTING"] = True
-    # with app.test_request_context():
-    # get_token.get_token()
-
-    # mock_session_id = "UNKNOWN_SESSION_ID"
-    # mock_domain = "MOCK_DOMAIN."
-    # app = flask.Flask(__name__)
-    # app.config["TESTING"] = True
-    # with app.test_client() as client:
-    #     client.set_cookie(mock_domain, "session_id", "MOCK_SESSION_ID")
-    #     client.set_cookie(mock_domain, "user_logged_in", "MOCK_SESSION_ID")
-    #     # with app.test_request_context():
-    #     get_token.get_token(mock_session_id)
