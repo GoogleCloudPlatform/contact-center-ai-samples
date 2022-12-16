@@ -34,6 +34,7 @@ def app():
     return curr_app
 
 
+@pytest.mark.hermetic
 @pytest.mark.parametrize(
     "project_id,status_code,expected,token_dict,valid",
     [
@@ -95,6 +96,7 @@ def test_validate_project_id(  # pylint: disable=too-many-arguments,redefined-ou
         assert json.loads(curr_response.decode()) == expected
 
 
+@pytest.mark.hermetic
 def test_get_principal_notoken(app):  # pylint: disable=redefined-outer-name
     """Test /get_principal endpoint."""
     endpoint = "/get_principal"
@@ -108,6 +110,7 @@ def test_get_principal_notoken(app):  # pylint: disable=redefined-outer-name
     assert return_value.status_code == 302
 
 
+@pytest.mark.hermetic
 def test_get_principal(app):  # pylint: disable=redefined-outer-name
     """Test /get_principal endpoint."""
     endpoint = "/get_principal"

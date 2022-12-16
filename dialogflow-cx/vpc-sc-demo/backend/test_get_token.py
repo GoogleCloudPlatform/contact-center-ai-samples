@@ -80,6 +80,23 @@ def test_get_token_from_auth_server_unknown_integration():
 
 
 @pytest.mark.hermetic
+def test_get_token_from_auth_server_unknown_hermetic_401():
+    """Integration test of get_token_from_auth_server against live auth service."""
+    mock_session_id = "UNKNOWN_SESSION_ID"
+
+    return_value = requests.Response()
+    return_value.status_code = 401
+
+    with patch.object(requests, "get", return_value=return_value):
+        result = get_token.get_token_from_auth_server(mock_session_id)
+    assert len(result) == 1
+    assert len(result["response"].response) == 1
+    assert result["response"].response[0].decode() == json.dumps(
+        {"status": "BLOCKED", "reason": "REJECTED_REQUEST"}
+    )
+
+
+@pytest.mark.hermetic
 def test_encryption_e2e():
     """Round-trip a plaintext message through AES/RSA."""
 
@@ -102,7 +119,7 @@ def test_encryption_e2e():
 
 
 @pytest.mark.hermetic
-def test_get_token_from_auth_server_unknown_hermetic():
+def test_get_token_from_auth_server_unknown_hermetic_200():
     """Hermetic test of get_token_from_auth_server."""
     mock_session_id = "UNKNOWN_SESSION_ID"
     return_value = requests.Response()
