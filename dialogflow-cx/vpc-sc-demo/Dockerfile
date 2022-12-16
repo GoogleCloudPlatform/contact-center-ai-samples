@@ -31,27 +31,29 @@ RUN unzip terraform_1.2.9_linux_amd64.zip
 RUN mv terraform /usr/bin/terraform
 
 # Frontend
-WORKDIR /app/frontend
+WORKDIR /backend/frontend
 
-COPY frontend/ /app/frontend/
+COPY frontend/ /backend/frontend/
 RUN npm install react-scripts@5.0.1 && npm run build
 
 # Backend
-WORKDIR /app
+WORKDIR /backend
 
-COPY backend/requirements.txt /app/requirements.txt
+COPY backend/requirements.txt /backend/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip==22.3.1
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY backend/create_keys.py /app/create_keys.py
+
+COPY backend /backend
+COPY deploy /deploy
 RUN python3 create_keys.py
 
-COPY backend/app.py /app/app.py
-COPY backend/tasks.py /app/tasks.py
-COPY backend/demo-server-key.json /app/demo-server-key.json
 
-RUN mkdir -p /app/.terraform.d/plugin-cache
-COPY components /app/components
+COPY components/webhook/telecom-webhook-src /components/telecom-webhook-src/
+COPY components/reverse_proxy_server/proxy-server-src /components/proxy-server-src/
+
+RUN mkdir -p /deploy/.terraform.d/plugin-cache
+
 
 EXPOSE 8080
 CMD ["gunicorn", "--bind=0.0.0.0:8080", "--workers=1", "--threads=8", "--log-level=info", "app:app"]
