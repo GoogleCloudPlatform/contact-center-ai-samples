@@ -25,9 +25,8 @@ from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 from google.oauth2 import id_token
 from mock import mock_open, patch
-from werkzeug.test import EnvironBuilder
-
 from test_status_utilities import assert_response
+from werkzeug.test import EnvironBuilder
 
 
 @pytest.fixture

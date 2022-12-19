@@ -120,8 +120,11 @@ def test_get_access_policy_name_no_policy_found():
     with patch.object(requests, "post", return_value=MockReturnObject(
         200, {'ancestor': [{'resourceId': {'type': 'organization', 'id': 'MOCK_ANCESTOR_ID'}}]}
     )):
-        with patch.object(status_utilities, "get_project_number", return_value={'project_number': 'MOCK_PROJECT_NUMBER'}
-                          ):
+        with patch.object(
+            status_utilities,
+            "get_project_number",
+            return_value={'project_number': 'MOCK_PROJECT_NUMBER'}
+        ):
             result = status_utilities.get_access_policy_name(
                 "MOCK_TOKEN", 'MOCK_PROJECT_TITLE', "MOCK_PROJECT_ID"
             )
@@ -134,9 +137,11 @@ def test_get_access_policy_name():
     with patch.object(requests, "post", return_value=MockReturnObject(
         200, {'ancestor': [{'resourceId': {'type': 'organization', 'id': 'MOCK_ANCESTOR_ID'}}]}
     )):
-        with patch.object(status_utilities, "get_project_number", return_value={'project_number': 'MOCK_PROJECT_NUMBER'}
-                          ):
-
+        with patch.object(
+            status_utilities,
+            "get_project_number",
+            return_value={'project_number': 'MOCK_PROJECT_NUMBER'}
+        ):
             with patch.object(requests, "get", return_value=MockReturnObject(
                 200, {'accessPolicies': [{
                     'title': 'MOCK_PROJECT_TITLE',
@@ -164,7 +169,9 @@ def test_get_service_perimeter_data_uri_api():
         result = status_utilities.get_service_perimeter_data_uri(
             "MOCK_TOKEN", 'MOCK_PROJECT_ID', "MOCK/MOCK_ACCESS_POLICY"
         )
-        assert_response(result, 200, {"status": "BLOCKED", "reason": "ACCESS_CONTEXT_MANAGER_API_DISABLED"})
+        assert_response(result, 200, {
+            "status": "BLOCKED", "reason": "ACCESS_CONTEXT_MANAGER_API_DISABLED"
+        })
 
 
 @pytest.mark.hermetic
@@ -220,7 +227,10 @@ def test_get_service_perimeter_data_uri_yes_perimeter():
         }]}
     )):
         result = status_utilities.get_service_perimeter_data_uri(
-            "MOCK_TOKEN", 'MOCK_PROJECT_ID', "MOCK/MOCK_ACCESS_POLICY", perimeter_title='MOCK_PERIMETER_TITLE'
+            "MOCK_TOKEN",
+            'MOCK_PROJECT_ID',
+            "MOCK/MOCK_ACCESS_POLICY",
+            perimeter_title='MOCK_PERIMETER_TITLE'
         )
         assert result == {
             "uri": 'https://accesscontextmanager.googleapis.com/v1/MOCK_PERIMETER_NAME',
