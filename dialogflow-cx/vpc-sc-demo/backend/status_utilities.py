@@ -64,7 +64,7 @@ def get_access_policy_name(token, access_policy_title, project_id):
     if response.status_code != 200:
         return {"response": flask.Response(status=500, response=json.dumps(
             {
-                "status": "BLOCKED", 
+                "status": "BLOCKED",
                 "reason": json.loads(response.text)["error"].get("status", "UNKNOWN_STATUS")
             }))
         }
@@ -108,10 +108,10 @@ def get_access_policy_name(token, access_policy_title, project_id):
 
 
 def get_service_perimeter_data_uri(token,
-        project_id,
-        access_policy_name,
-        perimeter_title="df_webhook",
-    ):
+                                   project_id,
+                                   access_policy_name,
+                                   perimeter_title="df_webhook",
+                                   ):
     access_policy_id = access_policy_name.split("/")[1]
     headers = {}
     headers["x-goog-user-project"] = project_id

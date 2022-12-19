@@ -71,7 +71,7 @@ class AESCipher:
 
     def unpad(self, cstr):
         """Unpad padded message."""
-        return cstr[: -ord(cstr[len(cstr) - 1 :])]  # noqa: E203
+        return cstr[: -ord(cstr[len(cstr) - 1:])]  # noqa: E203
 
     def encrypt(self, raw):
         """Encrypt plaintext."""
