@@ -35,6 +35,7 @@ class MockReturnObject:  # pylint: disable=too-few-public-methods
 
     @property
     def text(self):
+        """Mock text interfact."""
         return json.dumps(self.data)
 
 
@@ -222,7 +223,7 @@ def test_get_service_perimeter_data_uri_yes_perimeter():
             "MOCK_TOKEN", 'MOCK_PROJECT_ID', "MOCK/MOCK_ACCESS_POLICY", perimeter_title='MOCK_PERIMETER_TITLE'
         )
         assert result == {
-            "uri": f'https://accesscontextmanager.googleapis.com/v1/MOCK_PERIMETER_NAME',
+            "uri": 'https://accesscontextmanager.googleapis.com/v1/MOCK_PERIMETER_NAME',
         }
 
 
