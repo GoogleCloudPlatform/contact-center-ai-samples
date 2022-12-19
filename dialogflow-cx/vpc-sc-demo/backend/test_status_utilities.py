@@ -21,21 +21,7 @@ import requests
 import status_utilities
 from mock import patch
 
-
-class MockReturnObject:  # pylint: disable=too-few-public-methods
-    """Class to mock out json interface of requests.Response."""
-
-    def __init__(self, status_code, data):
-        self.status_code = status_code
-        self.data = data
-
-    def json(self):
-        """Mock json interface."""
-        return self.data
-
-    @property
-    def text(self):
-        return json.dumps(self.data)
+from conftest import MockReturnObject, assert_response
 
 
 def assert_response(result, status_code, expected):
