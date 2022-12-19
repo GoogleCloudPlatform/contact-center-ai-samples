@@ -291,12 +291,14 @@ def test_get_token_failure_success(token_type, expected):
         assert len(result) == 1
         assert result == expected
     else:
-        assert_response(result, 500,
-                        {
-                            "status": "BLOCKED",
-                            "reason": (
-                                'Requested token_type "UNKNOWN" not one of '
-                                '["access_token","id_token","email"]'
-                            ),
-                        }
-                        )
+        assert_response(
+            result,
+            500,
+            {
+                "status": "BLOCKED",
+                "reason": (
+                    'Requested token_type "UNKNOWN" not one of '
+                    '["access_token","id_token","email"]'
+                ),
+            },
+        )

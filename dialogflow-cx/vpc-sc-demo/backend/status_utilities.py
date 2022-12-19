@@ -65,11 +65,18 @@ def get_access_policy_name(token, access_policy_title, project_id):
     )
 
     if response.status_code != 200:
-        return {"response": flask.Response(status=500, response=json.dumps(
-            {
-                "status": "BLOCKED",
-                "reason": json.loads(response.text)["error"].get("status", "UNKNOWN_STATUS")
-            }))
+        return {
+            "response": flask.Response(
+                status=500,
+                response=json.dumps(
+                    {
+                        "status": "BLOCKED",
+                        "reason": json.loads(response.text)["error"].get(
+                            "status", "UNKNOWN_STATUS"
+                        ),
+                    }
+                ),
+            )
         }
 
     organization_id = None
@@ -94,8 +101,8 @@ def get_access_policy_name(token, access_policy_title, project_id):
     headers["Authorization"] = f"Bearer {token}"
     response = requests.get(
         (
-            'https://accesscontextmanager.googleapis.com/v1/'
-            f'accessPolicies?parent=organizations/{organization_id}'
+            "https://accesscontextmanager.googleapis.com/v1/"
+            f"accessPolicies?parent=organizations/{organization_id}"
         ),
         headers=headers,
         timeout=10,
@@ -114,11 +121,12 @@ def get_access_policy_name(token, access_policy_title, project_id):
     }
 
 
-def get_service_perimeter_data_uri(token,
-                                   project_id,
-                                   access_policy_name,
-                                   perimeter_title="df_webhook",
-                                   ):
+def get_service_perimeter_data_uri(
+    token,
+    project_id,
+    access_policy_name,
+    perimeter_title="df_webhook",
+):
     """Get uri for for service perimeter."""
     access_policy_id = access_policy_name.split("/")[1]
     headers = {}
@@ -126,8 +134,8 @@ def get_service_perimeter_data_uri(token,
     headers["Authorization"] = f"Bearer {token}"
     response = requests.get(
         (
-            f'https://accesscontextmanager.googleapis.com/v1/'
-            f'accessPolicies/{access_policy_id}/servicePerimeters'
+            f"https://accesscontextmanager.googleapis.com/v1/"
+            f"accessPolicies/{access_policy_id}/servicePerimeters"
         ),
         headers=headers,
         timeout=10,
@@ -162,9 +170,8 @@ def get_service_perimeter_data_uri(token,
     for service_perimeter_dict in response.json().get("servicePerimeters", []):
         if service_perimeter_dict["title"] == perimeter_title:
             return {
-                "uri":
-                (
-                    'https://accesscontextmanager.googleapis.com/v1/'
+                "uri": (
+                    "https://accesscontextmanager.googleapis.com/v1/"
                     f'{service_perimeter_dict["name"]}'
                 )
             }
@@ -247,8 +254,8 @@ def check_function_exists(token, project_id, region, function_name):
     headers["Authorization"] = f"Bearer {token}"
     result = requests.get(
         (
-            f'https://cloudfunctions.googleapis.com/v1/'
-            f'projects/{project_id}/locations/{region}/functions/{function_name}'
+            f"https://cloudfunctions.googleapis.com/v1/"
+            f"projects/{project_id}/locations/{region}/functions/{function_name}"
         ),
         headers=headers,
         timeout=10,
@@ -298,26 +305,33 @@ def check_function_exists(token, project_id, region, function_name):
                             "response": flask.Response(
                                 status=200,
                                 response=json.dumps(
-                                    {"status": "BLOCKED", "reason": "VPC_SERVICE_CONTROLS"}
+                                    {
+                                        "status": "BLOCKED",
+                                        "reason": "VPC_SERVICE_CONTROLS",
+                                    }
                                 ),
                             )
                         }
             if response is None:
-                response = {"response": flask.Response(status=500, response=result.text)}
+                response = {
+                    "response": flask.Response(status=500, response=result.text)
+                }
     else:
-        response = {"response": flask.Response(status=500, response=json.dumps(result.json()))}
+        response = {
+            "response": flask.Response(status=500, response=json.dumps(result.json()))
+        }
     return response
 
 
-def get_agents(token, project_id, region): # pylint: disable=too-many-branches
+def get_agents(token, project_id, region):  # pylint: disable=too-many-branches
     """Get agents using dialogflow API"""
     headers = {}
     headers["x-goog-user-project"] = project_id
     headers["Authorization"] = f"Bearer {token}"
     result = requests.get(
         (
-            f'https://{region}-dialogflow.googleapis.com/v3/'
-            f'projects/{project_id}/locations/{region}/agents'
+            f"https://{region}-dialogflow.googleapis.com/v3/"
+            f"projects/{project_id}/locations/{region}/agents"
         ),
         headers=headers,
         timeout=10,
@@ -328,7 +342,8 @@ def get_agents(token, project_id, region): # pylint: disable=too-many-branches
                 "Dialogflow API has not been used in project"
             )
         ):
-            response = {"response": flask.Response(
+            response = {
+                "response": flask.Response(
                     status=200,
                     response=json.dumps(
                         {"status": "BLOCKED", "reason": "DIALOGFLOW_API_DISABLED"}
@@ -340,7 +355,8 @@ def get_agents(token, project_id, region): # pylint: disable=too-many-branches
                 "Caller does not have required permission"
             )
         ):
-            response = {"response": flask.Response(
+            response = {
+                "response": flask.Response(
                     status=200,
                     response=json.dumps(
                         {"status": "BLOCKED", "reason": "WRONG_PERMISSION"}
@@ -356,12 +372,16 @@ def get_agents(token, project_id, region): # pylint: disable=too-many-branches
                             "response": flask.Response(
                                 status=200,
                                 response=json.dumps(
-                                    {"status": "BLOCKED", "reason": "VPC_SERVICE_CONTROLS"}
+                                    {
+                                        "status": "BLOCKED",
+                                        "reason": "VPC_SERVICE_CONTROLS",
+                                    }
                                 ),
                             )
                         }
             if response is None:
-                response = {'response': flask.Response(
+                response = {
+                    "response": flask.Response(
                         status=200,
                         response=json.dumps(
                             {"status": "BLOCKED", "reason": "PERMISSION_DENIED"}
@@ -370,8 +390,8 @@ def get_agents(token, project_id, region): # pylint: disable=too-many-branches
                 }
     elif result.status_code != 200:
         logger.info("  dialogflow API rejected request: %s", result.text)
-        response = {"response":
-            flask.Response(status=result.status_code, response=result.text)
+        response = {
+            "response": flask.Response(status=result.status_code, response=result.text)
         }
     else:
         result_dict = result.json()
@@ -379,7 +399,9 @@ def get_agents(token, project_id, region): # pylint: disable=too-many-branches
             response = {
                 "response": flask.Response(
                     status=200,
-                    response=json.dumps({"status": "BLOCKED", "reason": "AGENT_NOT_FOUND"}),
+                    response=json.dumps(
+                        {"status": "BLOCKED", "reason": "AGENT_NOT_FOUND"}
+                    ),
                 )
             }
         elif "error" in result_dict:
@@ -387,7 +409,9 @@ def get_agents(token, project_id, region): # pylint: disable=too-many-branches
             # Seems like a potential bug; returning a dict? Also error resulting from 200 code?
             response = None
         else:
-            response = {"data": {data["displayName"]: data for data in result_dict["agents"]}}
+            response = {
+                "data": {data["displayName"]: data for data in result_dict["agents"]}
+            }
     return response
 
 
