@@ -14,38 +14,11 @@
 
 """Module for testing status_utilities.py."""
 
-import json
-
 import pytest
 import requests
 import status_utilities
+from conftest import MockReturnObject, assert_response
 from mock import patch
-
-
-class MockReturnObject:  # pylint: disable=too-few-public-methods
-    """Class to mock out json interface of requests.Response."""
-
-    def __init__(self, status_code, data):
-        self.status_code = status_code
-        self.data = data
-
-    def json(self):
-        """Mock json interface."""
-        return self.data
-
-    @property
-    def text(self):
-        """Mock text interfact."""
-        return json.dumps(self.data)
-
-
-def assert_response(result, status_code, expected):
-    """Assert propertes of result response."""
-    assert len(result) == 1
-    response = result["response"]
-    assert response.status_code == status_code
-    assert len(response.response) == 1
-    assert json.loads(response.response[0].decode()) == expected
 
 
 @pytest.mark.hermetic
