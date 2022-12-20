@@ -15,6 +15,9 @@
 """conftest module for pytest containing test classes for reuse."""
 
 import json
+from urllib.parse import urlparse
+
+MOCK_DOMAIN = "MOCK_DOMAIN."
 
 
 class MockReturnObject:  # pylint: disable=too-few-public-methods
@@ -41,3 +44,18 @@ def assert_response(result, status_code, expected):
     assert response.status_code == status_code
     assert len(response.response) == 1
     assert json.loads(response.response[0].decode()) == expected
+
+
+def assert_response_ep(
+    return_value, status_code, endpoint, response=None, netloc=MOCK_DOMAIN
+):
+    """Assert function for testing responses"""
+    parsed_url = urlparse(return_value.request.url)
+    assert return_value.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert parsed_url.scheme == "https"
+    assert parsed_url.netloc == netloc
+    assert parsed_url.path == endpoint
+    assert return_value.status_code == status_code
+    if response is not None:
+        for curr_response in return_value.response:
+            assert curr_response.decode() == response
