@@ -25,6 +25,7 @@ from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 from google.oauth2 import id_token
 from mock import mock_open, patch
+from test_status_utilities import assert_response
 from werkzeug.test import EnvironBuilder
 
 
@@ -72,11 +73,20 @@ def test_get_token_from_auth_server_unknown_integration():
     mock_session_id = "UNKNOWN_SESSION_ID"
 
     result = get_token.get_token_from_auth_server(mock_session_id)
-    assert len(result) == 1
-    assert len(result["response"].response) == 1
-    assert result["response"].response[0].decode() == json.dumps(
-        {"status": "BLOCKED", "reason": "REJECTED_REQUEST"}
-    )
+    assert_response(result, 500, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
+
+
+@pytest.mark.hermetic
+def test_get_token_from_auth_server_unknown_hermetic_401():
+    """Integration test of get_token_from_auth_server against live auth service."""
+    mock_session_id = "UNKNOWN_SESSION_ID"
+
+    return_value = requests.Response()
+    return_value.status_code = 401
+
+    with patch.object(requests, "get", return_value=return_value):
+        result = get_token.get_token_from_auth_server(mock_session_id)
+    assert_response(result, 500, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
 
 
 @pytest.mark.hermetic
@@ -102,7 +112,7 @@ def test_encryption_e2e():
 
 
 @pytest.mark.hermetic
-def test_get_token_from_auth_server_unknown_hermetic():
+def test_get_token_from_auth_server_unknown_hermetic_200():
     """Hermetic test of get_token_from_auth_server."""
     mock_session_id = "UNKNOWN_SESSION_ID"
     return_value = requests.Response()
@@ -145,13 +155,7 @@ def test_get_token_no_session_id():
     builder = EnvironBuilder()
     request = builder.get_request()
     result = get_token.get_token(request)
-    assert len(result) == 1
-    response = result["response"]
-    assert response.status_code == 200
-    assert len(response.response) == 1
-    assert response.response[0].decode() == json.dumps(
-        {"status": "BLOCKED", "reason": "BAD_SESSION_ID"}
-    )
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "BAD_SESSION_ID"})
 
 
 @pytest.mark.hermetic
@@ -195,13 +199,7 @@ def test_get_token_failure_unknown():
     ):
         result = get_token.get_token(request, cache=cache)
     result = get_token.get_token(request, cache=cache)
-    assert len(result) == 1
-    response = result["response"]
-    assert response.status_code == 500
-    assert len(response.response) == 1
-    assert response.response[0].decode() == json.dumps(
-        {"status": "BLOCKED", "reason": "UNKNOWN"}
-    )
+    assert_response(result, 500, {"status": "BLOCKED", "reason": "UNKNOWN"})
 
 
 @pytest.mark.hermetic
@@ -225,13 +223,7 @@ def test_get_token_failure_expired():
         new=mock_verify_oauth2_token_raise_value_error,
     ):
         result = get_token.get_token(request, cache=cache)
-    assert len(result) == 1
-    response = result["response"]
-    assert response.status_code == 200
-    assert len(response.response) == 1
-    assert response.response[0].decode() == json.dumps(
-        {"status": "BLOCKED", "reason": "TOKEN_EXPIRED"}
-    )
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "TOKEN_EXPIRED"})
 
 
 @pytest.mark.hermetic
@@ -255,13 +247,7 @@ def test_get_token_failure_bad_email():
         new=mock_verify_oauth2_token_raise_value_error,
     ):
         result = get_token.get_token(request, cache=cache)
-    assert len(result) == 1
-    response = result["response"]
-    assert response.status_code == 500
-    assert len(response.response) == 1
-    assert response.response[0].decode() == json.dumps(
-        {"status": "BLOCKED", "reason": "BAD_EMAIL"}
-    )
+    assert_response(result, 500, {"status": "BLOCKED", "reason": "BAD_EMAIL"})
 
 
 @pytest.mark.hermetic
@@ -305,16 +291,14 @@ def test_get_token_failure_success(token_type, expected):
         assert len(result) == 1
         assert result == expected
     else:
-        assert len(result) == 1
-        response = result["response"]
-        assert response.status_code == 500
-        assert len(response.response) == 1
-        assert response.response[0].decode() == json.dumps(
+        assert_response(
+            result,
+            500,
             {
                 "status": "BLOCKED",
                 "reason": (
                     'Requested token_type "UNKNOWN" not one of '
                     '["access_token","id_token","email"]'
                 ),
-            }
+            },
         )
