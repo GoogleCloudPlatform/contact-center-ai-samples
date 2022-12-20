@@ -107,18 +107,18 @@ def test_restricted_services_status_no_project(
 def get_result(
     app,  # pylint: disable=redefined-outer-name
     endpoint,
-    mock_project_id=True,
-    mock_region=False,
-    mock_webhook_name=False,
+    mock_project_id="MOCK_PROJECT_ID",
+    mock_region=None,
+    mock_webhook_name=None,
 ):
     """Helper function to get result from a test client."""
     query_string = {}
     if mock_project_id:
-        query_string["project_id"] = "MOCK_PROJECT_ID"
+        query_string["project_id"] = mock_project_id
     if mock_region:
-        query_string["region"] = "MOCK_REGION"
+        query_string["region"] = mock_region
     if mock_webhook_name:
-        query_string["webhook_name"] = "MOCK_WEBHOOK_NAME"
+        query_string["webhook_name"] = mock_webhook_name
     with app.test_client() as curr_client:
         return curr_client.get(
             endpoint,
@@ -408,14 +408,18 @@ def test_webhook_access_allow_unauthenticated_status_success(
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "return_value,expected",
+    "return_value,expected,region",
     [
-        ({"response": "MOCK_RESPONSE"}, "MOCK_RESPONSE"),
-        ({"data": []}, json.dumps({"status": "BLOCKED", "reason": "AGENT_NOT_FOUND"})),
+        ({"response": "MOCK_RESPONSE"}, "MOCK_RESPONSE", 'us-central1'),
+        ({"data": []}, json.dumps({
+            "status": "BLOCKED",
+            "reason": "AGENT_NOT_FOUND",
+        }), 'us-central1'),
+        ({"data": []}, json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"}), 'BAD_REGION'),
     ],
 )
 def test_service_directory_webhook_fulfillment_status_no_agent(
-    app, return_value, expected
+    app, return_value, expected, region
 ):  # pylint: disable=redefined-outer-name
     """Test /service_directory_webhook_fulfillment_status, no agent"""
     endpoint = "/service_directory_webhook_fulfillment_status"
@@ -423,7 +427,7 @@ def test_service_directory_webhook_fulfillment_status_no_agent(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
     ):
         with patch.object(su, "get_agents", return_value=return_value):
-            return_value = get_result(app, endpoint, mock_region=True)
+            return_value = get_result(app, endpoint, mock_region=region)
     assert_response(
         return_value,
         200,
@@ -433,8 +437,12 @@ def test_service_directory_webhook_fulfillment_status_no_agent(
 
 
 @pytest.mark.hermetic
+@pytest.mark.parametrize('region,expected',[
+    ('us-central1', 'MOCK_RESPONSE'),
+    ('MOCK_REGION', json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"})),
+])
 def test_service_directory_webhook_fulfillment_status_no_webhook(
-    app,
+    app, region, expected
 ):  # pylint: disable=redefined-outer-name
     """Test /service_directory_webhook_fulfillment_status, no webhook"""
     endpoint = "/service_directory_webhook_fulfillment_status"
@@ -449,25 +457,29 @@ def test_service_directory_webhook_fulfillment_status_no_webhook(
             with patch.object(
                 su, "get_webhooks", return_value={"response": "MOCK_RESPONSE"}
             ):
-                return_value = get_result(app, endpoint, mock_region=True)
+                return_value = get_result(app, endpoint, mock_region=region)
     assert_response(
         return_value,
         200,
         endpoint,
-        "MOCK_RESPONSE",
+        expected,
     )
 
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "webhook_dict,status",
+    "webhook_dict,expected,region",
     [
-        ({}, False),
-        ({"serviceDirectory": "MOCK_DATA"}, True),
+        ({}, {"status": False}, 'us-central1'),
+        ({"serviceDirectory": "MOCK_DATA"}, {"status": True}, 'us-central1'),
+        ({"serviceDirectory": "MOCK_DATA"}, {
+            "status": "BLOCKED", 
+            "reason": "UNKNOWN_REGION",
+        }, 'MOCK_REGION'),
     ],
 )
 def test_service_directory_webhook_fulfillment_status_success(
-    app, webhook_dict, status
+    app, webhook_dict, expected, region
 ):  # pylint: disable=redefined-outer-name
     """Test /service_directory_webhook_fulfillment_status, success"""
     endpoint = "/service_directory_webhook_fulfillment_status"
@@ -484,10 +496,10 @@ def test_service_directory_webhook_fulfillment_status_success(
                 "get_webhooks",
                 return_value={"data": {"cxPrebuiltAgentsTelecom": webhook_dict}},
             ):
-                return_value = get_result(app, endpoint, mock_region=True)
+                return_value = get_result(app, endpoint, mock_region=region)
     assert_response(
         return_value,
         200,
         endpoint,
-        json.dumps({"status": status}),
+        json.dumps(expected),
     )
