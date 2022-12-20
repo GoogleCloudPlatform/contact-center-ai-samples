@@ -20,6 +20,7 @@ from flask import Flask
 from frontend_blueprint import frontend
 from launchpad_blueprint import launchpad
 from session_blueprint import session
+from status_blueprint import status
 
 
 def configure_logging():
@@ -34,6 +35,7 @@ def create_app():
     curr_app.register_blueprint(frontend)
     curr_app.register_blueprint(session)
     curr_app.register_blueprint(launchpad)
+    curr_app.register_blueprint(status)
     configure_logging()
     return curr_app
 
