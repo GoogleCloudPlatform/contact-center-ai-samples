@@ -195,3 +195,9 @@ def test_asset_status(
                     ):
                         return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, expected)
+
+
+def test_update_target(app):
+    """test /update_target, """
+    endpoint = '/update_target'
+    return_value = get_result(app, endpoint)
