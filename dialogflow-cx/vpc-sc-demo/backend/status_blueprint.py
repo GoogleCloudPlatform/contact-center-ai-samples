@@ -26,21 +26,32 @@ status = flask.Blueprint("status", __name__)
 logger = logging.getLogger(__name__)
 
 
-@status.route("/restricted_services_status_cloudfunctions", methods=["GET"])
-def restricted_services_status_cloudfunctions():
-    """Get boolean status of wether cloudfunctions is restricted."""
-    token_dict = get_token.get_token(flask.request, token_type="access_token")
+def get_token_and_project(request):
+    """Helper method to retrieve a token or project, or return early."""
+    response = {}
+    token_dict = get_token.get_token(request, token_type="access_token")
     if "response" in token_dict:
-        return token_dict["response"]
-    token = token_dict["access_token"]
+        return token_dict
+    response["token"] = token_dict["access_token"]
 
-    project_id = flask.request.args.get("project_id", None)
-    if not project_id:
-        return flask.Response(
-            status=200,
-            response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
-        )
-    access_policy_title = flask.request.args.get("access_policy_title", None)
+    response["project_id"] = flask.request.args.get("project_id", None)
+    if not response["project_id"]:
+        return {
+            "response": flask.Response(
+                status=200,
+                response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
+            )
+        }
+    return response
+
+
+def get_restricted_service_status(request, service_key):
+    """Get status of restricted service:"""
+    data = get_token_and_project(request)
+    if "response" in data:
+        return data["response"]
+    project_id, token = data["project_id"], data["token"]
+    access_policy_title = request.args.get("access_policy_title", None)
 
     response = su.get_access_policy_name(token, access_policy_title, project_id)
     if "response" in response:
@@ -54,56 +65,29 @@ def restricted_services_status_cloudfunctions():
 
     return flask.Response(
         status=200,
-        response=json.dumps({"status": status_dict["cloudfunctions_restricted"]}),
+        response=json.dumps({"status": status_dict[service_key]}),
     )
+
+
+@status.route("/restricted_services_status_cloudfunctions", methods=["GET"])
+def restricted_services_status_cloudfunctions():
+    """Get boolean status of wether cloudfunctions is restricted."""
+    return get_restricted_service_status(flask.request, "cloudfunctions_restricted")
 
 
 @status.route("/restricted_services_status_dialogflow", methods=["GET"])
 def restricted_services_status_dialogflow():
     """Get boolean status of wether dialogflow is restricted."""
-    token_dict = get_token.get_token(flask.request, token_type="access_token")
-    if "response" in token_dict:
-        return token_dict["response"]
-    token = token_dict["access_token"]
-
-    project_id = flask.request.args.get("project_id", None)
-    if not project_id:
-        return flask.Response(
-            status=200,
-            response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
-        )
-    access_policy_title = flask.request.args.get("access_policy_title", None)
-
-    response = su.get_access_policy_name(token, access_policy_title, project_id)
-    if "response" in response:
-        return response["response"]
-    access_policy_name = response["access_policy_name"]
-    status_dict = su.get_restricted_services_status(
-        token, project_id, access_policy_name
-    )
-    if "response" in status_dict:
-        return status_dict["response"]
-
-    return flask.Response(
-        status=200,
-        response=json.dumps({"status": status_dict["dialogflow_restricted"]}),
-    )
+    return get_restricted_service_status(flask.request, "dialogflow_restricted")
 
 
 @status.route("/webhook_ingress_internal_only_status", methods=["GET"])
 def webhook_ingress_internal_only_status():
     """Get boolean status of internally restricted webhook ingress."""
-    token_dict = get_token.get_token(flask.request, token_type="access_token")
-    if "response" in token_dict:
-        return token_dict["response"]
-    token = token_dict["access_token"]
-
-    project_id = flask.request.args.get("project_id", None)
-    if not project_id:
-        return flask.Response(
-            status=200,
-            response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
-        )
+    data = get_token_and_project(flask.request)
+    if "response" in data:
+        return data["response"]
+    project_id, token = data["project_id"], data["token"]
     region = flask.request.args["region"]
     webhook_name = flask.request.args["webhook_name"]
 
@@ -137,19 +121,10 @@ def webhook_ingress_internal_only_status():
 @status.route("/webhook_access_allow_unauthenticated_status", methods=["GET"])
 def webhook_access_allow_unauthenticated_status():  # pylint: disable=too-many-branches,too-many-return-statements
     """Get boolean status of allow unauthenticated webhook access."""
-    token_dict = get_token.get_token(flask.request, token_type="access_token")
-    if "response" in token_dict:
-        return token_dict["response"]
-    token = token_dict["access_token"]
-
-    project_id = flask.request.args.get("project_id", None)
-    if not project_id:
-        return flask.Response(
-            status=200,
-            response=json.dumps(
-                {"status": "BLOCKED", "reason": "NO_PROJECT_ID"},
-            ),
-        )
+    data = get_token_and_project(flask.request)
+    if "response" in data:
+        return data["response"]
+    project_id, token = data["project_id"], data["token"]
     region = flask.request.args["region"]
     webhook_name = flask.request.args["webhook_name"]
 
@@ -224,18 +199,18 @@ def webhook_access_allow_unauthenticated_status():  # pylint: disable=too-many-b
 @status.route("/service_directory_webhook_fulfillment_status", methods=["GET"])
 def service_directory_webhook_fulfillment_status():
     """Get boolean status of service directory usage in webhook."""
-    token_dict = get_token.get_token(flask.request, token_type="access_token")
-    if "response" in token_dict:
-        return token_dict["response"]
-    token = token_dict["access_token"]
-
-    project_id = flask.request.args.get("project_id", None)
-    if not project_id:
+    data = get_token_and_project(flask.request)
+    if "response" in data:
+        return data["response"]
+    project_id, token = data["project_id"], data["token"]
+    untrusted_region = flask.request.args["region"]
+    if untrusted_region in ["us-central1"]:
+        region = untrusted_region
+    else:
         return flask.Response(
             status=200,
-            response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
+            response=json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"}),
         )
-    region = flask.request.args["region"]
 
     result = su.get_agents(token, project_id, region)
     if "response" in result:

@@ -36,6 +36,23 @@ def app():
     return curr_app
 
 
+def get_result(
+    curr_app,
+    endpoint,
+):
+    """Helper function to get result from a test client."""
+    with curr_app.test_client() as curr_client:
+        return curr_client.get(
+            endpoint,
+            base_url=f"https://{MOCK_DOMAIN}",
+            query_string={
+                "project_id": "MOCK_PROJECT_ID",
+                "region": "MOCK_REGION",
+                "bucket": "MOCK_BUCKET_NAME",
+            },
+        )
+
+
 def test_asset_status_bad_token(app):  # pylint: disable=redefined-outer-name
     """Test /asset_status, bad token"""
     endpoint = "/asset_status"
@@ -54,16 +71,7 @@ def test_asset_status_init_exit(app):  # pylint: disable=redefined-outer-name
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
     ):
         with patch.object(au, "tf_init", return_value="MOCK_INIT"):
-            with app.test_client() as curr_client:
-                return_value = curr_client.get(
-                    endpoint,
-                    base_url=f"https://{MOCK_DOMAIN}",
-                    query_string={
-                        "project_id": "MOCK_PROJECT_ID",
-                        "region": "MOCK_REGION",
-                        "bucket": "MOCK_BUCKET_NAME",
-                    },
-                )
+            return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, "MOCK_INIT")
 
 
@@ -77,16 +85,7 @@ def test_asset_status_plan_exit(app):  # pylint: disable=redefined-outer-name
             with patch.object(
                 au, "tf_plan", return_value={"response": "MOCK_RESPONSE"}
             ):
-                with app.test_client() as curr_client:
-                    return_value = curr_client.get(
-                        endpoint,
-                        base_url=f"https://{MOCK_DOMAIN}",
-                        query_string={
-                            "project_id": "MOCK_PROJECT_ID",
-                            "region": "MOCK_REGION",
-                            "bucket": "MOCK_BUCKET_NAME",
-                        },
-                    )
+                return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
@@ -116,16 +115,7 @@ def test_asset_status_access_policy_err(app):  # pylint: disable=redefined-outer
                     "get_access_policy_title",
                     return_value={"response": "MOCK_RESPONSE"},
                 ):
-                    with app.test_client() as curr_client:
-                        return_value = curr_client.get(
-                            endpoint,
-                            base_url=f"https://{MOCK_DOMAIN}",
-                            query_string={
-                                "project_id": "MOCK_PROJECT_ID",
-                                "region": "MOCK_REGION",
-                                "bucket": "MOCK_BUCKET_NAME",
-                            },
-                        )
+                    return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
@@ -203,14 +193,5 @@ def test_asset_status(
                     with patch.object(
                         au, "tf_state_list", return_value=state_list_return_value
                     ):
-                        with app.test_client() as curr_client:
-                            return_value = curr_client.get(
-                                endpoint,
-                                base_url=f"https://{MOCK_DOMAIN}",
-                                query_string={
-                                    "project_id": "MOCK_PROJECT_ID",
-                                    "region": "MOCK_REGION",
-                                    "bucket": "MOCK_BUCKET_NAME",
-                                },
-                            )
+                        return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, expected)

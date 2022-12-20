@@ -15,16 +15,33 @@
 """Module for testing status_blueprint.py."""
 
 import json
+from urllib.parse import urlparse
 
 import flask
 import get_token
 import pytest
 import requests
 import status_utilities as su
-from conftest import MOCK_DOMAIN, MockReturnObject
-from conftest import assert_response_ep as assert_response
+from conftest import MockReturnObject
 from mock import patch
 from status_blueprint import status as blueprint
+
+_MOCK_DOMAIN = "MOCK_DOMAIN."
+
+
+def assert_response(
+    return_value, status_code, endpoint, response=None, netloc=_MOCK_DOMAIN
+):
+    """Assert function for testing responses"""
+    parsed_url = urlparse(return_value.request.url)
+    assert return_value.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert parsed_url.scheme == "https"
+    assert parsed_url.netloc == netloc
+    assert parsed_url.path == endpoint
+    assert return_value.status_code == status_code
+    if response is not None:
+        for curr_response in return_value.response:
+            assert curr_response.decode() == response
 
 
 @pytest.fixture
@@ -55,7 +72,7 @@ def test_restricted_services_status_bad_token(
         get_token, "get_token", return_value={"response": "MOCK_RESPONSE"}
     ):
         with app.test_client() as curr_client:
-            return_value = curr_client.get(endpoint, base_url=f"https://{MOCK_DOMAIN}")
+            return_value = curr_client.get(endpoint, base_url=f"https://{_MOCK_DOMAIN}")
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
@@ -78,13 +95,36 @@ def test_restricted_services_status_no_project(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
     ):
         with app.test_client() as curr_client:
-            return_value = curr_client.get(endpoint, base_url=f"https://{MOCK_DOMAIN}")
+            return_value = curr_client.get(endpoint, base_url=f"https://{_MOCK_DOMAIN}")
     assert_response(
         return_value,
         200,
         endpoint,
         json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
     )
+
+
+def get_result(
+    curr_app,
+    endpoint,
+    mock_project_id="MOCK_PROJECT_ID",
+    mock_region=None,
+    mock_webhook_name=None,
+):
+    """Helper function to get result from a test client."""
+    query_string = {}
+    if mock_project_id:
+        query_string["project_id"] = mock_project_id
+    if mock_region:
+        query_string["region"] = mock_region
+    if mock_webhook_name:
+        query_string["webhook_name"] = mock_webhook_name
+    with curr_app.test_client() as curr_client:
+        return curr_client.get(
+            endpoint,
+            base_url=f"https://{_MOCK_DOMAIN}",
+            query_string=query_string,
+        )
 
 
 @pytest.mark.hermetic
@@ -105,14 +145,7 @@ def test_restricted_services_status_no_policy(
         with patch.object(
             su, "get_access_policy_name", return_value={"response": "MOCK_RESPONSE"}
         ):
-            with app.test_client() as curr_client:
-                return_value = curr_client.get(
-                    endpoint,
-                    base_url=f"https://{MOCK_DOMAIN}",
-                    query_string={
-                        "project_id": "MOCK_PROJECT_ID",
-                    },
-                )
+            return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
@@ -141,14 +174,7 @@ def test_restricted_services_status_restricted(
                 "get_restricted_services_status",
                 return_value={"response": "MOCK_RESPONSE"},
             ):
-                with app.test_client() as curr_client:
-                    return_value = curr_client.get(
-                        endpoint,
-                        base_url=f"https://{MOCK_DOMAIN}",
-                        query_string={
-                            "project_id": "MOCK_PROJECT_ID",
-                        },
-                    )
+                return_value = get_result(app, endpoint)
         assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
@@ -177,14 +203,7 @@ def test_restricted_services_status_cloudfunctions_success(
                 "get_restricted_services_status",
                 return_value={status_key: "SUCCESS"},
             ):
-                with app.test_client() as curr_client:
-                    return_value = curr_client.get(
-                        endpoint,
-                        base_url=f"https://{MOCK_DOMAIN}",
-                        query_string={
-                            "project_id": "MOCK_PROJECT_ID",
-                        },
-                    )
+                return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, json.dumps({"status": "SUCCESS"}))
 
 
@@ -204,16 +223,9 @@ def test_webhook_no_function(app, endpoint):  # pylint: disable=redefined-outer-
         with patch.object(
             su, "check_function_exists", return_value={"response": "MOCK_RESPONSE"}
         ):
-            with app.test_client() as curr_client:
-                return_value = curr_client.get(
-                    endpoint,
-                    base_url=f"https://{MOCK_DOMAIN}",
-                    query_string={
-                        "project_id": "MOCK_PROJECT_ID",
-                        "region": "MOCK_REGION",
-                        "webhook_name": "MOCK_WEBHOOK_NAME",
-                    },
-                )
+            return_value = get_result(
+                app, endpoint, mock_region=True, mock_webhook_name=True
+            )
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
@@ -228,16 +240,9 @@ def test_webhook_ingress_internal_only_status_api_error(
     ):
         with patch.object(su, "check_function_exists", return_value={"status": "OK"}):
             with patch.object(requests, "get", return_value=MockReturnObject(500, {})):
-                with app.test_client() as curr_client:
-                    return_value = curr_client.get(
-                        endpoint,
-                        base_url=f"https://{MOCK_DOMAIN}",
-                        query_string={
-                            "project_id": "MOCK_PROJECT_ID",
-                            "region": "MOCK_REGION",
-                            "webhook_name": "MOCK_WEBHOOK_NAME",
-                        },
-                    )
+                return_value = get_result(
+                    app, endpoint, mock_region=True, mock_webhook_name=True
+                )
     assert_response(return_value, 500, endpoint)
 
 
@@ -266,16 +271,9 @@ def test_webhook_ingress_internal_only_status_success(
                     200, {"ingressSettings": ingress_settings}
                 ),
             ):
-                with app.test_client() as curr_client:
-                    return_value = curr_client.get(
-                        endpoint,
-                        base_url=f"https://{MOCK_DOMAIN}",
-                        query_string={
-                            "project_id": "MOCK_PROJECT_ID",
-                            "region": "MOCK_REGION",
-                            "webhook_name": "MOCK_WEBHOOK_NAME",
-                        },
-                    )
+                return_value = get_result(
+                    app, endpoint, mock_region=True, mock_webhook_name=True
+                )
     assert_response(return_value, 200, endpoint, json.dumps({"status": status}))
 
 
@@ -354,16 +352,9 @@ def test_webhook_access_allow_unauthenticated_status_api_error(
             with patch.object(
                 requests, "get", return_value=MockReturnObject(status, return_value)
             ):
-                with app.test_client() as curr_client:
-                    return_value = curr_client.get(
-                        endpoint,
-                        base_url=f"https://{MOCK_DOMAIN}",
-                        query_string={
-                            "project_id": "MOCK_PROJECT_ID",
-                            "region": "MOCK_REGION",
-                            "webhook_name": "MOCK_WEBHOOK_NAME",
-                        },
-                    )
+                return_value = get_result(
+                    app, endpoint, mock_region=True, mock_webhook_name=True
+                )
     assert_response(
         return_value,
         expected_status,
@@ -391,9 +382,9 @@ def test_webhook_access_allow_unauthenticated_status_api_error(
     ],
 )
 def test_webhook_access_allow_unauthenticated_status_success(
-    app,
+    app,  # pylint: disable=redefined-outer-name
     policy_dict,
-    status,  # pylint: disable=redefined-outer-name
+    status,
 ):
     """Test /webhook_access_allow_unauthenticated_status, success"""
     endpoint = "/webhook_access_allow_unauthenticated_status"
@@ -404,16 +395,9 @@ def test_webhook_access_allow_unauthenticated_status_success(
             with patch.object(
                 requests, "get", return_value=MockReturnObject(200, policy_dict)
             ):
-                with app.test_client() as curr_client:
-                    return_value = curr_client.get(
-                        endpoint,
-                        base_url=f"https://{MOCK_DOMAIN}",
-                        query_string={
-                            "project_id": "MOCK_PROJECT_ID",
-                            "region": "MOCK_REGION",
-                            "webhook_name": "MOCK_WEBHOOK_NAME",
-                        },
-                    )
+                return_value = get_result(
+                    app, endpoint, mock_region=True, mock_webhook_name=True
+                )
     assert_response(
         return_value,
         200,
@@ -424,14 +408,28 @@ def test_webhook_access_allow_unauthenticated_status_success(
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "return_value,expected",
+    "return_value,expected,region",
     [
-        ({"response": "MOCK_RESPONSE"}, "MOCK_RESPONSE"),
-        ({"data": []}, json.dumps({"status": "BLOCKED", "reason": "AGENT_NOT_FOUND"})),
+        ({"response": "MOCK_RESPONSE"}, "MOCK_RESPONSE", "us-central1"),
+        (
+            {"data": []},
+            json.dumps(
+                {
+                    "status": "BLOCKED",
+                    "reason": "AGENT_NOT_FOUND",
+                }
+            ),
+            "us-central1",
+        ),
+        (
+            {"data": []},
+            json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"}),
+            "BAD_REGION",
+        ),
     ],
 )
 def test_service_directory_webhook_fulfillment_status_no_agent(
-    app, return_value, expected
+    app, return_value, expected, region
 ):  # pylint: disable=redefined-outer-name
     """Test /service_directory_webhook_fulfillment_status, no agent"""
     endpoint = "/service_directory_webhook_fulfillment_status"
@@ -439,15 +437,7 @@ def test_service_directory_webhook_fulfillment_status_no_agent(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
     ):
         with patch.object(su, "get_agents", return_value=return_value):
-            with app.test_client() as curr_client:
-                return_value = curr_client.get(
-                    endpoint,
-                    base_url=f"https://{MOCK_DOMAIN}",
-                    query_string={
-                        "project_id": "MOCK_PROJECT_ID",
-                        "region": "MOCK_REGION",
-                    },
-                )
+            return_value = get_result(app, endpoint, mock_region=region)
     assert_response(
         return_value,
         200,
@@ -457,8 +447,15 @@ def test_service_directory_webhook_fulfillment_status_no_agent(
 
 
 @pytest.mark.hermetic
+@pytest.mark.parametrize(
+    "region,expected",
+    [
+        ("us-central1", "MOCK_RESPONSE"),
+        ("MOCK_REGION", json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"})),
+    ],
+)
 def test_service_directory_webhook_fulfillment_status_no_webhook(
-    app,
+    app, region, expected
 ):  # pylint: disable=redefined-outer-name
     """Test /service_directory_webhook_fulfillment_status, no webhook"""
     endpoint = "/service_directory_webhook_fulfillment_status"
@@ -473,33 +470,33 @@ def test_service_directory_webhook_fulfillment_status_no_webhook(
             with patch.object(
                 su, "get_webhooks", return_value={"response": "MOCK_RESPONSE"}
             ):
-                with app.test_client() as curr_client:
-                    return_value = curr_client.get(
-                        endpoint,
-                        base_url=f"https://{MOCK_DOMAIN}",
-                        query_string={
-                            "project_id": "MOCK_PROJECT_ID",
-                            "region": "MOCK_REGION",
-                        },
-                    )
+                return_value = get_result(app, endpoint, mock_region=region)
     assert_response(
         return_value,
         200,
         endpoint,
-        "MOCK_RESPONSE",
+        expected,
     )
 
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "webhook_dict,status",
+    "webhook_dict,expected,region",
     [
-        ({}, False),
-        ({"serviceDirectory": "MOCK_DATA"}, True),
+        ({}, {"status": False}, "us-central1"),
+        ({"serviceDirectory": "MOCK_DATA"}, {"status": True}, "us-central1"),
+        (
+            {"serviceDirectory": "MOCK_DATA"},
+            {
+                "status": "BLOCKED",
+                "reason": "UNKNOWN_REGION",
+            },
+            "MOCK_REGION",
+        ),
     ],
 )
 def test_service_directory_webhook_fulfillment_status_success(
-    app, webhook_dict, status
+    app, webhook_dict, expected, region
 ):  # pylint: disable=redefined-outer-name
     """Test /service_directory_webhook_fulfillment_status, success"""
     endpoint = "/service_directory_webhook_fulfillment_status"
@@ -516,18 +513,10 @@ def test_service_directory_webhook_fulfillment_status_success(
                 "get_webhooks",
                 return_value={"data": {"cxPrebuiltAgentsTelecom": webhook_dict}},
             ):
-                with app.test_client() as curr_client:
-                    return_value = curr_client.get(
-                        endpoint,
-                        base_url=f"https://{MOCK_DOMAIN}",
-                        query_string={
-                            "project_id": "MOCK_PROJECT_ID",
-                            "region": "MOCK_REGION",
-                        },
-                    )
+                return_value = get_result(app, endpoint, mock_region=region)
     assert_response(
         return_value,
         200,
         endpoint,
-        json.dumps({"status": status}),
+        json.dumps(expected),
     )
