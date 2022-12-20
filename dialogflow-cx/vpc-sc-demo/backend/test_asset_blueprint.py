@@ -53,14 +53,29 @@ def get_result(
         )
 
 
-def test_asset_status_bad_token(app):  # pylint: disable=redefined-outer-name
+@pytest.mark.parametrize(
+    "endpoint,how",
+    [
+        ("/asset_status", "get"),
+        ("/update_target", "post"),
+    ],
+)
+def test_asset_status_bad_token(
+    app, endpoint, how
+):  # pylint: disable=redefined-outer-name
     """Test /asset_status, bad token"""
-    endpoint = "/asset_status"
     with patch.object(
         get_token, "get_token", return_value={"response": "MOCK_RESPONSE"}
     ):
         with app.test_client() as curr_client:
-            return_value = curr_client.get(endpoint, base_url=f"https://{MOCK_DOMAIN}")
+            if how == "get":
+                return_value = curr_client.get(
+                    endpoint, base_url=f"https://{MOCK_DOMAIN}"
+                )
+            else:
+                return_value = curr_client.post(
+                    endpoint, base_url=f"https://{MOCK_DOMAIN}"
+                )
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
@@ -150,7 +165,9 @@ def test_asset_status_access_policy_err(app):  # pylint: disable=redefined-outer
         (True, True, "MOCK_RESPONSE"),
     ],
 )
+@patch.object(au, "tf_init", return_value=None)
 def test_asset_status(
+    mock_tf_init,
     app,  # pylint: disable=redefined-outer-name
     mock_policy,
     tf_state_list_err,
@@ -172,32 +189,109 @@ def test_asset_status(
     with patch.object(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
     ):
-        with patch.object(au, "tf_init", return_value=None):
+        with patch.object(
+            au,
+            "tf_plan",
+            return_value={
+                "hooks": {
+                    "refresh_complete": [
+                        {
+                            "resource": {"addr": addr},
+                            "id_value": "MOCK_ID_VALUE",
+                        }
+                    ]
+                }
+            },
+        ):
             with patch.object(
-                au,
-                "tf_plan",
-                return_value={
-                    "hooks": {
-                        "refresh_complete": [
-                            {
-                                "resource": {"addr": addr},
-                                "id_value": "MOCK_ID_VALUE",
-                            }
-                        ]
-                    }
-                },
+                au, "get_access_policy_title", return_value=policy_return_value
             ):
                 with patch.object(
-                    au, "get_access_policy_title", return_value=policy_return_value
+                    au, "tf_state_list", return_value=state_list_return_value
                 ):
-                    with patch.object(
-                        au, "tf_state_list", return_value=state_list_return_value
-                    ):
-                        return_value = get_result(app, endpoint)
+                    return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, expected)
+    mock_tf_init.assert_called_once()
 
 
-def test_update_target(app):
-    """test /update_target, """
-    endpoint = '/update_target'
-    return_value = get_result(app, endpoint)
+@pytest.mark.parametrize(
+    "json_data,call_count,apply_return_value,state",
+    [
+        ({"destroy": False}, 1, None, {"response": "MOCK_RESPONSE"}),
+        (
+            {"destroy": False, "targets": ["all"]},
+            1,
+            None,
+            {"response": "MOCK_RESPONSE"},
+        ),
+        (
+            {"destroy": False, "targets": ["MOCK_TARGET"]},
+            1,
+            None,
+            {"response": "MOCK_RESPONSE"},
+        ),
+        (
+            {"destroy": False, "targets": ["MOCK_TARGET_1", "MOCK_TARGET_2"]},
+            2,
+            "MOCK_APPLY_RETURN_VALUE",
+            {"response": "MOCK_RESPONSE"},
+        ),
+        (
+            {"destroy": False, "targets": ["MOCK_TARGET_1", "MOCK_TARGET_2"]},
+            2,
+            None,
+            {"response": "MOCK_RESPONSE"},
+        ),
+        (
+            {"destroy": False, "targets": ["MOCK_TARGET_1", "MOCK_TARGET_2"]},
+            2,
+            None,
+            {"resources": ["MOCK_RESOURCE"]},
+        ),
+    ],
+)
+@patch.object(au, "tf_init", return_value=None)
+@patch.object(au, "tf_plan", return_value=None)
+@patch.object(
+    get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
+)
+def test_update_target(  # pylint: disable=too-many-arguments
+    mock_get_token,
+    mock_tf_plan,
+    mock_tf_init,
+    app,  # pylint: disable=redefined-outer-name
+    json_data,
+    call_count,
+    apply_return_value,
+    state,
+):
+    """test /update_target,"""
+    endpoint = "/update_target"
+    with patch.object(au, "tf_apply", return_value=apply_return_value) as mock_tf_apply:
+        with patch.object(au, "tf_state_list", return_value=state):
+            with app.test_client() as curr_client:
+                return_value = curr_client.post(
+                    endpoint,
+                    base_url=f"https://{MOCK_DOMAIN}",
+                    query_string={
+                        "project_id": "MOCK_PROJECT_ID",
+                        "region": "MOCK_REGION",
+                        "bucket": "MOCK_BUCKET_NAME",
+                    },
+                    json=json_data,
+                )
+    mock_get_token.assert_called_once()
+    mock_tf_init.assert_called_once()
+    assert mock_tf_plan.call_count == call_count
+    assert mock_tf_apply.call_count == call_count
+    if apply_return_value:
+        assert_response(return_value, 200, endpoint, "MOCK_APPLY_RETURN_VALUE")
+    elif "response" in state:
+        assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
+    else:
+        assert_response(
+            return_value,
+            200,
+            endpoint,
+            json.dumps({"status": "OK", "resources": ["MOCK_RESOURCE"]}),
+        )
