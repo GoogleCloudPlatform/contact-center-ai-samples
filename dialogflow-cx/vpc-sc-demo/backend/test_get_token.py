@@ -21,11 +21,11 @@ import zipfile
 import get_token
 import pytest
 import requests
+from conftest import assert_response
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 from google.oauth2 import id_token
 from mock import mock_open, patch
-from conftest import assert_response
 from werkzeug.test import EnvironBuilder
 
 

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""conftest module for pytest containing test classes for reuse."""
+
 import json
 
 
@@ -28,6 +30,7 @@ class MockReturnObject:  # pylint: disable=too-few-public-methods
 
     @property
     def text(self):
+        """Mock text attribute interface."""
         return json.dumps(self.data)
 
 

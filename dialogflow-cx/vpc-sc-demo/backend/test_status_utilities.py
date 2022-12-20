@@ -14,14 +14,11 @@
 
 """Module for testing status_utilities.py."""
 
-import json
-
 import pytest
 import requests
 import status_utilities
-from mock import patch
-
 from conftest import MockReturnObject, assert_response
+from mock import patch
 
 
 @pytest.mark.hermetic
