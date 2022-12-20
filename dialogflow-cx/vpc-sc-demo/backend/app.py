@@ -16,6 +16,7 @@
 
 import logging
 
+from asset_blueprint import asset
 from flask import Flask
 from frontend_blueprint import frontend
 from launchpad_blueprint import launchpad
@@ -36,6 +37,7 @@ def create_app():
     curr_app.register_blueprint(session)
     curr_app.register_blueprint(launchpad)
     curr_app.register_blueprint(status)
+    curr_app.register_blueprint(asset)
     configure_logging()
     return curr_app
 

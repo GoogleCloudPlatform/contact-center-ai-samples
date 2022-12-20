@@ -105,7 +105,7 @@ def test_restricted_services_status_no_project(
 
 
 def get_result(
-    app,  # pylint: disable=redefined-outer-name
+    curr_app,
     endpoint,
     mock_project_id="MOCK_PROJECT_ID",
     mock_region=None,
@@ -119,7 +119,7 @@ def get_result(
         query_string["region"] = mock_region
     if mock_webhook_name:
         query_string["webhook_name"] = mock_webhook_name
-    with app.test_client() as curr_client:
+    with curr_app.test_client() as curr_client:
         return curr_client.get(
             endpoint,
             base_url=f"https://{_MOCK_DOMAIN}",
