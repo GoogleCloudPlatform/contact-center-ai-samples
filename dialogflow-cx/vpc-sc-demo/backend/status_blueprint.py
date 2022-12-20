@@ -204,7 +204,7 @@ def service_directory_webhook_fulfillment_status():
         return data["response"]
     project_id, token = data["project_id"], data["token"]
     untrusted_region = flask.request.args["region"]
-    if untrusted_region in ['us-central1']:
+    if untrusted_region in ["us-central1"]:
         region = untrusted_region
     else:
         return flask.Response(

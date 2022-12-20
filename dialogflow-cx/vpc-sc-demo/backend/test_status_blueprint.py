@@ -410,12 +410,22 @@ def test_webhook_access_allow_unauthenticated_status_success(
 @pytest.mark.parametrize(
     "return_value,expected,region",
     [
-        ({"response": "MOCK_RESPONSE"}, "MOCK_RESPONSE", 'us-central1'),
-        ({"data": []}, json.dumps({
-            "status": "BLOCKED",
-            "reason": "AGENT_NOT_FOUND",
-        }), 'us-central1'),
-        ({"data": []}, json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"}), 'BAD_REGION'),
+        ({"response": "MOCK_RESPONSE"}, "MOCK_RESPONSE", "us-central1"),
+        (
+            {"data": []},
+            json.dumps(
+                {
+                    "status": "BLOCKED",
+                    "reason": "AGENT_NOT_FOUND",
+                }
+            ),
+            "us-central1",
+        ),
+        (
+            {"data": []},
+            json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"}),
+            "BAD_REGION",
+        ),
     ],
 )
 def test_service_directory_webhook_fulfillment_status_no_agent(
@@ -437,10 +447,13 @@ def test_service_directory_webhook_fulfillment_status_no_agent(
 
 
 @pytest.mark.hermetic
-@pytest.mark.parametrize('region,expected',[
-    ('us-central1', 'MOCK_RESPONSE'),
-    ('MOCK_REGION', json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"})),
-])
+@pytest.mark.parametrize(
+    "region,expected",
+    [
+        ("us-central1", "MOCK_RESPONSE"),
+        ("MOCK_REGION", json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"})),
+    ],
+)
 def test_service_directory_webhook_fulfillment_status_no_webhook(
     app, region, expected
 ):  # pylint: disable=redefined-outer-name
@@ -470,12 +483,16 @@ def test_service_directory_webhook_fulfillment_status_no_webhook(
 @pytest.mark.parametrize(
     "webhook_dict,expected,region",
     [
-        ({}, {"status": False}, 'us-central1'),
-        ({"serviceDirectory": "MOCK_DATA"}, {"status": True}, 'us-central1'),
-        ({"serviceDirectory": "MOCK_DATA"}, {
-            "status": "BLOCKED", 
-            "reason": "UNKNOWN_REGION",
-        }, 'MOCK_REGION'),
+        ({}, {"status": False}, "us-central1"),
+        ({"serviceDirectory": "MOCK_DATA"}, {"status": True}, "us-central1"),
+        (
+            {"serviceDirectory": "MOCK_DATA"},
+            {
+                "status": "BLOCKED",
+                "reason": "UNKNOWN_REGION",
+            },
+            "MOCK_REGION",
+        ),
     ],
 )
 def test_service_directory_webhook_fulfillment_status_success(
