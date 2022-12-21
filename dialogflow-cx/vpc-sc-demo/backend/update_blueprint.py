@@ -25,6 +25,7 @@ from google.cloud import storage
 
 import get_token
 import status_utilities as su
+import update_utilities as uu
 
 
 DOMAIN = 'webhook.internal'
@@ -133,40 +134,6 @@ def update_webhook_ingress():
   return flask.Response(status=200)
 
 
-def update_service_perimeter_status_inplace(api, restrict_access, service_perimeter_status):
-  if restrict_access == False:
-    if 'restrictedServices' not in service_perimeter_status['status']:
-      return flask.Response(status=200)
-    if api not in service_perimeter_status['status']['restrictedServices']:
-      return flask.Response(status=200)
-    service_perimeter_status['status']['restrictedServices'] = [service for service in service_perimeter_status['status']['restrictedServices'] if service != api]
-  else:
-    if 'restrictedServices' not in service_perimeter_status['status']:
-      service_perimeter_status['status']['restrictedServices'] = api
-    elif api in service_perimeter_status['status']['restrictedServices']:
-      return flask.Response(status=200)
-    else:
-      service_perimeter_status['status']['restrictedServices'].append(api)
-
-
-def update_security_perimeter(token, api, restrict_access, project_id, access_policy_name):
-  service_perimeter_status = su.get_service_perimeter_status(token, project_id, access_policy_name)
-  response = update_service_perimeter_status_inplace(api, restrict_access, service_perimeter_status)
-  if response:
-    return response
-    
-  headers = {}
-  headers["x-goog-user-project"] = project_id
-  headers['Authorization'] = f'Bearer {token}'
-  response = su.get_service_perimeter_data_uri(token, project_id, access_policy_name)
-  if 'response' in response:
-    return response
-  service_perimeter_data_uri = response['uri']
-  r = requests.patch(service_perimeter_data_uri, headers=headers, json=service_perimeter_status, params={'updateMask':'status.restrictedServices'})
-  if r.status_code != 200:
-    logger.info(f'  accesscontextmanager API rejected PATCH request: {r.text}')
-    return flask.Response(status=r.status_code, response=r.text)
-  return flask.Response(status=200)
 
 
 @update.route('/update_security_perimeter_cloudfunctions', methods=['POST'])
@@ -188,7 +155,7 @@ def update_security_perimeter_cloudfunctions():
 
   content = flask.request.get_json(silent=True)
   restrict_access = content['status']
-  return update_security_perimeter(token, 'cloudfunctions.googleapis.com', restrict_access, project_id, access_policy_name)
+  return uu.update_security_perimeter(token, 'cloudfunctions.googleapis.com', restrict_access, project_id, access_policy_name)
 
 
 @update.route('/update_security_perimeter_dialogflow', methods=['POST'])
@@ -210,7 +177,7 @@ def update_security_perimeter_dialogflow():
 
   content = flask.request.get_json(silent=True)
   restrict_access = content['status']
-  return update_security_perimeter(token, 'dialogflow.googleapis.com', restrict_access, project_id, access_policy_name)
+  return uu.update_security_perimeter(token, 'dialogflow.googleapis.com', restrict_access, project_id, access_policy_name)
 
 @update.route('/update_service_directory_webhook_fulfillment', methods=['POST'])
 def update_service_directory_webhook_fulfillment():
