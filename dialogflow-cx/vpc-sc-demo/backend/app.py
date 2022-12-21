@@ -22,6 +22,7 @@ from frontend_blueprint import frontend
 from launchpad_blueprint import launchpad
 from session_blueprint import session
 from status_blueprint import status
+from update_blueprint import update
 
 
 def configure_logging():
@@ -38,6 +39,7 @@ def create_app():
     curr_app.register_blueprint(launchpad)
     curr_app.register_blueprint(status)
     curr_app.register_blueprint(asset)
+    curr_app.register_blueprint(update)
     configure_logging()
     return curr_app
 

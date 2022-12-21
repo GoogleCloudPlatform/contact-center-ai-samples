@@ -22,15 +22,13 @@ import get_token
 import pytest
 import requests
 import status_utilities as su
-from conftest import MockReturnObject
+from conftest import MockReturnObject, MOCK_DOMAIN
 from mock import patch
 from status_blueprint import status as blueprint
 
-_MOCK_DOMAIN = "MOCK_DOMAIN."
-
 
 def assert_response(
-    return_value, status_code, endpoint, response=None, netloc=_MOCK_DOMAIN
+    return_value, status_code, endpoint, response=None, netloc=MOCK_DOMAIN
 ):
     """Assert function for testing responses"""
     parsed_url = urlparse(return_value.request.url)
@@ -72,7 +70,7 @@ def test_restricted_services_status_bad_token(
         get_token, "get_token", return_value={"response": "MOCK_RESPONSE"}
     ):
         with app.test_client() as curr_client:
-            return_value = curr_client.get(endpoint, base_url=f"https://{_MOCK_DOMAIN}")
+            return_value = curr_client.get(endpoint, base_url=f"https://{MOCK_DOMAIN}")
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
@@ -95,7 +93,7 @@ def test_restricted_services_status_no_project(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
     ):
         with app.test_client() as curr_client:
-            return_value = curr_client.get(endpoint, base_url=f"https://{_MOCK_DOMAIN}")
+            return_value = curr_client.get(endpoint, base_url=f"https://{MOCK_DOMAIN}")
     assert_response(
         return_value,
         200,
@@ -122,7 +120,7 @@ def get_result(
     with curr_app.test_client() as curr_client:
         return curr_client.get(
             endpoint,
-            base_url=f"https://{_MOCK_DOMAIN}",
+            base_url=f"https://{MOCK_DOMAIN}",
             query_string=query_string,
         )
 
