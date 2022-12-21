@@ -21,7 +21,7 @@ import os
 import flask
 import werkzeug
 
-STATIC_FOLDER = "frontend/build"
+STATIC_FOLDER = "/frontend/build"
 
 frontend = flask.Blueprint("frontend", __name__, static_folder=STATIC_FOLDER)
 logger = logging.getLogger(__name__)
