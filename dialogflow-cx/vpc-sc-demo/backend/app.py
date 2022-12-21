@@ -34,7 +34,7 @@ def configure_logging():
 
 def create_app():
     """Create the webserver, register blueprints."""
-    curr_app = Flask(__name__, static_folder=STATIC_FOLDER, static_url_path='/static')
+    curr_app = Flask(__name__, static_folder=STATIC_FOLDER, static_url_path="/static")
     curr_app.register_blueprint(frontend)
     curr_app.register_blueprint(session)
     curr_app.register_blueprint(launchpad)
