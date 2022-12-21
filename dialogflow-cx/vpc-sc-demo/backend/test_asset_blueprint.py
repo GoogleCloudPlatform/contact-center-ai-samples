@@ -39,21 +39,21 @@ def app():
 def get_result(
     curr_app,
     endpoint,
-    method='get',
+    method="get",
     json_data=None,
 ):
     """Helper function to get result from a test client."""
     with curr_app.test_client() as curr_client:
-        fcn = curr_client.get if method == 'get' else curr_client.post
+        fcn = curr_client.get if method == "get" else curr_client.post
         kwargs = {
-            'query_string': {
+            "query_string": {
                 "project_id": "MOCK_PROJECT_ID",
                 "region": "MOCK_REGION",
                 "bucket": "MOCK_BUCKET_NAME",
             },
         }
         if json_data:
-            kwargs['json']=json_data
+            kwargs["json"] = json_data
         return fcn(
             endpoint,
             base_url=f"https://{MOCK_DOMAIN}",
@@ -280,7 +280,7 @@ def test_update_target(  # pylint: disable=too-many-arguments
             return_value = get_result(
                 app,
                 endpoint,
-                method='post',
+                method="post",
                 json_data=json_data,
             )
     mock_get_token.assert_called_once()
@@ -314,7 +314,7 @@ def test_update_target_bad_init(
     return_value = get_result(
         app,
         endpoint,
-        method='post',
+        method="post",
         json_data={"destroy": False},
     )
     mock_get_token.assert_called_once()
@@ -326,7 +326,7 @@ def test_update_target_bad_init(
     get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
 )
 @patch.object(au, "tf_init", return_value=None)
-@patch.object(au, "tf_plan", return_value={'response':'MOCK_RESPONSE'})
+@patch.object(au, "tf_plan", return_value={"response": "MOCK_RESPONSE"})
 def test_update_target_bad_plan(
     mock_tf_plan,
     mock_tf_init,
@@ -338,8 +338,8 @@ def test_update_target_bad_plan(
     return_value = get_result(
         app,
         endpoint,
-        method='post',
-        json_data={"destroy": False, 'targets':['MOCK_TARGET']},
+        method="post",
+        json_data={"destroy": False, "targets": ["MOCK_TARGET"]},
     )
     mock_tf_plan.assert_called_once()
     mock_get_token.assert_called_once()
