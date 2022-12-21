@@ -36,12 +36,12 @@ ACCESS_POLICY_RESOURCE = (
 @asset.route("/asset_status", methods=["GET"])
 def asset_status():  # pylint: disable=too-many-locals
     """Get status of terraform-tracked assets."""
-    debug = flask.request.args.get("debug") == "true"
-    target = flask.request.args.get("target", None)
-    update = flask.request.args.get("update", True)
     token_dict = get_token.get_token(flask.request, token_type="access_token")
     if "response" in token_dict:
         return token_dict["response"]
+    debug = flask.request.args.get("debug") == "true"
+    target = flask.request.args.get("target", None)
+    update = flask.request.args.get("update", True)
     access_token = token_dict["access_token"]
     env = au.get_terraform_env(access_token, flask.request.args, debug=debug)
     ctx = context.Context()
@@ -88,4 +88,52 @@ def asset_status():  # pylint: disable=too-many-locals
                     "accessPolicyTitle": access_policy_title,
                 }
             ),
+        )
+
+
+@asset.route("/update_target", methods=["POST"])
+def update_target():
+    """Use terraform to update a target."""
+    token_dict = get_token.get_token(flask.request, token_type="access_token")
+    if "response" in token_dict:
+        return token_dict["response"]
+    content = flask.request.get_json(silent=True)
+    access_token = token_dict["access_token"]
+
+    debug = flask.request.args.get("debug") == "true"
+    env = au.get_terraform_env(access_token, flask.request.args, debug=debug)
+    targets = content.get("targets")
+    destroy = content["destroy"]
+
+    if targets == ["all"]:
+        targets = None
+
+    ctx = context.Context()
+    module = "/app/deploy/terraform/main.tf"
+    prefix = f'terraform/{flask.request.args["project_id"]}'
+    with tempfile.TemporaryDirectory() as workdir:
+
+        result = au.tf_init(ctx, module, workdir, env, prefix)
+        if result:
+            return result
+
+        if targets:
+            for target in targets:
+                result = au.tf_plan(ctx, module, workdir, env, target=target)
+                if result and "response" in result:
+                    return result["response"]
+                result = au.tf_apply(ctx, module, workdir, env, destroy, target=target)
+        else:
+            result = au.tf_plan(ctx, module, workdir, env)
+            result = au.tf_apply(ctx, module, workdir, env, destroy)
+        if result:
+            return result
+
+        result = au.tf_state_list(ctx, module, workdir, env)
+        if "response" in result:
+            return result["response"]
+        resources = result["resources"]
+
+        return flask.Response(
+            status=200, response=json.dumps({"status": "OK", "resources": resources})
         )
