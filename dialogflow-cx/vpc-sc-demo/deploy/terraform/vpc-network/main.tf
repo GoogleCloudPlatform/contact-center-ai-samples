@@ -1,3 +1,26 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+terraform {
+  required_providers {
+    google = "~> 4.37.0"
+    google-beta = "~> 4.45.0"
+    time = "~> 0.9.1"
+    archive = "~> 2.2.0"
+  }
+}
+
 variable "project_id" {
   description = "Project ID"
   type        = string
@@ -66,6 +89,10 @@ variable "dialogflow_api" {
   type = object({})
 }
 
+variable "compute_api" {
+  type = object({})
+}
+
 variable "artifactregistry_api" {
   type = object({})
 }
@@ -90,7 +117,8 @@ resource "google_compute_network" "vpc_network" {
   depends_on = [
     var.proxy_permission_storage,
     var.proxy_permission_registry,
-    var.proxy_permission_invoke
+    var.proxy_permission_invoke,
+    var.compute_api,
   ]
 }
 
@@ -154,10 +182,6 @@ resource "google_compute_address" "reverse_proxy_address" {
   purpose      = "GCE_ENDPOINT"
   region       = var.region
   address      = var.reverse_proxy_server_ip
-}
-
-data "google_project" "project" {
-  project_id     = var.project_id
 }
 
 data "archive_file" "proxy_server_source" {
@@ -224,7 +248,10 @@ resource "google_cloudbuild_trigger" "reverse_proxy_server" {
   ]
 
   provisioner "local-exec" {
-    command = "export CLOUDSDK_AUTH_ACCESS_TOKEN=${var.access_token} && gcloud --project=${var.project_id} pubsub topics publish build --message=build"
+    interpreter = [
+      "/bin/bash", "-c"
+    ]
+    command = "source /root/.bashrc && export CLOUDSDK_AUTH_ACCESS_TOKEN=${var.access_token} && gcloud --project=${var.project_id} pubsub topics publish build --message=build"
   }
 }
 
@@ -257,6 +284,26 @@ resource "google_project_iam_member" "dfsa_sd_pscAuthorizedService" {
   member = "serviceAccount:${google_project_service_identity.dfsa.email}"
 }
 
+resource "google_service_account" "rpcsa_service_account" {
+  account_id   = "rps-sa"
+  display_name = "Reverse Proxy Server Service Account"
+  depends_on = [
+    var.iam_api,
+  ]
+}
+
+resource "google_project_iam_member" "rpcsa_artifactregistry" {
+  project = var.project_id
+  role               = "roles/artifactregistry.reader"
+  member = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
+}
+
+resource "google_project_iam_member" "rpcsa_cfinvoker" {
+  project = var.project_id
+  role               = "roles/cloudfunctions.invoker"
+  member = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
+}
+
 resource "google_compute_instance" "reverse_proxy_server" {
   name         = "webhook-server"
   project      =  var.project_id
@@ -264,7 +311,14 @@ resource "google_compute_instance" "reverse_proxy_server" {
   machine_type = "n1-standard-1"
   tags = ["webhook-reverse-proxy-vm"]
   service_account {
-    scopes = ["cloud-platform"]
+    scopes = [
+      "compute-ro",
+      "logging-write",
+      "monitoring-write",
+      "storage-ro",
+      "trace",
+    ]
+    email  = google_service_account.rpcsa_service_account.email
   }
 
   boot_disk {
@@ -293,16 +347,20 @@ resource "google_compute_instance" "reverse_proxy_server" {
   metadata_startup_script = file("${path.module}/startup_script.sh")
 
   provisioner "local-exec" {
-    command = "/deploy/terraform/vpc-network/wait_until_server_ready.sh --zone=${self.zone} --project_id=${var.project_id}  --token=${var.access_token}"
+    interpreter = [
+      "/bin/bash", "-c"
+    ]
+    command = "source /root/.bashrc && /deploy/terraform/vpc-network/wait_until_server_ready.sh --zone=${self.zone} --project_id=${var.project_id}  --token=${var.access_token}"
   }
   depends_on = [
     time_sleep.wait_for_build,
     var.bucket,
     google_project_iam_member.dfsa_sd_viewer,
     google_project_iam_member.dfsa_sd_pscAuthorizedService,
+    google_project_iam_member.rpcsa_artifactregistry,
+    google_project_iam_member.rpcsa_cfinvoker,
     google_compute_router_nat.nat_manual,
     google_compute_firewall.allow_dialogflow,
     google_compute_firewall.allow,
   ]
-  
 }

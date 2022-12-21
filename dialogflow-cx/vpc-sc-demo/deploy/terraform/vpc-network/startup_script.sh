@@ -1,4 +1,17 @@
 #! /bin/bash
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 sudo apt-get update
 sudo apt-get install -y \
@@ -47,7 +60,7 @@ openssl genrsa -out ${ssl_key} 2048
 openssl req -nodes -new -sha256 -key ${ssl_key} -subj "/CN=webhook.internal" -out ${ssl_csr}
 openssl x509 -req -days 3650 -in ${ssl_csr} -signkey ${ssl_key} -out ${ssl_crt} -extfile <(printf "\nsubjectAltName='DNS:webhook.internal'")
 openssl x509 -in ${ssl_crt} -out ${ssl_der} -outform DER
-gsutil cp ${ssl_der} gs://${BUCKET?}/server.der
+gsutil cp ${ssl_der} gs://"${BUCKET?}"/server.der
 
 echo \
 '

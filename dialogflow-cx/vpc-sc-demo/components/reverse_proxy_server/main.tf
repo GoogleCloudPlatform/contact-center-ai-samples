@@ -292,14 +292,12 @@ resource "google_service_account" "rpcsa_service_account" {
 
 resource "google_project_iam_member" "rpcsa_artifactregistry" {
   project = var.project_id
-
   role               = "roles/artifactregistry.reader"
   member = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
 }
 
 resource "google_project_iam_member" "rpcsa_cfinvoker" {
   project = var.project_id
-
   role               = "roles/cloudfunctions.invoker"
   member = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
 }

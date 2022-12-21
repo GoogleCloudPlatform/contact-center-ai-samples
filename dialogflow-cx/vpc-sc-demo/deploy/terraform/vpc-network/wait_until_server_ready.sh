@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 SHORT=z::,p::,t::,h
 LONG=zone::,project_id::,token::,help
@@ -51,12 +64,12 @@ do
 done
 
 export CLOUDSDK_AUTH_ACCESS_TOKEN=${TOKEN?}
-gcloud config set project ${PROJECT_ID?}
+gcloud config set project "${PROJECT_ID?}"
 
 READY=false
 until [ ${READY?} = true ]
 do
-  if ` gcloud compute instances get-serial-port-output --start=0 webhook-server --zone ${ZONE?} | grep -q "google-startup-scripts.service: Succeeded" `; then
+  if gcloud compute instances get-serial-port-output --start=0 webhook-server --zone "${ZONE?}" | grep -q "google-startup-scripts.service: Succeeded"; then
     READY=true
   fi
   sleep 1
