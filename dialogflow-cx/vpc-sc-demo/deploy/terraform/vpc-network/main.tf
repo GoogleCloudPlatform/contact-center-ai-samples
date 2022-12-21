@@ -12,6 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+terraform {
+  required_providers {
+    google = "~> 4.37.0"
+    google-beta = "~> 4.45.0"
+    time = "~> 0.9.1"
+    archive = "~> 2.2.0"
+  }
+}
+
 variable "project_id" {
   description = "Project ID"
   type        = string
@@ -23,163 +32,156 @@ variable "access_token" {
   sensitive = true
 }
 
-variable "bucket" {
-  description = "bucket"
+variable "webhook_name" {
+  description = "webhook_name"
   type        = string
-}
-
-terraform {
-  required_providers {
-    google = "~> 4.37.0"
-    google-beta = "~> 4.45.0"
-    archive = "~> 2.2.0"
-    time = "~> 0.9.1"
-  }
-  backend "gcs" {
-    bucket  = null
-    prefix  = null
-  }
 }
 
 variable "region" {
   description = "Region"
   type        = string
-  default     = "us-central1"
-}
-
-provider "google" {
-  project     = var.project_id
-  billing_project     = var.project_id
-  region      = var.region
-  user_project_override = true
-}
-
-variable "webhook_name" {
-  description = "webhook_name"
-  type        = string
-  default     = "custom-telco-webhook"
-}
-
-variable "vpc_network" {
-  description = "VPC Network Name"
-  type        = string
-  default     = "webhook-net"
 }
 
 variable "vpc_subnetwork" {
-  description = "Subnetwork for Reverse Proxy Server"
+  description = "VPC Subnetwork"
   type        = string
   default     = "webhook-subnet"
 }
 
-variable "reverse_proxy_server_ip" {
-  description = "IP Address of Reverse Proxy Servier"
+variable "vpc_network" {
+  description = "VPC Network"
   type        = string
-  default     = "10.10.20.2"
+  default     = "webhook-net"
 }
 
 variable "proxy_server_src" {
   description = "proxy_server_src"
   type        = string
-  default = "./proxy-server-src"
 }
 
-resource "google_project_service" "serviceusage" {
-  service = "serviceusage.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
-  disable_dependent_services = true
+variable "reverse_proxy_server_ip" {
+  description = "reverse_proxy_server_ip"
+  type        = string
+  default     = "10.10.20.2"
 }
 
-resource "google_project_service" "compute" {
-  service = "compute.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
-  disable_dependent_services = true
-  depends_on = [
-    google_project_service.serviceusage
-  ]
+variable "proxy_permission_storage" {
+  type = object({})
 }
 
-resource "google_project_service" "artifactregistry" {
-  service = "artifactregistry.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
-  disable_dependent_services = true
-  depends_on = [
-    google_project_service.serviceusage
-  ]
+variable "proxy_permission_registry" {
+  type = object({})
 }
 
-resource "google_project_service" "pubsub" {
-  service = "pubsub.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
-  disable_dependent_services = true
-  depends_on = [
-    google_project_service.serviceusage
-  ]
+variable "proxy_permission_invoke" {
+  type = object({})
 }
 
-resource "google_project_service" "cloudbuild" {
-  service = "cloudbuild.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
-  disable_dependent_services = true
-  depends_on = [
-    google_project_service.serviceusage
-  ]
+variable "bucket" {
+  type = object({})
 }
 
-resource "google_project_service" "iam" {
-  service = "iam.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
-  disable_dependent_services = true
-  depends_on = [
-    google_project_service.serviceusage
-  ]
+variable "iam_api" {
+  type = object({})
 }
 
-resource "google_project_service" "dialogflow" {
-  service = "dialogflow.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
-  disable_dependent_services = true
-  depends_on = [
-    google_project_service.serviceusage
-  ]
+variable "dialogflow_api" {
+  type = object({})
 }
 
-data "google_project" "project" {
-  project_id     = var.project_id
+variable "compute_api" {
+  type = object({})
 }
 
-resource "google_project_iam_member" "storage_admin" {
+variable "artifactregistry_api" {
+  type = object({})
+}
+
+variable "pubsub_api" {
+  type = object({})
+}
+
+variable "cloudbuild_api" {
+  type = object({})
+}
+
+variable "bucket_name" {
+  description = "bucket_name"
+  type        = string
+}
+
+resource "google_compute_network" "vpc_network" {
+  name = var.vpc_network
   project = var.project_id
-  role    = "roles/storage.admin"
-  member  = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+  auto_create_subnetworks = false
   depends_on = [
-    google_project_service.iam
+    var.proxy_permission_storage,
+    var.proxy_permission_registry,
+    var.proxy_permission_invoke,
+    var.compute_api,
   ]
 }
 
-resource "google_project_iam_member" "registry_reader" {
-  project = var.project_id
-  role    = "roles/artifactregistry.reader"
-  member  = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
-  depends_on = [
-    google_project_service.iam
-  ]
+resource "google_compute_router" "nat_router" {
+  name                          = "nat-router"
+  network                       = google_compute_network.vpc_network.name
+  region = var.region
 }
 
-resource "google_project_iam_member" "webhook_invoker" {
-  project = var.project_id
-  role    = "roles/cloudfunctions.invoker"
-  member  = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
-  depends_on = [
-    google_project_service.iam
-  ]
+resource "google_compute_router_nat" "nat_manual" {
+  name   = "nat-config"
+  router = google_compute_router.nat_router.name
+  region = google_compute_router.nat_router.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+  log_config {
+    enable = true
+    filter = "ALL"
+  }
+}
+
+resource "google_compute_firewall" "allow_dialogflow" {
+  name    = "allow-dialogflow"
+  network = google_compute_network.vpc_network.name
+  direction = "INGRESS"
+  priority = 1000
+  allow {
+    protocol = "tcp"
+    ports    = ["443"]
+  }
+  source_ranges = ["35.199.192.0/19"]
+  target_tags = ["webhook-reverse-proxy-vm"]
+}
+
+resource "google_compute_firewall" "allow" {
+  name    = "allow"
+  network = google_compute_network.vpc_network.name
+  allow {
+    protocol = "tcp"
+    ports    = ["443", "3389", "22"]
+  }
+  allow {
+    protocol = "icmp"
+  }
+  source_ranges = ["0.0.0.0/0"]
+}
+
+resource "google_compute_subnetwork" "reverse_proxy_subnetwork" {
+  name          = var.vpc_subnetwork
+  ip_cidr_range = "10.10.20.0/28"
+  project       = var.project_id
+  region        = var.region
+  network       = google_compute_network.vpc_network.name
+  private_ip_google_access = true
+}
+
+resource "google_compute_address" "reverse_proxy_address" {
+  name         = "webhook-reverse-proxy-address"
+  subnetwork   = google_compute_subnetwork.reverse_proxy_subnetwork.id
+  address_type = "INTERNAL"
+  purpose      = "GCE_ENDPOINT"
+  region       = var.region
+  address      = var.reverse_proxy_server_ip
 }
 
 data "archive_file" "proxy_server_source" {
@@ -190,7 +192,7 @@ data "archive_file" "proxy_server_source" {
 
 resource "google_storage_bucket_object" "proxy_server_source" {
   name   = "server.zip"
-  bucket = var.bucket
+  bucket = var.bucket_name
   source = data.archive_file.proxy_server_source.output_path
   depends_on = [
     var.bucket
@@ -200,7 +202,7 @@ resource "google_storage_bucket_object" "proxy_server_source" {
 resource "google_pubsub_topic" "reverse_proxy_server_build" {
   name = "build"
   depends_on = [
-    google_project_service.pubsub,
+    var.pubsub_api
   ]
 }
 
@@ -210,7 +212,7 @@ resource "google_artifact_registry_repository" "webhook_registry" {
   format        = "DOCKER"
   project       = var.project_id
   depends_on = [
-    google_project_service.artifactregistry,
+    var.artifactregistry_api
   ]
 }
 
@@ -223,12 +225,12 @@ resource "google_cloudbuild_trigger" "reverse_proxy_server" {
   build {
     source {
       storage_source {
-        bucket = var.bucket
+        bucket = var.bucket_name
         object = google_storage_bucket_object.proxy_server_source.name
       }
     }
     
-    logs_bucket = "gs://${var.bucket}"
+    logs_bucket = "gs://${var.bucket_name}"
 
     step {
       name = "gcr.io/cloud-builders/docker"
@@ -242,7 +244,7 @@ resource "google_cloudbuild_trigger" "reverse_proxy_server" {
   depends_on = [
     google_artifact_registry_repository.webhook_registry,
     var.bucket,
-    google_project_service.cloudbuild,
+    var.cloudbuild_api,
   ]
 
   provisioner "local-exec" {
@@ -265,8 +267,8 @@ resource "google_project_service_identity" "dfsa" {
   project = var.project_id
   service = "dialogflow.googleapis.com"
   depends_on = [
-    google_project_service.iam,
-    google_project_service.dialogflow
+    var.iam_api,
+    var.dialogflow_api,
   ]
 }
 
@@ -286,7 +288,7 @@ resource "google_service_account" "rpcsa_service_account" {
   account_id   = "rps-sa"
   display_name = "Reverse Proxy Server Service Account"
   depends_on = [
-    google_project_service.iam,
+    var.iam_api,
   ]
 }
 
@@ -330,13 +332,13 @@ resource "google_compute_instance" "reverse_proxy_server" {
   }
 
   network_interface {
-    network = var.vpc_network
-    subnetwork = var.vpc_subnetwork
-    network_ip = var.reverse_proxy_server_ip
+    network = google_compute_network.vpc_network.name
+    subnetwork = google_compute_subnetwork.reverse_proxy_subnetwork.name
+    network_ip = google_compute_address.reverse_proxy_address.address
   }
 
   metadata = {
-    bucket = var.bucket
+    bucket = var.bucket_name
     image = "${var.region}-docker.pkg.dev/${var.project_id}/webhook-registry/webhook-server-image:latest"
     bot_user = google_project_service_identity.dfsa.email
     webhook_trigger_uri = "https://${var.region}-${var.project_id}.cloudfunctions.net/${var.webhook_name}"
@@ -348,7 +350,7 @@ resource "google_compute_instance" "reverse_proxy_server" {
     interpreter = [
       "/bin/bash", "-c"
     ]
-    command = "source /root/.bashrc && /app/wait_until_server_ready.sh --zone=${self.zone} --project_id=${var.project_id}  --token=${var.access_token}"
+    command = "source /root/.bashrc && /deploy/terraform/vpc-network/wait_until_server_ready.sh --zone=${self.zone} --project_id=${var.project_id}  --token=${var.access_token}"
   }
   depends_on = [
     time_sleep.wait_for_build,
@@ -357,5 +359,8 @@ resource "google_compute_instance" "reverse_proxy_server" {
     google_project_iam_member.dfsa_sd_pscAuthorizedService,
     google_project_iam_member.rpcsa_artifactregistry,
     google_project_iam_member.rpcsa_cfinvoker,
+    google_compute_router_nat.nat_manual,
+    google_compute_firewall.allow_dialogflow,
+    google_compute_firewall.allow,
   ]
 }
