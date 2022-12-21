@@ -39,17 +39,25 @@ def app():
 def get_result(
     curr_app,
     endpoint,
+    method="get",
+    json_data=None,
 ):
     """Helper function to get result from a test client."""
     with curr_app.test_client() as curr_client:
-        return curr_client.get(
-            endpoint,
-            base_url=f"https://{MOCK_DOMAIN}",
-            query_string={
+        fcn = curr_client.get if method == "get" else curr_client.post
+        kwargs = {
+            "query_string": {
                 "project_id": "MOCK_PROJECT_ID",
                 "region": "MOCK_REGION",
                 "bucket": "MOCK_BUCKET_NAME",
             },
+        }
+        if json_data:
+            kwargs["json"] = json_data
+        return fcn(
+            endpoint,
+            base_url=f"https://{MOCK_DOMAIN}",
+            **kwargs,
         )
 
 
@@ -269,17 +277,12 @@ def test_update_target(  # pylint: disable=too-many-arguments
     endpoint = "/update_target"
     with patch.object(au, "tf_apply", return_value=apply_return_value) as mock_tf_apply:
         with patch.object(au, "tf_state_list", return_value=state):
-            with app.test_client() as curr_client:
-                return_value = curr_client.post(
-                    endpoint,
-                    base_url=f"https://{MOCK_DOMAIN}",
-                    query_string={
-                        "project_id": "MOCK_PROJECT_ID",
-                        "region": "MOCK_REGION",
-                        "bucket": "MOCK_BUCKET_NAME",
-                    },
-                    json=json_data,
-                )
+            return_value = get_result(
+                app,
+                endpoint,
+                method="post",
+                json_data=json_data,
+            )
     mock_get_token.assert_called_once()
     mock_tf_init.assert_called_once()
     assert mock_tf_plan.call_count == call_count
@@ -295,3 +298,50 @@ def test_update_target(  # pylint: disable=too-many-arguments
             endpoint,
             json.dumps({"status": "OK", "resources": ["MOCK_RESOURCE"]}),
         )
+
+
+@patch.object(
+    get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
+)
+@patch.object(au, "tf_init", return_value="MOCK_RESPONSE")
+def test_update_target_bad_init(
+    mock_tf_init,
+    mock_get_token,
+    app,  # pylint: disable=redefined-outer-name
+):
+    """test /update_target, tf_init has non-zero return value."""
+    endpoint = "/update_target"
+    return_value = get_result(
+        app,
+        endpoint,
+        method="post",
+        json_data={"destroy": False},
+    )
+    mock_get_token.assert_called_once()
+    mock_tf_init.assert_called_once()
+    assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
+
+
+@patch.object(
+    get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
+)
+@patch.object(au, "tf_init", return_value=None)
+@patch.object(au, "tf_plan", return_value={"response": "MOCK_RESPONSE"})
+def test_update_target_bad_plan(
+    mock_tf_plan,
+    mock_tf_init,
+    mock_get_token,
+    app,  # pylint: disable=redefined-outer-name
+):
+    """test /update_target, tf_plan has non-zero return value."""
+    endpoint = "/update_target"
+    return_value = get_result(
+        app,
+        endpoint,
+        method="post",
+        json_data={"destroy": False, "targets": ["MOCK_TARGET"]},
+    )
+    mock_tf_plan.assert_called_once()
+    mock_get_token.assert_called_once()
+    mock_tf_init.assert_called_once()
+    assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
