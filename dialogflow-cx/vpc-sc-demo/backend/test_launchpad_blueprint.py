@@ -107,7 +107,9 @@ def test_get_principal_notoken(app):  # pylint: disable=redefined-outer-name
             endpoint,
             base_url=f"https://{mock_domain}",
         )
-    assert return_value.status_code == 302
+    assert return_value.status_code == 200
+    for curr_response in return_value.response:
+        assert json.loads(curr_response.decode()) == {'principal': None}
 
 
 @pytest.mark.hermetic

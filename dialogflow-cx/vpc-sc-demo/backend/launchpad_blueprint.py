@@ -31,7 +31,9 @@ def get_principal():
     """Get the email of the current principal for the session."""
     token_dict = get_token.get_token(flask.request, token_type="email")
     if "response" in token_dict:
-        return flask.redirect(flask.url_for("session.logout"))
+        return flask.Response(
+            status=200, response=json.dumps({"principal": None})
+        )
     return flask.Response(
         status=200, response=json.dumps({"principal": token_dict["email"]})
     )
