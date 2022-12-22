@@ -109,7 +109,7 @@ def test_get_principal_notoken(app):  # pylint: disable=redefined-outer-name
         )
     assert return_value.status_code == 200
     for curr_response in return_value.response:
-        assert json.loads(curr_response.decode()) == {'principal': None}
+        assert json.loads(curr_response.decode()) == {"principal": None}
 
 
 @pytest.mark.hermetic
