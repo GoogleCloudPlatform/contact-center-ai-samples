@@ -31,9 +31,9 @@ RUN unzip terraform_1.2.9_linux_amd64.zip
 RUN mv terraform /usr/bin/terraform
 
 # Frontend
-WORKDIR /backend/frontend
+COPY frontend/ /frontend
+WORKDIR /frontend
 
-COPY frontend/ /backend/frontend/
 RUN npm install react-scripts@5.0.1 && npm run build
 
 # Backend
