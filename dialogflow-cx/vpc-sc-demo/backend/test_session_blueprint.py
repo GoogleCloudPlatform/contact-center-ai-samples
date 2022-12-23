@@ -17,76 +17,15 @@
 import os
 from urllib.parse import urlparse
 
-import flask
 import pytest
 from mock import mock_open, patch
-from session_blueprint import DEBUG_DOMAIN, PUBLIC_PEM_FILENAME, login_landing_uri
+from session_blueprint import PUBLIC_PEM_FILENAME
 from session_blueprint import session as blueprint
-from session_blueprint import user_service_domain
-
-
-@pytest.fixture
-def app():
-    """Fixture for tests on session blueprint."""
-    curr_app = flask.Flask(__name__)
-    curr_app.register_blueprint(blueprint)
-    curr_app.config["TESTING"] = True
-    return curr_app
 
 
 @pytest.mark.hermetic
-@pytest.mark.parametrize(
-    "base_url,landing_uri,prod,query_params",
-    [
-        ("http://localhost:5001/", f"http://{DEBUG_DOMAIN}:3000", "", {}),
-        ("http://localhost:8081/", f"http://{DEBUG_DOMAIN}:8080", "", {}),
-        (
-            "https://MOCK_PRODUCTION_DOMAIN/",
-            "https://MOCK_PRODUCTION_DOMAIN",
-            "true",
-            None,
-        ),
-        (
-            "https://MOCK_PRODUCTION_DOMAIN/",
-            "https://MOCK_PRODUCTION_DOMAIN/?MOCK_KEY=MOCK_VAL",
-            "true",
-            {"MOCK_KEY": "MOCK_VAL"},
-        ),
-    ],
-)
-def test_login_landing_uri_local(
-    app,  # pylint: disable=redefined-outer-name
-    base_url,
-    landing_uri,
-    prod,
-    query_params,
-):
-    """Test login_landing_uri_local."""
-    with patch.dict(os.environ, {"PROD": prod}):
-        with app.test_request_context(base_url=base_url):
-            assert login_landing_uri(flask.request, query_params) == landing_uri
-
-
-@pytest.mark.hermetic
-@pytest.mark.parametrize(
-    "base_url,prod,domain",
-    [
-        ("http://localhost:5001/", "", "user-service.localhost"),
-        ("http://localhost:8081/", "", "user-service.localhost"),
-        ("https://MOCK_PRODUCTION_DOMAIN/", "true", "mock_production_domain"),
-    ],
-)
-def test_user_service_domain(
-    app, base_url, prod, domain
-):  # pylint: disable=redefined-outer-name
-    """Test user_service_domain method."""
-    with patch.dict(os.environ, {"PROD": prod}):
-        with app.test_request_context(base_url=base_url):
-            assert user_service_domain(flask.request) == domain
-
-
-@pytest.mark.hermetic
-def test_session_route(app):  # pylint: disable=redefined-outer-name
+@pytest.mark.parametrize('app',[blueprint], indirect=['app'])
+def test_session_route(app):
     """Test /session."""
     mock_domain = "MOCK_DOMAIN."
     endpoint = "/session"
@@ -110,7 +49,8 @@ def test_session_route(app):  # pylint: disable=redefined-outer-name
 
 
 @pytest.mark.hermetic
-def test_logout_route(app):  # pylint: disable=redefined-outer-name
+@pytest.mark.parametrize('app',[blueprint], indirect=['app'])
+def test_logout_route(app):
     """Test /logout"""
     mock_domain = "MOCK_DOMAIN."
     endpoint = "/logout"
