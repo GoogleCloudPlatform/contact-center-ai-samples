@@ -46,9 +46,7 @@ def test_get_project_number_no_project():
 @pytest.mark.parametrize("title", [None, False])
 def test_get_access_policy_name_no_policy(title):
     """Test get_access_policy_name function, no policy given."""
-    result = su.get_access_policy_name(
-        "MOCK_TOKEN", title, "MOCK_PROJECT_ID"
-    )
+    result = su.get_access_policy_name("MOCK_TOKEN", title, "MOCK_PROJECT_ID")
     assert_response(result, 200, {"status": "BLOCKED", "reason": "NO_ACCESS_POLICY"})
 
 
@@ -630,9 +628,7 @@ def test_get_agents_api():
             },
         ),
     ):
-        result = su.get_agents(
-            "MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION"
-        )
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
         assert_response(
             result, 200, {"status": "BLOCKED", "reason": "DIALOGFLOW_API_DISABLED"}
         )
@@ -654,9 +650,7 @@ def test_get_agents_iam():
             },
         ),
     ):
-        result = su.get_agents(
-            "MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION"
-        )
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
         assert_response(
             result, 200, {"status": "BLOCKED", "reason": "WRONG_PERMISSION"}
         )
@@ -679,9 +673,7 @@ def test_get_agents_vpc():
             },
         ),
     ):
-        result = su.get_agents(
-            "MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION"
-        )
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
         assert_response(
             result, 200, {"status": "BLOCKED", "reason": "VPC_SERVICE_CONTROLS"}
         )
@@ -704,9 +696,7 @@ def test_get_agents_permissions_unknown():
             },
         ),
     ):
-        result = su.get_agents(
-            "MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION"
-        )
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
         assert_response(
             result, 200, {"status": "BLOCKED", "reason": "PERMISSION_DENIED"}
         )
@@ -718,9 +708,7 @@ def test_get_agents_server_error():
     with patch.object(
         requests, "get", return_value=MockReturnObject(500, ["SERVER_ERROR"])
     ):
-        result = su.get_agents(
-            "MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION"
-        )
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
         assert_response(result, 500, ["SERVER_ERROR"])
 
 
@@ -735,9 +723,7 @@ def test_get_agents_not_found():
             {},
         ),
     ):
-        result = su.get_agents(
-            "MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION"
-        )
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
         assert_response(result, 200, {"status": "BLOCKED", "reason": "AGENT_NOT_FOUND"})
 
 
@@ -752,9 +738,7 @@ def test_get_agents_potential_buggy_codepath():
             {"error": "MOCK_ERROR"},
         ),
     ):
-        result = su.get_agents(
-            "MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION"
-        )
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
         assert result is None
 
 
@@ -769,9 +753,7 @@ def test_get_agents_success():
             {"agents": [{"displayName": "MOCK_AGENT_NAME"}]},
         ),
     ):
-        result = su.get_agents(
-            "MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION"
-        )
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
     assert result == {"data": {"MOCK_AGENT_NAME": {"displayName": "MOCK_AGENT_NAME"}}}
 
 
@@ -832,16 +814,18 @@ def test_get_webhooks_success():
 
 
 @pytest.mark.hermetic
-@patch.object(get_token, 'get_token', return_value={'response': 'MOCK_RESPONSE'})
+@patch.object(get_token, "get_token", return_value={"response": "MOCK_RESPONSE"})
 def test_get_token_and_project_bad_token(mock_get_token, mock_request):
     """Test get_token_and_project utility function, bad token"""
     response = su.get_token_and_project(mock_request)
-    assert response == {'response': 'MOCK_RESPONSE'}
+    assert response == {"response": "MOCK_RESPONSE"}
     mock_get_token.assert_called_once()
 
 
 @pytest.mark.hermetic
-@patch.object(get_token, 'get_token', return_value={'access_token': 'MOCK_ACCESS_TOKEN'})
+@patch.object(
+    get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
+)
 def test_get_token_and_project_bad_project_id(mock_get_token, mock_request):
     """Test get_token_and_project utility function, bad token"""
     response = su.get_token_and_project(mock_request)
@@ -850,38 +834,39 @@ def test_get_token_and_project_bad_project_id(mock_get_token, mock_request):
 
 
 @pytest.mark.hermetic
-@patch.object(get_token, 'get_token', return_value={'access_token': 'MOCK_ACCESS_TOKEN'})
+@patch.object(
+    get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
+)
 def test_get_token_and_project_success(mock_get_token, mock_request):
     """Test get_token_and_project utility function, bad token"""
-    mock_request.args = {'project_id': 'MOCK_PROJECT_ID'}
+    mock_request.args = {"project_id": "MOCK_PROJECT_ID"}
     response = su.get_token_and_project(mock_request)
-    assert response == {'token': 'MOCK_ACCESS_TOKEN', 'project_id': 'MOCK_PROJECT_ID'}
+    assert response == {"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"}
     mock_get_token.assert_called_once()
 
 
 @pytest.mark.hermetic
-@patch.object(su, 'get_token_and_project', return_value={'response': 'MOCK_RESPONSE'})
+@patch.object(su, "get_token_and_project", return_value={"response": "MOCK_RESPONSE"})
 def test_get_restricted_service_status_bad_token(mock_get_token_project, mock_request):
     """Test get_restricted_service_status helper function, bad token/project"""
-    response = su.get_restricted_service_status(mock_request, 'MOCK_SERVICE_KEY')
-    assert response == 'MOCK_RESPONSE'
+    response = su.get_restricted_service_status(mock_request, "MOCK_SERVICE_KEY")
+    assert response == "MOCK_RESPONSE"
     mock_get_token_project.assert_called_once()
 
 
 @pytest.mark.hermetic
 @patch.object(
     su,
-    'get_token_and_project',
-    return_value={'token': 'MOCK_ACCESS_TOKEN', 'project_id': 'MOCK_PROJECT_ID'},
+    "get_token_and_project",
+    return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
 )
-@patch.object(su, 'get_access_policy_name', return_value={'response': 'MOCK_RESPONSE'})
+@patch.object(su, "get_access_policy_name", return_value={"response": "MOCK_RESPONSE"})
 def test_get_restricted_service_status_bad_policy(
-        mock_get_access_policy,
-        mock_get_token_project,
-        mock_request):
+    mock_get_access_policy, mock_get_token_project, mock_request
+):
     """Test get_restricted_service_status helper function, bad policy"""
-    response = su.get_restricted_service_status(mock_request, 'MOCK_SERVICE_KEY')
-    assert response == 'MOCK_RESPONSE'
+    response = su.get_restricted_service_status(mock_request, "MOCK_SERVICE_KEY")
+    assert response == "MOCK_RESPONSE"
     mock_get_token_project.assert_called_once()
     mock_get_access_policy.assert_called_once()
 
@@ -889,27 +874,28 @@ def test_get_restricted_service_status_bad_policy(
 @pytest.mark.hermetic
 @patch.object(
     su,
-    'get_token_and_project',
-    return_value={'token': 'MOCK_ACCESS_TOKEN', 'project_id': 'MOCK_PROJECT_ID'},
+    "get_token_and_project",
+    return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
 )
 @patch.object(
     su,
-    'get_access_policy_name',
-    return_value={'access_policy_name': '/MOCK_ACCESS_POLICY_NAME'}
+    "get_access_policy_name",
+    return_value={"access_policy_name": "/MOCK_ACCESS_POLICY_NAME"},
 )
 @patch.object(
     su,
-    'get_restricted_services_status',
-    return_value={'response': 'MOCK_RESPONSE'},
+    "get_restricted_services_status",
+    return_value={"response": "MOCK_RESPONSE"},
 )
 def test_get_restricted_service_status_bad_status(
-        mock_get_restricted_services_status,
-        mock_get_access_policy,
-        mock_get_token_project,
-        mock_request):
+    mock_get_restricted_services_status,
+    mock_get_access_policy,
+    mock_get_token_project,
+    mock_request,
+):
     """Test get_restricted_service_status helper function, bad status"""
-    response = su.get_restricted_service_status(mock_request, 'MOCK_SERVICE_KEY')
-    assert response == 'MOCK_RESPONSE'
+    response = su.get_restricted_service_status(mock_request, "MOCK_SERVICE_KEY")
+    assert response == "MOCK_RESPONSE"
     mock_get_restricted_services_status.assert_called_once()
     mock_get_access_policy.assert_called_once()
     mock_get_token_project.assert_called_once()
@@ -918,27 +904,28 @@ def test_get_restricted_service_status_bad_status(
 @pytest.mark.hermetic
 @patch.object(
     su,
-    'get_token_and_project',
-    return_value={'token': 'MOCK_ACCESS_TOKEN', 'project_id': 'MOCK_PROJECT_ID'},
+    "get_token_and_project",
+    return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
 )
 @patch.object(
     su,
-    'get_access_policy_name',
-    return_value={'access_policy_name': '/MOCK_ACCESS_POLICY_NAME'}
+    "get_access_policy_name",
+    return_value={"access_policy_name": "/MOCK_ACCESS_POLICY_NAME"},
 )
 @patch.object(
     su,
-    'get_restricted_services_status',
-    return_value={'MOCK_SERVICE_KEY': 'MOCK_SERVICE_STATUS'},
+    "get_restricted_services_status",
+    return_value={"MOCK_SERVICE_KEY": "MOCK_SERVICE_STATUS"},
 )
 def test_get_restricted_service_status_success(
-        mock_get_restricted_services_status,
-        mock_get_access_policy,
-        mock_get_token_project,
-        mock_request):
+    mock_get_restricted_services_status,
+    mock_get_access_policy,
+    mock_get_token_project,
+    mock_request,
+):
     """Test get_restricted_service_status helper function, bad status"""
-    response = su.get_restricted_service_status(mock_request, 'MOCK_SERVICE_KEY')
-    assert_response({'response': response}, 200, {'status': 'MOCK_SERVICE_STATUS'})
+    response = su.get_restricted_service_status(mock_request, "MOCK_SERVICE_KEY")
+    assert_response({"response": response}, 200, {"status": "MOCK_SERVICE_STATUS"})
     mock_get_restricted_services_status.assert_called_once()
     mock_get_access_policy.assert_called_once()
     mock_get_token_project.assert_called_once()

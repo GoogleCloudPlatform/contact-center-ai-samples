@@ -476,9 +476,7 @@ def get_restricted_service_status(request, service_key):
     if "response" in response:
         return response["response"]
     access_policy_name = response["access_policy_name"]
-    status_dict = get_restricted_services_status(
-        token, project_id, access_policy_name
-    )
+    status_dict = get_restricted_services_status(token, project_id, access_policy_name)
     if "response" in status_dict:
         return status_dict["response"]
 
