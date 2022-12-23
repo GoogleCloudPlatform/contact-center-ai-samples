@@ -19,6 +19,7 @@ from urllib.parse import urlparse
 
 import flask
 import pytest
+from werkzeug.test import EnvironBuilder
 
 MOCK_DOMAIN = "MOCK_DOMAIN."
 
@@ -77,3 +78,10 @@ def app(request):
     curr_app.register_blueprint(request.param)
     curr_app.config["TESTING"] = True
     return curr_app
+
+
+@pytest.fixture
+def mock_request():
+    """Mock request for testing functions that take a request as an arg."""
+    builder = EnvironBuilder()
+    return builder.get_request()
