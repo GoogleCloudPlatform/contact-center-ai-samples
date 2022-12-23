@@ -368,3 +368,140 @@ def test_update_perimeter_success(
             "MOCK_ACCESS_POLICY_NAME"
         ]),
     )
+
+
+@pytest.mark.hermetic
+@pytest.mark.parametrize('app,status',[
+    (blueprint, True),
+    (blueprint, False),
+], indirect=['app']
+)
+@patch.object(
+    su,
+    "get_token_and_project",
+    return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
+)
+@patch.object(
+    su,
+    "get_agents",
+    return_value={"response": "MOCK_RESPONSE"},
+)
+def test_update_service_directory_webhook_fulfillment_bad_agent(
+    mock_get_token_and_project,
+    mock_get_agent,
+    app,
+    status,
+):
+    """Test update_service_directory_webhook_fulfillment, bad agent."""
+    endpoint = '/update_service_directory_webhook_fulfillment'
+    return_value = get_result(
+        app,
+        endpoint,
+        query_string={
+            'region':'MOCK_REGION',
+            'bucket': 'MOCK_BUCKET_NAME',
+            'webhook_name':'MOCK_WEBHOOK_NAME',
+        },
+        json_data={
+            'status': status,
+        },
+    )
+    assert_response(return_value, 200, endpoint, 'MOCK_RESPONSE')
+    mock_get_token_and_project.assert_called_once()
+    mock_get_agent.assert_called_once()
+
+
+@pytest.mark.hermetic
+@pytest.mark.parametrize('app,status',[
+    (blueprint, True),
+    (blueprint, False),
+], indirect=['app']
+)
+@patch.object(
+    su,
+    "get_token_and_project",
+    return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
+)
+@patch.object(
+    su,
+    "get_agents",
+    return_value={'data':{'Telecommunications':{'name':'MOCK_NAME'}}},
+)
+@patch.object(
+    su,
+    "get_webhooks",
+    return_value={"response": "MOCK_RESPONSE"},
+)
+def test_update_service_directory_webhook_fulfillment_bad_webhook(
+    mock_get_token_and_project,
+    mock_get_agents,
+    mock_get_webhooks,
+    app,
+    status,
+):
+    """Test update_service_directory_webhook_fulfillment, bad webhook."""
+    endpoint = '/update_service_directory_webhook_fulfillment'
+    return_value = get_result(
+        app,
+        endpoint,
+        query_string={
+            'region':'MOCK_REGION',
+            'bucket': 'MOCK_BUCKET_NAME',
+            'webhook_name':'MOCK_WEBHOOK_NAME',
+        },
+        json_data={
+            'status': status,
+        },
+    )
+    assert_response(return_value, 200, endpoint, 'MOCK_RESPONSE')
+    mock_get_token_and_project.assert_called_once()
+    mock_get_agents.assert_called_once()
+    mock_get_webhooks.assert_called_once()
+
+
+@pytest.mark.hermetic
+@pytest.mark.parametrize('app,status',[
+    (blueprint, True),
+    (blueprint, False),
+], indirect=['app']
+)
+@patch.object(
+    su,
+    "get_token_and_project",
+    return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
+)
+@patch.object(
+    su,
+    "get_agents",
+    return_value={'data':{'Telecommunications':{'name':'MOCK_AGENT_NAME'}}},
+)
+@patch.object(
+    su,
+    "get_webhooks",
+    return_value={"data": {"cxPrebuiltAgentsTelecom":{'name':'MOCK_WEBHOOK_NAME'}}},
+)
+def test_update_service_directory_webhook_fulfillment(
+    mock_get_token_and_project,
+    mock_get_agents,
+    mock_get_webhooks,
+    app,
+    status,
+):
+    """Test update_service_directory_webhook_fulfillment."""
+    endpoint = '/update_service_directory_webhook_fulfillment'
+    return_value = get_result(
+        app,
+        endpoint,
+        query_string={
+            'region':'MOCK_REGION',
+            'bucket': 'MOCK_BUCKET_NAME',
+            'webhook_name':'MOCK_WEBHOOK_NAME',
+        },
+        json_data={
+            'status': status,
+        },
+    )
+    assert_response(return_value, 200, endpoint, 'MOCK_RESPONSE')
+    mock_get_token_and_project.assert_called_once()
+    mock_get_agents.assert_called_once()
+    mock_get_webhooks.assert_called_once()

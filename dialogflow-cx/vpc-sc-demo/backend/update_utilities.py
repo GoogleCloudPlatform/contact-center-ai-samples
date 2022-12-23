@@ -19,6 +19,8 @@ import logging
 import flask
 import requests
 import status_utilities as su
+from google.oauth2 import credentials
+from google.cloud import storage
 
 logger = logging.getLogger(__name__)
 
@@ -79,3 +81,10 @@ def update_security_perimeter(
         )
         return flask.Response(status=result.status_code, response=result.text)
     return flask.Response(status=200)
+
+
+def get_cert(token, project_id, bucket):
+    curr_credentials = credentials.Credentials(token)  
+    bucket_obj = storage.Client(project=project_id, credentials=curr_credentials).bucket(bucket)
+    blob = storage.blob.Blob(f'server.der', bucket_obj)
+    return blob.download_as_string()

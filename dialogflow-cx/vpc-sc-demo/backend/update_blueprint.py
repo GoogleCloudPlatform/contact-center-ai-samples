@@ -20,10 +20,6 @@ import base64
 
 import flask
 import requests
-from google.oauth2 import credentials
-from google.cloud import storage
-
-import get_token
 import status_utilities as su
 import update_utilities as uu
 
@@ -154,6 +150,7 @@ def update_security_perimeter_dialogflow():
   restrict_access = content['status']
   return uu.update_security_perimeter(token, 'dialogflow.googleapis.com', restrict_access, project_id, access_policy_name)
 
+
 @update.route('/update_service_directory_webhook_fulfillment', methods=['POST'])
 def update_service_directory_webhook_fulfillment():
   data = su.get_token_and_project(flask.request)
@@ -169,7 +166,6 @@ def update_service_directory_webhook_fulfillment():
     fulfillment = 'generic-web-service'
 
   bucket = flask.request.args['bucket']
-  region = flask.request.args['region']
   webhook_name = flask.request.args['webhook_name']
   service_directory_namespace = "df-namespace"
   service_directory_service = "df-service"
@@ -190,10 +186,7 @@ def update_service_directory_webhook_fulfillment():
     def b64Encode(msg_bytes):
       base64_bytes = base64.b64encode(msg_bytes)
       return base64_bytes.decode('ascii')
-    curr_credentials = credentials.Credentials(token)  
-    BUCKET = storage.Client(project=project_id, credentials=curr_credentials).bucket(bucket)
-    blob = storage.blob.Blob(f'server.der', BUCKET)
-    allowed_ca_cert = blob.download_as_string()
+    allowed_ca_cert = uu.get_cert(token, project_id, bucket)
     data = {
       "displayName": "cxPrebuiltAgentsTelecom", 
       "serviceDirectory": {
@@ -205,8 +198,7 @@ def update_service_directory_webhook_fulfillment():
       }
     }
   else:
-    return flask.Response(status=500, response=f'Unexpected setting for fulfillment: {fulfillment}')
-
+    return flask.Response(status=500, response=f'Unexpected setting for fulfillment: {fulfillment}')  # pragma: no cover
 
   headers = {}
   headers["x-goog-user-project"] = project_id
