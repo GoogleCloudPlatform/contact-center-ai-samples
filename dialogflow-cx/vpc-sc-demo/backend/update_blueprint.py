@@ -119,8 +119,6 @@ def update_webhook_ingress():
   return flask.Response(status=200)
 
 
-
-
 @update.route('/update_security_perimeter_cloudfunctions', methods=['POST'])
 def update_security_perimeter_cloudfunctions():
   data = su.get_token_and_project(flask.request)
