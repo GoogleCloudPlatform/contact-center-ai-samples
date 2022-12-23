@@ -18,7 +18,9 @@ import json
 import logging
 
 import flask
+import get_token
 import requests
+import status_utilities as su
 
 logger = logging.getLogger(__name__)
 
@@ -442,3 +444,46 @@ def get_webhooks(token, agent_name, project_id, region):
         return {"response": response}
     agents = result.json()
     return {"data": {data["displayName"]: data for data in agents["webhooks"]}}
+
+
+def get_token_and_project(request):
+    """Helper method to retrieve a token or project, or return early."""
+    response = {}
+    token_dict = get_token.get_token(request, token_type="access_token")
+    if "response" in token_dict:
+        return token_dict
+    response["token"] = token_dict["access_token"]
+
+    response["project_id"] = flask.request.args.get("project_id", None)
+    if not response["project_id"]:
+        return {
+            "response": flask.Response(
+                status=200,
+                response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
+            )
+        }
+    return response
+
+
+def get_restricted_service_status(request, service_key):
+    """Get status of restricted service:"""
+    data = get_token_and_project(request)
+    if "response" in data:
+        return data["response"]
+    project_id, token = data["project_id"], data["token"]
+    access_policy_title = request.args.get("access_policy_title", None)
+
+    response = su.get_access_policy_name(token, access_policy_title, project_id)
+    if "response" in response:
+        return response["response"]
+    access_policy_name = response["access_policy_name"]
+    status_dict = su.get_restricted_services_status(
+        token, project_id, access_policy_name
+    )
+    if "response" in status_dict:
+        return status_dict["response"]
+
+    return flask.Response(
+        status=200,
+        response=json.dumps({"status": status_dict[service_key]}),
+    )
