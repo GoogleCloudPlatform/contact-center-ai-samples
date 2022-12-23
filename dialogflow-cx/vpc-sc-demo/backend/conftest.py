@@ -77,4 +77,3 @@ def app(request):
     curr_app.register_blueprint(request.param)
     curr_app.config["TESTING"] = True
     return curr_app
-
