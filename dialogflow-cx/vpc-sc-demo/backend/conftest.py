@@ -82,5 +82,6 @@ def app(request):
 
 @pytest.fixture
 def mock_request():
+    """Mock request for testing functions that take a request as an arg."""
     builder = EnvironBuilder()
     return builder.get_request()

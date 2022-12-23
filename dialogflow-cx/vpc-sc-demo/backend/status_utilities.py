@@ -20,7 +20,6 @@ import logging
 import flask
 import get_token
 import requests
-import status_utilities as su
 
 logger = logging.getLogger(__name__)
 
@@ -454,7 +453,7 @@ def get_token_and_project(request):
         return token_dict
     response["token"] = token_dict["access_token"]
 
-    response["project_id"] = flask.request.args.get("project_id", None)
+    response["project_id"] = request.args.get("project_id", None)
     if not response["project_id"]:
         return {
             "response": flask.Response(
@@ -473,11 +472,11 @@ def get_restricted_service_status(request, service_key):
     project_id, token = data["project_id"], data["token"]
     access_policy_title = request.args.get("access_policy_title", None)
 
-    response = su.get_access_policy_name(token, access_policy_title, project_id)
+    response = get_access_policy_name(token, access_policy_title, project_id)
     if "response" in response:
         return response["response"]
     access_policy_name = response["access_policy_name"]
-    status_dict = su.get_restricted_services_status(
+    status_dict = get_restricted_services_status(
         token, project_id, access_policy_name
     )
     if "response" in status_dict:
