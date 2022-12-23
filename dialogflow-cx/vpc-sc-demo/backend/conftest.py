@@ -64,6 +64,12 @@ def assert_response_ep(
             assert curr_response.decode() == response
 
 
+@pytest.fixture
+def lru_fixture():
+    """Fixture function for testing LruCache."""
+    return lambda x: x
+
+
 @pytest.fixture(scope="function")
 def app(request):
     """Fixture for tests on session blueprint."""
