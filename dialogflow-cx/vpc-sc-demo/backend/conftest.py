@@ -17,6 +17,8 @@
 import json
 from urllib.parse import urlparse
 
+import pytest
+
 MOCK_DOMAIN = "MOCK_DOMAIN."
 
 
@@ -59,3 +61,9 @@ def assert_response_ep(
     if response is not None:
         for curr_response in return_value.response:
             assert curr_response.decode() == response
+
+
+@pytest.fixture
+def lru_fixture():
+    """Fixture function for testing LruCache."""
+    return lambda x: x

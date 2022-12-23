@@ -29,14 +29,8 @@ from mock import mock_open, patch
 from werkzeug.test import EnvironBuilder
 
 
-@pytest.fixture
-def lru_fixture():
-    """Fixture function for testing LruCache."""
-    return lambda x: x
-
-
 @pytest.mark.hermetic
-def test_lru_cache_bump_out(lru_fixture):  # pylint: disable=redefined-outer-name
+def test_lru_cache_bump_out(lru_fixture):
     """Test LruCache bumps LRU value out when over capacity."""
     max_size, test_size, = (
         5,
@@ -57,7 +51,7 @@ def test_lru_cache_bump_out(lru_fixture):  # pylint: disable=redefined-outer-nam
 
 
 @pytest.mark.hermetic
-def test_lru_cache_reuse(lru_fixture):  # pylint: disable=redefined-outer-name
+def test_lru_cache_reuse(lru_fixture):
     """Test LruCache does cache lookup instead of retrieval."""
     mock_val = 10
     cache = get_token.LruCache(lru_fixture, max_size=1)
