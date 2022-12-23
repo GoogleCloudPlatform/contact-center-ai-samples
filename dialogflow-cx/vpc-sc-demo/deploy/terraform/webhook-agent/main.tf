@@ -107,10 +107,11 @@ resource "google_storage_bucket_object" "webhook" {
 }
 
 resource "time_sleep" "wait_for_apis" {
-  create_duration = "60s"
+  create_duration = "20s"
   depends_on = [
     var.cloudfunctions_api,
-    var.cloudbuild_api
+    var.cloudbuild_api,
+    var.dialogflow_api,
   ]
 }
 
@@ -130,13 +131,6 @@ resource "google_cloudfunctions_function" "webhook" {
   depends_on = [
     time_sleep.wait_for_apis,
     var.bucket,
-  ]
-}
-
-resource "time_sleep" "wait_for_apis" {
-  create_duration = "20s"
-  depends_on = [
-    var.dialogflow_api,
   ]
 }
 

@@ -15,20 +15,18 @@
 set -e
 
 export USER_SERVICE_IMAGE='vpc-sc-demo'
-export USER_SERVICE_TAG_BASE='latest'
-export USER_SERVICE_TAG='debug'
+export USER_SERVICE_TAG_BASE='development'
 
 sudo docker build --build-arg PROD=false -t ${USER_SERVICE_IMAGE?}:${USER_SERVICE_TAG_BASE?} .
-sudo docker build -t ${USER_SERVICE_IMAGE?}:${USER_SERVICE_TAG?} -f Dockerfile.debug .
 
 sudo docker run -it \
-  -p 5001:5001 \
-  -p 3001:3001 \
+  -p 8081:8081 \
   --rm \
-  --entrypoint=/backend/debug_runner.sh \
+  --env PROD=false \
+  --env FLASK_DEBUG=1 \
   -v "$(pwd)"/backend:/backend \
-  -v "$(pwd)"/frontend:/frontend \
   -v "$(pwd)"/deploy:/deploy \
   -v "$(pwd)"/components/webhook/telecom-webhook-src:/components/telecom-webhook-src \
   -v "$(pwd)"/components/reverse_proxy_server/proxy-server-src:/components/proxy-server-src \
-  ${USER_SERVICE_IMAGE?}:${USER_SERVICE_TAG?}
+  ${USER_SERVICE_IMAGE?}:${USER_SERVICE_TAG_BASE?} \
+  flask run --port 8081 --host=0.0.0.0

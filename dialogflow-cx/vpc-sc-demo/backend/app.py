@@ -24,6 +24,8 @@ from session_blueprint import session
 from status_blueprint import status
 from update_blueprint import update
 
+STATIC_FOLDER = "/frontend/build/static"
+
 
 def configure_logging():
     """Set up logging for webserver."""
@@ -33,7 +35,7 @@ def configure_logging():
 
 def create_app():
     """Create the webserver, register blueprints."""
-    curr_app = Flask(__name__)
+    curr_app = Flask(__name__, static_folder=STATIC_FOLDER, static_url_path="/static")
     curr_app.register_blueprint(frontend)
     curr_app.register_blueprint(session)
     curr_app.register_blueprint(launchpad)

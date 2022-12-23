@@ -139,7 +139,7 @@ def webhook_access_allow_unauthenticated_status():  # pylint: disable=too-many-b
         (
             "https://cloudfunctions.googleapis.com/v2/"
             f"projects/{project_id}/locations/{region}/"
-            f"functions/{webhook_name}:getIamPolicy",
+            f"functions/{webhook_name}:getIamPolicy"
         ),
         headers=headers,
         timeout=10,
