@@ -19,6 +19,7 @@ from urllib.parse import urlparse
 
 import flask
 import pytest
+from werkzeug.test import EnvironBuilder
 
 MOCK_DOMAIN = "MOCK_DOMAIN."
 
@@ -64,6 +65,12 @@ def assert_response_ep(
             assert curr_response.decode() == response
 
 
+@pytest.fixture
+def lru_fixture():
+    """Fixture function for testing LruCache."""
+    return lambda x: x
+
+
 @pytest.fixture(scope="function")
 def app(request):
     """Fixture for tests on session blueprint."""
@@ -71,3 +78,9 @@ def app(request):
     curr_app.register_blueprint(request.param)
     curr_app.config["TESTING"] = True
     return curr_app
+
+
+@pytest.fixture
+def mock_request():
+    builder = EnvironBuilder()
+    return builder.get_request()
