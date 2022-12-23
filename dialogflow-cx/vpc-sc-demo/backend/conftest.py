@@ -17,6 +17,9 @@
 import json
 from urllib.parse import urlparse
 
+import flask
+import pytest
+
 MOCK_DOMAIN = "MOCK_DOMAIN."
 
 
@@ -59,3 +62,12 @@ def assert_response_ep(
     if response is not None:
         for curr_response in return_value.response:
             assert curr_response.decode() == response
+
+
+@pytest.fixture(scope="function")
+def app(request):
+    """Fixture for tests on session blueprint."""
+    curr_app = flask.Flask(__name__)
+    curr_app.register_blueprint(request.param)
+    curr_app.config["TESTING"] = True
+    return curr_app
