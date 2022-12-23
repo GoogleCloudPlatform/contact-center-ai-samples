@@ -35,18 +35,17 @@ logger = logging.getLogger(__name__)
 
 @update.route('/update_webhook_access', methods=['POST'])
 def update_webhook_access():
-  logger.info('update_webhook_access:')
   token_dict = get_token.get_token(flask.request, token_type='access_token')
   if 'response' in token_dict:
     return token_dict['response']
   token = token_dict['access_token']
+  project_id = flask.request.args.get('project_id', None)
+  if not project_id:
+    return flask.Response(status=200, response=json.dumps({'status':'BLOCKED', 'reason':'NO_PROJECT_ID'}))
 
   content = flask.request.get_json(silent=True)
   internal_only = content['status']
 
-  project_id = flask.request.args.get('project_id', None)
-  if not project_id:
-    return flask.Response(status=200, response=json.dumps({'status':'BLOCKED', 'reason':'NO_PROJECT_ID'})) 
   region = flask.request.args['region']
   webhook_name = flask.request.args['webhook_name']
 
@@ -99,10 +98,10 @@ def update_webhook_ingress():
   if 'response' in token_dict:
     return token_dict['response']
   token = token_dict['access_token']
-
   project_id = flask.request.args.get('project_id', None)
   if not project_id:
     return flask.Response(status=200, response=json.dumps({'status':'BLOCKED', 'reason':'NO_PROJECT_ID'})) 
+
   region = flask.request.args['region']
   webhook_name = flask.request.args['webhook_name']
 
@@ -138,15 +137,14 @@ def update_webhook_ingress():
 
 @update.route('/update_security_perimeter_cloudfunctions', methods=['POST'])
 def update_security_perimeter_cloudfunctions():
-  logger.info('update_security_perimeter_cloudfunctions:')
   token_dict = get_token.get_token(flask.request, token_type='access_token')
   if 'response' in token_dict:
     return token_dict['response']
   token = token_dict['access_token']
-
   project_id = flask.request.args.get('project_id', None)
   if not project_id:
     return flask.Response(status=200, response=json.dumps({'status':'BLOCKED', 'reason':'NO_PROJECT_ID'})) 
+
   access_policy_title = flask.request.args['access_policy_title']
   response = su.get_access_policy_name(token, access_policy_title, project_id)
   if 'response' in response:
@@ -160,15 +158,14 @@ def update_security_perimeter_cloudfunctions():
 
 @update.route('/update_security_perimeter_dialogflow', methods=['POST'])
 def update_security_perimeter_dialogflow():
-  logger.info('update_security_perimeter_dialogflow:')
   token_dict = get_token.get_token(flask.request, token_type='access_token')
   if 'response' in token_dict:
     return token_dict['response']
   token = token_dict['access_token']
-
   project_id = flask.request.args.get('project_id', None)
   if not project_id:
     return flask.Response(status=200, response=json.dumps({'status':'BLOCKED', 'reason':'NO_PROJECT_ID'})) 
+
   access_policy_title = flask.request.args['access_policy_title']
   response = su.get_access_policy_name(token, access_policy_title, project_id)
   if 'response' in response:
@@ -181,11 +178,13 @@ def update_security_perimeter_dialogflow():
 
 @update.route('/update_service_directory_webhook_fulfillment', methods=['POST'])
 def update_service_directory_webhook_fulfillment():
-  logger.info(f'/update_service_directory_webhook_fulfillment:')
   token_dict = get_token.get_token(flask.request, token_type='access_token')
   if 'response' in token_dict:
     return token_dict['response']
   token = token_dict['access_token']
+  project_id = flask.request.args.get('project_id', None)
+  if not project_id:
+    return flask.Response(status=200, response=json.dumps({'status':'BLOCKED', 'reason':'NO_PROJECT_ID'})) 
 
   content = flask.request.get_json(silent=True)
   if content['status'] == True:
@@ -193,9 +192,6 @@ def update_service_directory_webhook_fulfillment():
   else:
     fulfillment = 'generic-web-service'
 
-  project_id = flask.request.args.get('project_id', None)
-  if not project_id:
-    return flask.Response(status=200, response=json.dumps({'status':'BLOCKED', 'reason':'NO_PROJECT_ID'})) 
   bucket = flask.request.args['bucket']
   region = flask.request.args['region']
   webhook_name = flask.request.args['webhook_name']

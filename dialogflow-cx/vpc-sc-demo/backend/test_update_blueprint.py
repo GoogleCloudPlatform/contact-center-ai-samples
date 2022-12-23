@@ -35,12 +35,15 @@ def app():
 def get_result(
     curr_app,
     endpoint,
+    json_data=None,
 ):
     """Helper function to get result from a test client."""
+    json_data = {} if json_data is None else json_data
     with curr_app.test_client() as curr_client:
         return curr_client.post(
             endpoint,
             base_url=f"https://{MOCK_DOMAIN}",
+            json=json_data,
         )
 
 
@@ -62,4 +65,12 @@ def test_endpoints_bad_token(get_token_mock, app, endpoint):  # pylint: disable=
     return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
     get_token_mock.assert_called_once()
-    
+
+
+@patch.object(get_token, 'get_token', return_value={'access_token': 'MOCK_ACCESS_TOKEN'})
+def test_update_webhook_access(mock_get_token, app):
+    """Test /update_webhook_access,"""
+    endpoint = "/update_webhook_access"
+    return_value = get_result(app, endpoint,json_data={'status': True})
+    print(return_value)
+
