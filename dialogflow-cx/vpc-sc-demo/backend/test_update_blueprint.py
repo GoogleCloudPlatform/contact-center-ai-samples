@@ -14,63 +14,174 @@
 
 """Tests for update_blueprint.py."""
 
-import flask
-import pytest
 from mock import patch
+import pytest
+import requests
 
-from conftest import assert_response_ep as assert_response, MOCK_DOMAIN
-import get_token
+from conftest import assert_response_ep as assert_response, MOCK_DOMAIN, MockReturnObject
+import status_utilities as su
 from update_blueprint import update as blueprint
 
 
-@pytest.fixture
-def app():
-    """Fixture for tests on session blueprint."""
-    curr_app = flask.Flask(__name__)
-    curr_app.register_blueprint(blueprint)
-    curr_app.config["TESTING"] = True
-    return curr_app
-
-
 def get_result(
-    curr_app,
+    app,
     endpoint,
     json_data=None,
+    query_string=None,
 ):
     """Helper function to get result from a test client."""
     json_data = {} if json_data is None else json_data
-    with curr_app.test_client() as curr_client:
+    query_string = {} if query_string is None else query_string
+    with app.test_client() as curr_client:
         return curr_client.post(
             endpoint,
             base_url=f"https://{MOCK_DOMAIN}",
             json=json_data,
+            query_string=query_string,
         )
 
 
+@pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "endpoint",
+    "app,endpoint",
     [
-        "/update_webhook_access",
-        "/update_webhook_ingress",
-        "/update_security_perimeter_cloudfunctions",
-        "/update_security_perimeter_dialogflow",
-        "/update_service_directory_webhook_fulfillment",
+        (blueprint, "/update_webhook_access"),
+        (blueprint, "/update_webhook_ingress"),
+        (blueprint, "/update_security_perimeter_cloudfunctions"),
+        (blueprint, "/update_security_perimeter_dialogflow"),
+        (blueprint, "/update_service_directory_webhook_fulfillment"),
     ],
+    indirect=["app"],
 )
 @patch.object(
-    get_token, "get_token", return_value={"response": "MOCK_RESPONSE"}
+    su, "get_token_and_project", return_value={"response": "MOCK_RESPONSE"}
 )
-def test_endpoints_bad_token(get_token_mock, app, endpoint):  # pylint: disable=redefined-outer-name
+def test_endpoints_bad_token(get_token_mock, app, endpoint):
     """Test endpoints, bad token"""
     return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
     get_token_mock.assert_called_once()
 
 
-@patch.object(get_token, 'get_token', return_value={'access_token': 'MOCK_ACCESS_TOKEN'})
-def test_update_webhook_access(mock_get_token, app):
-    """Test /update_webhook_access,"""
-    endpoint = "/update_webhook_access"
-    return_value = get_result(app, endpoint,json_data={'status': True})
-    print(return_value)
+@pytest.mark.hermetic
+@pytest.mark.parametrize('app,endpoint', [
+    (blueprint,'/update_webhook_access'),
+    (blueprint,'/update_webhook_ingress'),
+], indirect=['app'])
+@patch.object(
+    su,
+    "get_token_and_project",
+    return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
+)
+@patch.object(
+    requests,
+    "get",
+    return_value=MockReturnObject(500, "MOCK_RESPONSE"),
+)
+def test_update_webhook_access_cloudfunctions_error(
+    mock_requests,
+    mock_get_token,
+    app,
+    endpoint
+):
+    """Test update_webhook endpoints, bad cloudfunctions api access."""
+    return_value = get_result(app,
+        endpoint,
+        json_data={'status': True},
+        query_string={
+            "region": "MOCK_REGION",
+            'webhook_name': 'MOCK_WEBHOOK_NAME',
+        }
+    )
+    assert_response(return_value, 500, endpoint, '"MOCK_RESPONSE"')
+    mock_get_token.assert_called_once()
+    mock_requests.assert_called_once()
 
+
+@pytest.mark.hermetic
+@pytest.mark.parametrize('app,policy_dict,status', [
+    (blueprint, {}, True),
+    (blueprint, {'bindings':[]}, True),
+    (blueprint, {'bindings':[{'role': "MOCK_ROLE", 'members':['allUsers']}]}, True),
+    (blueprint, {'bindings':[{'role': "roles/cloudfunctions.invoker", 'members':['MOCK_USER']}]}, True),
+    (blueprint, {'bindings':[{'role': "roles/cloudfunctions.invoker", 'members':['allUsers']}]}, False),
+], indirect=['app'])
+@patch.object(
+    su,
+    "get_token_and_project",
+    return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
+)
+def test_update_webhook_access_no_change_needed(
+    mock_get_token,
+    app,
+    policy_dict,
+    status,
+):
+    "Test update_webhook_access, no change needed."
+    endpoint = '/update_webhook_access'
+    with patch.object(
+        requests,
+        "get",
+        return_value=MockReturnObject(200, policy_dict)
+    ):
+        return_value = get_result(app,
+            endpoint,
+            json_data={'status': status},
+            query_string={
+                "region": "MOCK_REGION",
+                'webhook_name': 'MOCK_WEBHOOK_NAME',
+            }
+        )
+    assert_response(return_value, 200, endpoint)
+    mock_get_token.assert_called_once()
+
+
+@pytest.mark.hermetic
+@pytest.mark.parametrize('app,policy_dict,status,post_return_code', [
+    (blueprint, {}, False, 500),
+    (blueprint, {'bindings':[]}, False, 500),
+    (blueprint, {'bindings':[{'role': "MOCK_ROLE", 'members':['allUsers']}]}, False, 500),
+    (blueprint, {'bindings':[{'role': "roles/cloudfunctions.invoker", 'members':['MOCK_USER']}]}, False, 500),
+    (blueprint, {'bindings':[{'role': "roles/cloudfunctions.invoker", 'members':['allUsers']}]}, True, 500),
+    (blueprint, {}, False, 200),
+    (blueprint, {'bindings':[]}, False, 200),
+    (blueprint, {'bindings':[{'role': "MOCK_ROLE", 'members':['allUsers']}]}, False, 200),
+    (blueprint, {'bindings':[{'role': "roles/cloudfunctions.invoker", 'members':['MOCK_USER']}]}, False, 200),
+    (blueprint, {'bindings':[{'role': "roles/cloudfunctions.invoker", 'members':['allUsers']}]}, True, 200),
+], indirect=['app'])
+@patch.object(
+    su,
+    "get_token_and_project",
+    return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
+)
+def test_update_webhook_access_change_needed_internal_true_post_error(
+    mock_get_token,
+    app,
+    policy_dict,
+    status,
+    post_return_code,
+):
+    "Test update_webhook_access, change requests and currently internal post error."
+    endpoint = '/update_webhook_access'
+    with patch.object(
+        requests,
+        "get",
+        return_value=MockReturnObject(200, policy_dict)
+    ) as mock_request_get:
+        with patch.object(
+            requests,
+            "post",
+            return_value=MockReturnObject(post_return_code, 'MOCK_RESPONSE'),
+        ) as mock_request_post:
+            return_value = get_result(app,
+                endpoint,
+                json_data={'status': status},
+                query_string={
+                    "region": "MOCK_REGION",
+                    'webhook_name': 'MOCK_WEBHOOK_NAME',
+                }
+            )
+    assert_response(return_value, post_return_code, endpoint, '"MOCK_RESPONSE"')
+    mock_get_token.assert_called_once()
+    mock_request_post.assert_called_once()
+    mock_request_get.assert_called_once()

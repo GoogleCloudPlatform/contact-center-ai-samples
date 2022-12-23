@@ -25,21 +25,13 @@ from mock import patch
 from session_blueprint import session
 
 
-@pytest.fixture
-def app():
-    """Fixture for tests on session blueprint."""
-    curr_app = flask.Flask(__name__)
-    curr_app.register_blueprint(blueprint)
-    curr_app.config["TESTING"] = True
-    return curr_app
-
-
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "project_id,status_code,expected,token_dict,valid",
+    "app,project_id,status_code,expected,token_dict,valid",
     [
-        (None, 200, {"status": False}, {}, None),
+        (blueprint, None, 200, {"status": False}, {}, None),
         (
+            blueprint,
             "MOCK_PROJECT_ID",
             0,
             {"MOCK_KEY": "MOCK_VAL"},
@@ -51,6 +43,7 @@ def app():
             None,
         ),
         (
+            blueprint,
             "MOCK_PROJECT_ID",
             200,
             {"status": False},
@@ -58,6 +51,7 @@ def app():
             False,
         ),
         (
+            blueprint,
             "MOCK_PROJECT_ID",
             200,
             {"status": True},
@@ -65,8 +59,9 @@ def app():
             True,
         ),
     ],
+    indirect=["app"],
 )
-def test_validate_project_id(  # pylint: disable=too-many-arguments,redefined-outer-name
+def test_validate_project_id(  # pylint: disable=too-many-arguments
     app,
     project_id,
     status_code,
@@ -97,7 +92,8 @@ def test_validate_project_id(  # pylint: disable=too-many-arguments,redefined-ou
 
 
 @pytest.mark.hermetic
-def test_get_principal_notoken(app):  # pylint: disable=redefined-outer-name
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
+def test_get_principal_notoken(app):
     """Test /get_principal endpoint."""
     endpoint = "/get_principal"
     app.register_blueprint(session)
@@ -113,7 +109,8 @@ def test_get_principal_notoken(app):  # pylint: disable=redefined-outer-name
 
 
 @pytest.mark.hermetic
-def test_get_principal(app):  # pylint: disable=redefined-outer-name
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
+def test_get_principal(app):
     """Test /get_principal endpoint."""
     endpoint = "/get_principal"
     mock_email = "MOCK_EMAIL"

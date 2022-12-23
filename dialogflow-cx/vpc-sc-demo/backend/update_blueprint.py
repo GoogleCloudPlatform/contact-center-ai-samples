@@ -35,19 +35,14 @@ logger = logging.getLogger(__name__)
 
 @update.route('/update_webhook_access', methods=['POST'])
 def update_webhook_access():
-  token_dict = get_token.get_token(flask.request, token_type='access_token')
-  if 'response' in token_dict:
-    return token_dict['response']
-  token = token_dict['access_token']
-  project_id = flask.request.args.get('project_id', None)
-  if not project_id:
-    return flask.Response(status=200, response=json.dumps({'status':'BLOCKED', 'reason':'NO_PROJECT_ID'}))
-
+  data = su.get_token_and_project(flask.request)
+  if "response" in data:
+      return data["response"]
+  project_id, token = data["project_id"], data["token"]
+  region = flask.request.args["region"]
+  webhook_name = flask.request.args['webhook_name']
   content = flask.request.get_json(silent=True)
   internal_only = content['status']
-
-  region = flask.request.args['region']
-  webhook_name = flask.request.args['webhook_name']
 
   headers = {}
   headers["x-goog-user-project"] = project_id
@@ -55,24 +50,24 @@ def update_webhook_access():
   r = requests.get(f'https://cloudfunctions.googleapis.com/v2/projects/{project_id}/locations/{region}/functions/{webhook_name}:getIamPolicy', headers=headers)
   if r.status_code != 200:
     logger.info(f'  cloudfunctions API rejected getIamPolicy GET request: {r.text}')
-    return flask.abort(r.status_code)
+    return flask.Response(status=r.status_code, response=r.text)
+
   policy_dict = r.json()
   allUsers_is_invoker_member = False
   for binding in policy_dict.get('bindings', []):
-    for member in binding.get('members', []):
+    for member in binding['members']:
       if member == "allUsers" and binding['role'] == "roles/cloudfunctions.invoker":
         allUsers_is_invoker_member = True
   if (
     (not internal_only and allUsers_is_invoker_member) or 
     ((internal_only) and (not allUsers_is_invoker_member))
   ):
-    logger.info(f'  internal_only matches request; no change needed')
-    logger.info(f'  internal_only ({internal_only}) matches request; no change needed')
+    # internal_only matches request; no change needed
     return flask.Response(status=200)
 
   if internal_only:
     for binding in policy_dict.get('bindings', []):
-      for member in binding.get('members', []):
+      for member in binding['members']:
         if binding['role'] == "roles/cloudfunctions.invoker":
           binding['members'] = [member for member in binding['members'] if member != 'allUsers']
   else:
@@ -88,30 +83,19 @@ def update_webhook_access():
   r = requests.post(f'https://cloudfunctions.googleapis.com/v1/projects/{project_id}/locations/{region}/functions/{webhook_name}:setIamPolicy', headers=headers, json={'policy':policy_dict})
   if r.status_code != 200:
     logger.info(f'  cloudfunctions API rejected setIamPolicy POST request: {r.text}')
-    return flask.abort(r.status_code)
+    return flask.Response(status=r.status_code, response=r.text)
   return flask.Response(status=200)
 
 
 @update.route('/update_webhook_ingress', methods=['POST'])
 def update_webhook_ingress():
-  token_dict = get_token.get_token(flask.request, token_type='access_token')
-  if 'response' in token_dict:
-    return token_dict['response']
-  token = token_dict['access_token']
-  project_id = flask.request.args.get('project_id', None)
-  if not project_id:
-    return flask.Response(status=200, response=json.dumps({'status':'BLOCKED', 'reason':'NO_PROJECT_ID'})) 
-
-  region = flask.request.args['region']
+  data = su.get_token_and_project(flask.request)
+  if "response" in data:
+      return data["response"]
+  project_id, token = data["project_id"], data["token"]
+  region = flask.request.args["region"]
   webhook_name = flask.request.args['webhook_name']
-
   content = flask.request.get_json(silent=True)
-  internal_only = content['status']
-  if internal_only:
-    ingress_settings = "ALLOW_INTERNAL_ONLY"
-  else:
-    ingress_settings = "ALLOW_ALL"
-  logger.info(f'  internal_only: {internal_only}')
 
   headers = {}
   headers['Content-type'] = 'application/json'
@@ -121,7 +105,9 @@ def update_webhook_ingress():
   if r.status_code != 200:
     logger.info(f'  cloudfunctions API rejected GET request: {r.text}')
     return flask.Response(status=r.status_code, response=r.text)
+
   webhook_data = r.json()
+  ingress_settings = "ALLOW_INTERNAL_ONLY" if content['status'] else "ALLOW_ALL"
   if webhook_data['ingressSettings'] == ingress_settings:
     return flask.Response(status=200)
   
@@ -137,13 +123,10 @@ def update_webhook_ingress():
 
 @update.route('/update_security_perimeter_cloudfunctions', methods=['POST'])
 def update_security_perimeter_cloudfunctions():
-  token_dict = get_token.get_token(flask.request, token_type='access_token')
-  if 'response' in token_dict:
-    return token_dict['response']
-  token = token_dict['access_token']
-  project_id = flask.request.args.get('project_id', None)
-  if not project_id:
-    return flask.Response(status=200, response=json.dumps({'status':'BLOCKED', 'reason':'NO_PROJECT_ID'})) 
+  data = su.get_token_and_project(flask.request)
+  if "response" in data:
+      return data["response"]
+  project_id, token = data["project_id"], data["token"]
 
   access_policy_title = flask.request.args['access_policy_title']
   response = su.get_access_policy_name(token, access_policy_title, project_id)
@@ -158,13 +141,10 @@ def update_security_perimeter_cloudfunctions():
 
 @update.route('/update_security_perimeter_dialogflow', methods=['POST'])
 def update_security_perimeter_dialogflow():
-  token_dict = get_token.get_token(flask.request, token_type='access_token')
-  if 'response' in token_dict:
-    return token_dict['response']
-  token = token_dict['access_token']
-  project_id = flask.request.args.get('project_id', None)
-  if not project_id:
-    return flask.Response(status=200, response=json.dumps({'status':'BLOCKED', 'reason':'NO_PROJECT_ID'})) 
+  data = su.get_token_and_project(flask.request)
+  if "response" in data:
+      return data["response"]
+  project_id, token = data["project_id"], data["token"]
 
   access_policy_title = flask.request.args['access_policy_title']
   response = su.get_access_policy_name(token, access_policy_title, project_id)
@@ -178,13 +158,11 @@ def update_security_perimeter_dialogflow():
 
 @update.route('/update_service_directory_webhook_fulfillment', methods=['POST'])
 def update_service_directory_webhook_fulfillment():
-  token_dict = get_token.get_token(flask.request, token_type='access_token')
-  if 'response' in token_dict:
-    return token_dict['response']
-  token = token_dict['access_token']
-  project_id = flask.request.args.get('project_id', None)
-  if not project_id:
-    return flask.Response(status=200, response=json.dumps({'status':'BLOCKED', 'reason':'NO_PROJECT_ID'})) 
+  data = su.get_token_and_project(flask.request)
+  if "response" in data:
+      return data["response"]
+  project_id, token = data["project_id"], data["token"]
+  region = flask.request.args["region"]
 
   content = flask.request.get_json(silent=True)
   if content['status'] == True:

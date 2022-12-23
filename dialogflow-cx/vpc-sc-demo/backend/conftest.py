@@ -17,7 +17,9 @@
 import json
 from urllib.parse import urlparse
 
+import flask
 import pytest
+from werkzeug.test import EnvironBuilder
 
 MOCK_DOMAIN = "MOCK_DOMAIN."
 
@@ -67,3 +69,19 @@ def assert_response_ep(
 def lru_fixture():
     """Fixture function for testing LruCache."""
     return lambda x: x
+
+
+@pytest.fixture(scope="function")
+def app(request):
+    """Fixture for tests on session blueprint."""
+    curr_app = flask.Flask(__name__)
+    curr_app.register_blueprint(request.param)
+    curr_app.config["TESTING"] = True
+    return curr_app
+
+
+@pytest.fixture
+def mock_request():
+    """Mock request for testing functions that take a request as an arg."""
+    builder = EnvironBuilder()
+    return builder.get_request()

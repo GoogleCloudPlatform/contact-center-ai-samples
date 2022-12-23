@@ -17,7 +17,6 @@
 import json
 
 import asset_utilities as au
-import flask
 import get_token
 import pytest
 from asset_blueprint import ACCESS_POLICY_RESOURCE, asset as blueprint
@@ -25,23 +24,14 @@ from conftest import assert_response_ep as assert_response, MOCK_DOMAIN
 from mock import patch
 
 
-@pytest.fixture
-def app():
-    """Fixture for tests on session blueprint."""
-    curr_app = flask.Flask(__name__)
-    curr_app.register_blueprint(blueprint)
-    curr_app.config["TESTING"] = True
-    return curr_app
-
-
 def get_result(
-    curr_app,
+    app,
     endpoint,
     method="get",
     json_data=None,
 ):
     """Helper function to get result from a test client."""
-    with curr_app.test_client() as curr_client:
+    with app.test_client() as curr_client:
         fcn = curr_client.get if method == "get" else curr_client.post
         kwargs = {
             "query_string": {
@@ -60,15 +50,14 @@ def get_result(
 
 
 @pytest.mark.parametrize(
-    "endpoint,how",
+    "app,endpoint,how",
     [
-        ("/asset_status", "get"),
-        ("/update_target", "post"),
+        (blueprint, "/asset_status", "get"),
+        (blueprint, "/update_target", "post"),
     ],
+    indirect=["app"],
 )
-def test_asset_status_bad_token(
-    app, endpoint, how
-):  # pylint: disable=redefined-outer-name
+def test_asset_status_bad_token(app, endpoint, how):
     """Test /asset_status, bad token"""
     with patch.object(
         get_token, "get_token", return_value={"response": "MOCK_RESPONSE"}
@@ -85,7 +74,8 @@ def test_asset_status_bad_token(
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
-def test_asset_status_init_exit(app):  # pylint: disable=redefined-outer-name
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
+def test_asset_status_init_exit(app):
     """Test /asset_status, init had nonzero return value."""
     endpoint = "/asset_status"
     with patch.object(
@@ -96,7 +86,8 @@ def test_asset_status_init_exit(app):  # pylint: disable=redefined-outer-name
     assert_response(return_value, 200, endpoint, "MOCK_INIT")
 
 
-def test_asset_status_plan_exit(app):  # pylint: disable=redefined-outer-name
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
+def test_asset_status_plan_exit(app):
     """Test /asset_status, tf_plan has nonzero return"""
     endpoint = "/asset_status"
     with patch.object(
@@ -110,7 +101,8 @@ def test_asset_status_plan_exit(app):  # pylint: disable=redefined-outer-name
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
-def test_asset_status_access_policy_err(app):  # pylint: disable=redefined-outer-name
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
+def test_asset_status_access_policy_err(app):
     """Test /asset_status, error in get_access_policy_title"""
     endpoint = "/asset_status"
     with patch.object(
@@ -141,9 +133,10 @@ def test_asset_status_access_policy_err(app):  # pylint: disable=redefined-outer
 
 
 @pytest.mark.parametrize(
-    "mock_policy,tf_state_list_err,expected",
+    "app, mock_policy,tf_state_list_err,expected",
     [
         (
+            blueprint,
             False,
             False,
             json.dumps(
@@ -155,8 +148,9 @@ def test_asset_status_access_policy_err(app):  # pylint: disable=redefined-outer
                 }
             ),
         ),
-        (False, True, "MOCK_RESPONSE"),
+        (blueprint, False, True, "MOCK_RESPONSE"),
         (
+            blueprint,
             True,
             False,
             json.dumps(
@@ -168,13 +162,14 @@ def test_asset_status_access_policy_err(app):  # pylint: disable=redefined-outer
                 }
             ),
         ),
-        (True, True, "MOCK_RESPONSE"),
+        (blueprint, True, True, "MOCK_RESPONSE"),
     ],
+    indirect=["app"],
 )
 @patch.object(au, "tf_init", return_value=None)
 def test_asset_status(
     mock_tf_init,
-    app,  # pylint: disable=redefined-outer-name
+    app,
     mock_policy,
     tf_state_list_err,
     expected,
@@ -221,40 +216,46 @@ def test_asset_status(
 
 
 @pytest.mark.parametrize(
-    "json_data,call_count,apply_return_value,state",
+    "app,json_data,call_count,apply_return_value,state",
     [
-        ({"destroy": False}, 1, None, {"response": "MOCK_RESPONSE"}),
+        (blueprint, {"destroy": False}, 1, None, {"response": "MOCK_RESPONSE"}),
         (
+            blueprint,
             {"destroy": False, "targets": ["all"]},
             1,
             None,
             {"response": "MOCK_RESPONSE"},
         ),
         (
+            blueprint,
             {"destroy": False, "targets": ["MOCK_TARGET"]},
             1,
             None,
             {"response": "MOCK_RESPONSE"},
         ),
         (
+            blueprint,
             {"destroy": False, "targets": ["MOCK_TARGET_1", "MOCK_TARGET_2"]},
             2,
             "MOCK_APPLY_RETURN_VALUE",
             {"response": "MOCK_RESPONSE"},
         ),
         (
+            blueprint,
             {"destroy": False, "targets": ["MOCK_TARGET_1", "MOCK_TARGET_2"]},
             2,
             None,
             {"response": "MOCK_RESPONSE"},
         ),
         (
+            blueprint,
             {"destroy": False, "targets": ["MOCK_TARGET_1", "MOCK_TARGET_2"]},
             2,
             None,
             {"resources": ["MOCK_RESOURCE"]},
         ),
     ],
+    indirect=["app"],
 )
 @patch.object(au, "tf_init", return_value=None)
 @patch.object(au, "tf_plan", return_value=None)
@@ -265,7 +266,7 @@ def test_update_target(  # pylint: disable=too-many-arguments
     mock_get_token,
     mock_tf_plan,
     mock_tf_init,
-    app,  # pylint: disable=redefined-outer-name
+    app,
     json_data,
     call_count,
     apply_return_value,
@@ -302,10 +303,11 @@ def test_update_target(  # pylint: disable=too-many-arguments
     get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
 )
 @patch.object(au, "tf_init", return_value="MOCK_RESPONSE")
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_update_target_bad_init(
     mock_tf_init,
     mock_get_token,
-    app,  # pylint: disable=redefined-outer-name
+    app,
 ):
     """test /update_target, tf_init has non-zero return value."""
     endpoint = "/update_target"
@@ -325,11 +327,12 @@ def test_update_target_bad_init(
 )
 @patch.object(au, "tf_init", return_value=None)
 @patch.object(au, "tf_plan", return_value={"response": "MOCK_RESPONSE"})
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_update_target_bad_plan(
     mock_tf_plan,
     mock_tf_init,
     mock_get_token,
-    app,  # pylint: disable=redefined-outer-name
+    app,
 ):
     """test /update_target, tf_plan has non-zero return value."""
     endpoint = "/update_target"
