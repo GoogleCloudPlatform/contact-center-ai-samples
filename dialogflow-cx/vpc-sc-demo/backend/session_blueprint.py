@@ -74,5 +74,7 @@ def logout():
         su.login_landing_uri(flask.request, query_params=flask.request.args)
     )
     response.delete_cookie("session_id", domain=su.user_service_domain(flask.request))
-    response.delete_cookie("user_logged_in", domain=su.user_service_domain(flask.request))
+    response.delete_cookie(
+        "user_logged_in", domain=su.user_service_domain(flask.request)
+    )
     return response

@@ -24,13 +24,13 @@ from session_blueprint import DEBUG_DOMAIN
 from session_blueprint import session as blueprint
 
 
-@patch.dict(os.environ, {"PROD": 'true'})
+@patch.dict(os.environ, {"PROD": "true"})
 def test_is_prod_true():
     """Test is_prod indicator, True"""
     assert su.is_prod()
 
 
-@patch.dict(os.environ, {"PROD": ''})
+@patch.dict(os.environ, {"PROD": ""})
 def test_is_prod_false():
     """Test is_prod indicator, False"""
     assert not su.is_prod()
@@ -43,7 +43,7 @@ def test_is_prod_false():
         (blueprint, "http://localhost:5001/", f"http://{DEBUG_DOMAIN}:3000", "", {}),
         (blueprint, "http://localhost:8081/", f"http://{DEBUG_DOMAIN}:8080", "", {}),
         (
-            blueprint, 
+            blueprint,
             "https://MOCK_PRODUCTION_DOMAIN/",
             "https://MOCK_PRODUCTION_DOMAIN",
             "true",
@@ -57,7 +57,7 @@ def test_is_prod_false():
             {"MOCK_KEY": "MOCK_VAL"},
         ),
     ],
-    indirect=['app'],
+    indirect=["app"],
 )
 def test_login_landing_uri_local(
     app,
@@ -65,7 +65,6 @@ def test_login_landing_uri_local(
     landing_uri,
     prod,
     query_params,
-    
 ):
     """Test login_landing_uri_local."""
     with patch.dict(os.environ, {"PROD": prod}):
@@ -79,7 +78,12 @@ def test_login_landing_uri_local(
     [
         (blueprint, "http://localhost:5001/", "", "user-service.localhost"),
         (blueprint, "http://localhost:8081/", "", "user-service.localhost"),
-        (blueprint, "https://MOCK_PRODUCTION_DOMAIN/", "true", "mock_production_domain"),
+        (
+            blueprint,
+            "https://MOCK_PRODUCTION_DOMAIN/",
+            "true",
+            "mock_production_domain",
+        ),
     ],
     indirect=["app"],
 )

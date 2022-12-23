@@ -64,7 +64,7 @@ def assert_response_ep(
             assert curr_response.decode() == response
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def app(request):
     """Fixture for tests on session blueprint."""
     curr_app = flask.Flask(__name__)

@@ -53,11 +53,9 @@ def assert_response(
         (blueprint, "/restricted_services_status_dialogflow"),
         (blueprint, "/service_directory_webhook_fulfillment_status"),
     ],
-    indirect=['app'],
+    indirect=["app"],
 )
-def test_restricted_services_status_bad_token(
-    app, endpoint
-):
+def test_restricted_services_status_bad_token(app, endpoint):
     """Test restricted services status, bad token."""
     with patch.object(
         get_token, "get_token", return_value={"response": "MOCK_RESPONSE"}
@@ -77,11 +75,9 @@ def test_restricted_services_status_bad_token(
         (blueprint, "/restricted_services_status_dialogflow"),
         (blueprint, "/service_directory_webhook_fulfillment_status"),
     ],
-    indirect=['app'],
+    indirect=["app"],
 )
-def test_restricted_services_status_no_project(
-    app, endpoint
-):
+def test_restricted_services_status_no_project(app, endpoint):
     """Test restricted services status, no project."""
     with patch.object(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
@@ -126,11 +122,9 @@ def get_result(
         (blueprint, "/restricted_services_status_cloudfunctions"),
         (blueprint, "/restricted_services_status_dialogflow"),
     ],
-    indirect=['app'],
+    indirect=["app"],
 )
-def test_restricted_services_status_no_policy(
-    app, endpoint
-):
+def test_restricted_services_status_no_policy(app, endpoint):
     """Test restricted services status, no policy."""
     with patch.object(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
@@ -149,11 +143,9 @@ def test_restricted_services_status_no_policy(
         (blueprint, "/restricted_services_status_cloudfunctions"),
         (blueprint, "/restricted_services_status_dialogflow"),
     ],
-    indirect=['app'],
+    indirect=["app"],
 )
-def test_restricted_services_status_restricted(
-    app, endpoint
-):
+def test_restricted_services_status_restricted(app, endpoint):
     """Test restricted services status, restricted."""
     with patch.object(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
@@ -176,14 +168,16 @@ def test_restricted_services_status_restricted(
 @pytest.mark.parametrize(
     "app, endpoint,status_key",
     [
-        (blueprint, "/restricted_services_status_cloudfunctions", "cloudfunctions_restricted"),
+        (
+            blueprint,
+            "/restricted_services_status_cloudfunctions",
+            "cloudfunctions_restricted",
+        ),
         (blueprint, "/restricted_services_status_dialogflow", "dialogflow_restricted"),
     ],
-    indirect=['app'],
+    indirect=["app"],
 )
-def test_restricted_services_status_cloudfunctions_success(
-    app, endpoint, status_key
-):
+def test_restricted_services_status_cloudfunctions_success(app, endpoint, status_key):
     """Test restricted services status, success."""
     with patch.object(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
@@ -209,7 +203,7 @@ def test_restricted_services_status_cloudfunctions_success(
         (blueprint, "/webhook_ingress_internal_only_status"),
         (blueprint, "/webhook_access_allow_unauthenticated_status"),
     ],
-    indirect=['app']
+    indirect=["app"],
 )
 def test_webhook_no_function(app, endpoint):
     """Test webhook, function does not exist"""
@@ -226,7 +220,7 @@ def test_webhook_no_function(app, endpoint):
 
 
 @pytest.mark.hermetic
-@pytest.mark.parametrize('app',[blueprint], indirect=['app'])
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_webhook_ingress_internal_only_status_api_error(
     app,
 ):
@@ -251,11 +245,9 @@ def test_webhook_ingress_internal_only_status_api_error(
         (blueprint, "ALLOW_ALL", False),
         (blueprint, "ALLOW_INTERNAL_AND_GCLB", True),
     ],
-    indirect=['app'],
+    indirect=["app"],
 )
-def test_webhook_ingress_internal_only_status_success(
-    app, ingress_settings, status
-):
+def test_webhook_ingress_internal_only_status_success(app, ingress_settings, status):
     """Test /webhook_ingress_internal_only_status, success."""
     endpoint = "/webhook_ingress_internal_only_status"
     with patch.object(
@@ -337,7 +329,7 @@ def test_webhook_ingress_internal_only_status_success(
         ),
         (blueprint, 500, {}, None, 500),
     ],
-    indirect=['app'],
+    indirect=["app"],
 )
 def test_webhook_access_allow_unauthenticated_status_api_error(
     app,
@@ -373,7 +365,8 @@ def test_webhook_access_allow_unauthenticated_status_api_error(
         (blueprint, {}, True),
         (blueprint, {"bindings": []}, True),
         (blueprint, {"bindings": [{"members": []}]}, True),
-        (blueprint, 
+        (
+            blueprint,
             {
                 "bindings": [
                     {"members": ["allUsers"], "role": "roles/cloudfunctions.invoker"}
@@ -381,9 +374,13 @@ def test_webhook_access_allow_unauthenticated_status_api_error(
             },
             False,
         ),
-        (blueprint, {"bindings": [{"members": ["allUsers"], "role": "MOCK_ROLE"}]}, True),
+        (
+            blueprint,
+            {"bindings": [{"members": ["allUsers"], "role": "MOCK_ROLE"}]},
+            True,
+        ),
     ],
-    indirect=['app']
+    indirect=["app"],
 )
 def test_webhook_access_allow_unauthenticated_status_success(
     app,
@@ -433,7 +430,7 @@ def test_webhook_access_allow_unauthenticated_status_success(
             "BAD_REGION",
         ),
     ],
-    indirect=['app'],
+    indirect=["app"],
 )
 def test_service_directory_webhook_fulfillment_status_no_agent(
     app, return_value, expected, region
@@ -458,13 +455,15 @@ def test_service_directory_webhook_fulfillment_status_no_agent(
     "app,region,expected",
     [
         (blueprint, "us-central1", "MOCK_RESPONSE"),
-        (blueprint, "MOCK_REGION", json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"})),
+        (
+            blueprint,
+            "MOCK_REGION",
+            json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"}),
+        ),
     ],
-    indirect=['app'],
+    indirect=["app"],
 )
-def test_service_directory_webhook_fulfillment_status_no_webhook(
-    app, region, expected
-):
+def test_service_directory_webhook_fulfillment_status_no_webhook(app, region, expected):
     """Test /service_directory_webhook_fulfillment_status, no webhook"""
     endpoint = "/service_directory_webhook_fulfillment_status"
     with patch.object(
@@ -494,7 +493,7 @@ def test_service_directory_webhook_fulfillment_status_no_webhook(
         (blueprint, {}, {"status": False}, "us-central1"),
         (blueprint, {"serviceDirectory": "MOCK_DATA"}, {"status": True}, "us-central1"),
         (
-            blueprint, 
+            blueprint,
             {"serviceDirectory": "MOCK_DATA"},
             {
                 "status": "BLOCKED",
@@ -503,7 +502,7 @@ def test_service_directory_webhook_fulfillment_status_no_webhook(
             "MOCK_REGION",
         ),
     ],
-    indirect=['app'],
+    indirect=["app"],
 )
 def test_service_directory_webhook_fulfillment_status_success(
     app, webhook_dict, expected, region

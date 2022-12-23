@@ -24,7 +24,7 @@ from session_blueprint import session as blueprint
 
 
 @pytest.mark.hermetic
-@pytest.mark.parametrize('app',[blueprint], indirect=['app'])
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_session_route(app):
     """Test /session."""
     mock_domain = "MOCK_DOMAIN."
@@ -49,7 +49,7 @@ def test_session_route(app):
 
 
 @pytest.mark.hermetic
-@pytest.mark.parametrize('app',[blueprint], indirect=['app'])
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_logout_route(app):
     """Test /logout"""
     mock_domain = "MOCK_DOMAIN."

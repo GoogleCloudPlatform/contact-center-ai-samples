@@ -31,7 +31,7 @@ from session_blueprint import session
     [
         (blueprint, None, 200, {"status": False}, {}, None),
         (
-            blueprint, 
+            blueprint,
             "MOCK_PROJECT_ID",
             0,
             {"MOCK_KEY": "MOCK_VAL"},
@@ -43,7 +43,7 @@ from session_blueprint import session
             None,
         ),
         (
-            blueprint, 
+            blueprint,
             "MOCK_PROJECT_ID",
             200,
             {"status": False},
@@ -51,7 +51,7 @@ from session_blueprint import session
             False,
         ),
         (
-            blueprint, 
+            blueprint,
             "MOCK_PROJECT_ID",
             200,
             {"status": True},
@@ -59,7 +59,7 @@ from session_blueprint import session
             True,
         ),
     ],
-    indirect=['app'],
+    indirect=["app"],
 )
 def test_validate_project_id(  # pylint: disable=too-many-arguments
     app,
@@ -92,7 +92,7 @@ def test_validate_project_id(  # pylint: disable=too-many-arguments
 
 
 @pytest.mark.hermetic
-@pytest.mark.parametrize('app',[blueprint], indirect=['app'])
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_get_principal_notoken(app):
     """Test /get_principal endpoint."""
     endpoint = "/get_principal"
@@ -109,7 +109,7 @@ def test_get_principal_notoken(app):
 
 
 @pytest.mark.hermetic
-@pytest.mark.parametrize('app',[blueprint], indirect=['app'])
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_get_principal(app):
     """Test /get_principal endpoint."""
     endpoint = "/get_principal"

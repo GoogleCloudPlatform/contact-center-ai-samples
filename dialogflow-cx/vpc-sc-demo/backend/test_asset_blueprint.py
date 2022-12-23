@@ -59,9 +59,7 @@ def get_result(
     ],
     indirect=["app"],
 )
-def test_asset_status_bad_token(
-    app, endpoint, how
-):
+def test_asset_status_bad_token(app, endpoint, how):
     """Test /asset_status, bad token"""
     with patch.object(
         get_token, "get_token", return_value={"response": "MOCK_RESPONSE"}
@@ -78,7 +76,7 @@ def test_asset_status_bad_token(
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
-@pytest.mark.parametrize('app',[blueprint], indirect=['app'])
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_asset_status_init_exit(app):
     """Test /asset_status, init had nonzero return value."""
     endpoint = "/asset_status"
@@ -90,7 +88,7 @@ def test_asset_status_init_exit(app):
     assert_response(return_value, 200, endpoint, "MOCK_INIT")
 
 
-@pytest.mark.parametrize('app',[blueprint], indirect=['app'])
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_asset_status_plan_exit(app):
     """Test /asset_status, tf_plan has nonzero return"""
     endpoint = "/asset_status"
@@ -105,7 +103,7 @@ def test_asset_status_plan_exit(app):
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
-@pytest.mark.parametrize('app',[blueprint], indirect=['app'])
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_asset_status_access_policy_err(app):
     """Test /asset_status, error in get_access_policy_title"""
     endpoint = "/asset_status"
@@ -139,7 +137,8 @@ def test_asset_status_access_policy_err(app):
 @pytest.mark.parametrize(
     "app, mock_policy,tf_state_list_err,expected",
     [
-        (   blueprint,
+        (
+            blueprint,
             False,
             False,
             json.dumps(
@@ -167,7 +166,7 @@ def test_asset_status_access_policy_err(app):
         ),
         (blueprint, True, True, "MOCK_RESPONSE"),
     ],
-    indirect=['app']
+    indirect=["app"],
 )
 @patch.object(au, "tf_init", return_value=None)
 def test_asset_status(
@@ -230,35 +229,35 @@ def test_asset_status(
             {"response": "MOCK_RESPONSE"},
         ),
         (
-            blueprint, 
+            blueprint,
             {"destroy": False, "targets": ["MOCK_TARGET"]},
             1,
             None,
             {"response": "MOCK_RESPONSE"},
         ),
         (
-            blueprint, 
+            blueprint,
             {"destroy": False, "targets": ["MOCK_TARGET_1", "MOCK_TARGET_2"]},
             2,
             "MOCK_APPLY_RETURN_VALUE",
             {"response": "MOCK_RESPONSE"},
         ),
         (
-            blueprint, 
+            blueprint,
             {"destroy": False, "targets": ["MOCK_TARGET_1", "MOCK_TARGET_2"]},
             2,
             None,
             {"response": "MOCK_RESPONSE"},
         ),
         (
-            blueprint, 
+            blueprint,
             {"destroy": False, "targets": ["MOCK_TARGET_1", "MOCK_TARGET_2"]},
             2,
             None,
             {"resources": ["MOCK_RESOURCE"]},
         ),
     ],
-    indirect=['app'],
+    indirect=["app"],
 )
 @patch.object(au, "tf_init", return_value=None)
 @patch.object(au, "tf_plan", return_value=None)
@@ -306,7 +305,7 @@ def test_update_target(  # pylint: disable=too-many-arguments
     get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
 )
 @patch.object(au, "tf_init", return_value="MOCK_RESPONSE")
-@pytest.mark.parametrize('app',[blueprint], indirect=['app'])
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_update_target_bad_init(
     mock_tf_init,
     mock_get_token,
@@ -330,7 +329,7 @@ def test_update_target_bad_init(
 )
 @patch.object(au, "tf_init", return_value=None)
 @patch.object(au, "tf_plan", return_value={"response": "MOCK_RESPONSE"})
-@pytest.mark.parametrize('app',[blueprint], indirect=['app'])
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_update_target_bad_plan(
     mock_tf_plan,
     mock_tf_init,
