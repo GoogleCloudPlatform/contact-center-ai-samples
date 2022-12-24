@@ -19,6 +19,8 @@ import requests
 import status_utilities as su
 import update_utilities as uu
 from conftest import MockReturnObject
+from google.cloud import storage
+from google.oauth2 import credentials as oauth2_credentials
 from mock import patch
 
 
@@ -146,3 +148,37 @@ def test_update_security_perimeter_success(
     mock_update_service_perimeter_status_inplace.assert_called_once()
     mock_get_service_perimeter_status.assert_called_once()
     mock_patch.assert_called_once()
+
+
+class MockClient:  # pylint: disable=too-few-public-methods
+    """Mock storage.Client object."""
+
+    def __init__(self, project, credentials):
+        assert project == 'MOCK_PROJECT'
+        assert credentials == 'MOCK_CREDENTIALS'
+
+    def bucket(self, bucket):
+        "Mock bucket interface."
+        assert bucket == 'MOCK_BUCKET'
+        return 'MOCK_BUCKET_OBJECT'
+
+
+class MockBlob:  # pylint: disable=too-few-public-methods
+    """Mock storage.blob.Blob object."""
+
+    def __init__(self, filename, bucket_object):
+        assert filename == 'server.der'
+        assert bucket_object == 'MOCK_BUCKET_OBJECT'
+
+    def download_as_string(self):
+        "Mock download_as_string interface."
+        return 'MOCK_STRING'
+
+
+@patch.object(oauth2_credentials, "Credentials", return_value="MOCK_CREDENTIALS")
+@patch.object(storage, "Client", new=MockClient)
+@patch.object(storage.blob, "Blob", new=MockBlob)
+def test_get_cert(mock_credentials):
+    """Test get_cert utility method."""
+    assert uu.get_cert('MOCK_TOKEN', 'MOCK_PROJECT', 'MOCK_BUCKET') == 'MOCK_STRING'
+    mock_credentials.assert_called_once()
