@@ -86,6 +86,8 @@ def update_security_perimeter(
 def get_cert(token, project_id, bucket):
     """Utility method to get cert file from bucket."""
     curr_credentials = credentials.Credentials(token)
-    bucket_obj = storage.Client(project=project_id, credentials=curr_credentials).bucket(bucket)
-    blob = storage.blob.Blob('server.der', bucket_obj)
+    bucket_obj = storage.Client(
+        project=project_id, credentials=curr_credentials
+    ).bucket(bucket)
+    blob = storage.blob.Blob("server.der", bucket_obj)
     return blob.download_as_string()

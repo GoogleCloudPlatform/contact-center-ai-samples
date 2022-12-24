@@ -154,25 +154,25 @@ class MockClient:  # pylint: disable=too-few-public-methods
     """Mock storage.Client object."""
 
     def __init__(self, project, credentials):
-        assert project == 'MOCK_PROJECT'
-        assert credentials == 'MOCK_CREDENTIALS'
+        assert project == "MOCK_PROJECT"
+        assert credentials == "MOCK_CREDENTIALS"
 
     def bucket(self, bucket):
         "Mock bucket interface."
-        assert bucket == 'MOCK_BUCKET'
-        return 'MOCK_BUCKET_OBJECT'
+        assert bucket == "MOCK_BUCKET"
+        return "MOCK_BUCKET_OBJECT"
 
 
 class MockBlob:  # pylint: disable=too-few-public-methods
     """Mock storage.blob.Blob object."""
 
     def __init__(self, filename, bucket_object):
-        assert filename == 'server.der'
-        assert bucket_object == 'MOCK_BUCKET_OBJECT'
+        assert filename == "server.der"
+        assert bucket_object == "MOCK_BUCKET_OBJECT"
 
     def download_as_string(self):
         "Mock download_as_string interface."
-        return 'MOCK_STRING'
+        return "MOCK_STRING"
 
 
 @patch.object(oauth2_credentials, "Credentials", return_value="MOCK_CREDENTIALS")
@@ -180,5 +180,5 @@ class MockBlob:  # pylint: disable=too-few-public-methods
 @patch.object(storage.blob, "Blob", new=MockBlob)
 def test_get_cert(mock_credentials):
     """Test get_cert utility method."""
-    assert uu.get_cert('MOCK_TOKEN', 'MOCK_PROJECT', 'MOCK_BUCKET') == 'MOCK_STRING'
+    assert uu.get_cert("MOCK_TOKEN", "MOCK_PROJECT", "MOCK_BUCKET") == "MOCK_STRING"
     mock_credentials.assert_called_once()
