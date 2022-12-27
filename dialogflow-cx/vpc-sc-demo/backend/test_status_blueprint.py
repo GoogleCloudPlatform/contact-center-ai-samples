@@ -21,7 +21,7 @@ import get_token
 import pytest
 import requests
 import status_utilities as su
-from conftest import MockReturnObject, MOCK_DOMAIN
+from conftest import MOCK_DOMAIN, MockReturnObject
 from mock import patch
 from status_blueprint import status as blueprint
 

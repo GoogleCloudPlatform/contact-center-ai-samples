@@ -19,8 +19,10 @@ import json
 import asset_utilities as au
 import get_token
 import pytest
-from asset_blueprint import ACCESS_POLICY_RESOURCE, asset as blueprint
-from conftest import assert_response_ep as assert_response, MOCK_DOMAIN
+from asset_blueprint import ACCESS_POLICY_RESOURCE
+from asset_blueprint import asset as blueprint
+from conftest import MOCK_DOMAIN
+from conftest import assert_response_ep as assert_response
 from mock import patch
 
 
