@@ -613,6 +613,15 @@ def test_check_function_exists_success():
 
 
 @pytest.mark.hermetic
+def test_get_agents_bad_region():
+    """Test get_agents, bad region provided."""
+    result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "BAD_REGION")
+    assert_response(
+        result, 200, {"status": "BLOCKED", "reason": "UNKNOWN_REGION"}
+    )
+
+
+@pytest.mark.hermetic
 def test_get_agents_api():
     """Test get_agents permission denied api not set up"""
     with patch.object(
@@ -628,7 +637,7 @@ def test_get_agents_api():
             },
         ),
     ):
-        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "us-central1")
         assert_response(
             result, 200, {"status": "BLOCKED", "reason": "DIALOGFLOW_API_DISABLED"}
         )
@@ -650,7 +659,7 @@ def test_get_agents_iam():
             },
         ),
     ):
-        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "us-central1")
         assert_response(
             result, 200, {"status": "BLOCKED", "reason": "WRONG_PERMISSION"}
         )
@@ -673,7 +682,7 @@ def test_get_agents_vpc():
             },
         ),
     ):
-        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "us-central1")
         assert_response(
             result, 200, {"status": "BLOCKED", "reason": "VPC_SERVICE_CONTROLS"}
         )
@@ -687,7 +696,7 @@ def test_get_agents_permissions_unknown():
         "get",
         return_value=MockReturnObject(
             403,
-            {
+            data={
                 "error": {
                     "status": "PERMISSION_DENIED",
                     "message": "UNKNOWN",
@@ -696,7 +705,7 @@ def test_get_agents_permissions_unknown():
             },
         ),
     ):
-        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "us-central1")
         assert_response(
             result, 200, {"status": "BLOCKED", "reason": "PERMISSION_DENIED"}
         )
@@ -706,10 +715,10 @@ def test_get_agents_permissions_unknown():
 def test_get_agents_server_error():
     """Test get_agents server error."""
     with patch.object(
-        requests, "get", return_value=MockReturnObject(500, ["SERVER_ERROR"])
+        requests, "get", return_value=MockReturnObject(500, text="SERVER_ERROR")
     ):
-        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
-        assert_response(result, 500, ["SERVER_ERROR"])
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "us-central1")
+        assert_response(result, 500, {'error': "SERVER_ERROR"})
 
 
 @pytest.mark.hermetic
@@ -723,7 +732,7 @@ def test_get_agents_not_found():
             {},
         ),
     ):
-        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "us-central1")
         assert_response(result, 200, {"status": "BLOCKED", "reason": "AGENT_NOT_FOUND"})
 
 
@@ -738,7 +747,7 @@ def test_get_agents_potential_buggy_codepath():
             {"error": "MOCK_ERROR"},
         ),
     ):
-        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "us-central1")
         assert result is None
 
 
@@ -753,7 +762,7 @@ def test_get_agents_success():
             {"agents": [{"displayName": "MOCK_AGENT_NAME"}]},
         ),
     ):
-        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_REGION")
+        result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "us-central1")
     assert result == {"data": {"MOCK_AGENT_NAME": {"displayName": "MOCK_AGENT_NAME"}}}
 
 
@@ -786,12 +795,12 @@ def test_get_webhooks_vpc():
 def test_get_webhooks_server_error():
     """Test get_webhooks, access error vpc"""
     with patch.object(
-        requests, "get", return_value=MockReturnObject(500, ["SERVER_ERROR"])
+        requests, "get", return_value=MockReturnObject(500, text="SERVER_ERROR")
     ):
         result = su.get_webhooks(
             "MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_PROJECT_ID", "MOCK_REGION"
         )
-        assert_response(result, 500, ["SERVER_ERROR"])
+        assert_response(result, 500, {'error': "SERVER_ERROR"})
 
 
 @pytest.mark.hermetic

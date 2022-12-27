@@ -15,6 +15,7 @@
 """Module for updating configuration of assets."""
 
 import base64
+import json
 import logging
 
 import flask
@@ -54,7 +55,10 @@ def update_webhook_access():  # pylint: disable=too-many-branches
         logger.info(
             "  cloudfunctions API rejected getIamPolicy GET request: %s", response.text
         )
-        return flask.Response(status=response.status_code, response=response.text)
+        return flask.Response(
+            status=response.status_code,
+            response=json.dumps({'error':response.text})
+        )
 
     policy_dict = response.json()
     all_users_is_invoker_member = False
@@ -105,7 +109,10 @@ def update_webhook_access():  # pylint: disable=too-many-branches
         logger.info(
             "  cloudfunctions API rejected setIamPolicy POST request: %s", response.text
         )
-        return flask.Response(status=response.status_code, response=response.text)
+        return flask.Response(
+            status=response.status_code,
+            response=json.dumps({'error':response.text})
+        )
     return flask.Response(status=200)
 
 
@@ -134,7 +141,10 @@ def update_webhook_ingress():
     )
     if response.status_code != 200:
         logger.info("  cloudfunctions API rejected GET request: %s", response.text)
-        return flask.Response(status=response.status_code, response=response.text)
+        return flask.Response(
+            status=response.status_code,
+            response=json.dumps({'error':response.text})
+        )
 
     webhook_data = response.json()
     ingress_settings = "ALLOW_INTERNAL_ONLY" if content["status"] else "ALLOW_ALL"
@@ -153,7 +163,10 @@ def update_webhook_ingress():
     )
     if response.status_code != 200:
         logger.info("  cloudfunctions API rejected PATCH request: %s", response.text)
-        return flask.Response(status=response.status_code, response=response.text)
+        return flask.Response(
+            status=response.status_code,
+            response=json.dumps({'error':response.text})
+        )
     return flask.Response(status=200)
 
 
@@ -208,13 +221,20 @@ def update_security_perimeter_dialogflow():
 
 
 @update.route("/update_service_directory_webhook_fulfillment", methods=["POST"])
-def update_service_directory_webhook_fulfillment():
+def update_service_directory_webhook_fulfillment():  # pylint: disable=too-many-return-statements,too-many-locals
     """Update agent webhook; toggle between service directory and generic webhook."""
     data = su.get_token_and_project(flask.request)
     if "response" in data:
         return data["response"]
     project_id, token = data["project_id"], data["token"]
-    region = flask.request.args["region"]
+    untrusted_region = flask.request.args["region"]
+    if untrusted_region in ["us-central1"]:
+        region = untrusted_region
+    else:
+        return flask.Response(
+            status=200,
+            response=json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"}),
+        )
 
     content = flask.request.get_json(silent=True)
     if content["status"] is True:
@@ -279,5 +299,8 @@ def update_service_directory_webhook_fulfillment():
             "  dialogflow API unexpectedly rejected invocation PATCH request: %s",
             response.text,
         )
-        return flask.Response(status=response.status_code, response=response.text)
+        return flask.Response(
+            status=response.status_code,
+            response=json.dumps({'error':response.text})
+        )
     return flask.Response(status=200)

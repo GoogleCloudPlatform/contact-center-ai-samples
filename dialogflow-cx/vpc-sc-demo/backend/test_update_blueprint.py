@@ -82,7 +82,7 @@ def test_endpoints_bad_token(get_token_mock, app, endpoint):
 @patch.object(
     requests,
     "get",
-    return_value=MockReturnObject(500, "MOCK_RESPONSE"),
+    return_value=MockReturnObject(500, text="MOCK_RESPONSE"),
 )
 def test_update_webhook_access_cloudfunctions_error(
     mock_requests, mock_get_token, app, endpoint
@@ -97,7 +97,9 @@ def test_update_webhook_access_cloudfunctions_error(
             "webhook_name": "MOCK_WEBHOOK_NAME",
         },
     )
-    assert_response(return_value, 500, endpoint, '"MOCK_RESPONSE"')
+    assert_response(return_value, 500, endpoint, json.dumps(
+        {'error':'MOCK_RESPONSE'}
+    ))
     mock_get_token.assert_called_once()
     mock_requests.assert_called_once()
 
@@ -244,7 +246,7 @@ def test_update_webhook_access_change_needed(
         with patch.object(
             requests,
             "post",
-            return_value=MockReturnObject(post_return_code, "MOCK_RESPONSE"),
+            return_value=MockReturnObject(post_return_code, text="MOCK_RESPONSE"),
         ) as mock_request_post:
             return_value = get_result(
                 app,
@@ -255,7 +257,8 @@ def test_update_webhook_access_change_needed(
                     "webhook_name": "MOCK_WEBHOOK_NAME",
                 },
             )
-    assert_response(return_value, post_return_code, endpoint, '"MOCK_RESPONSE"')
+    assert_response(return_value, post_return_code, endpoint, json.dumps(
+        {'error':'MOCK_RESPONSE'}))
     mock_get_token.assert_called_once()
     mock_request_post.assert_called_once()
     mock_request_get.assert_called_once()
@@ -490,7 +493,7 @@ def test_update_service_directory_webhook_fulfillment_bad_agent(
         app,
         endpoint,
         query_string={
-            "region": "MOCK_REGION",
+            "region": "us-central1",
             "bucket": "MOCK_BUCKET_NAME",
             "webhook_name": "MOCK_WEBHOOK_NAME",
         },
@@ -540,7 +543,7 @@ def test_update_service_directory_webhook_fulfillment_bad_webhook(
         app,
         endpoint,
         query_string={
-            "region": "MOCK_REGION",
+            "region": "us-central1",
             "bucket": "MOCK_BUCKET_NAME",
             "webhook_name": "MOCK_WEBHOOK_NAME",
         },
@@ -599,13 +602,13 @@ def test_update_service_directory_webhook_fulfillment(  # pylint: disable=too-ma
     with patch.object(
         requests,
         "patch",
-        return_value=MockReturnObject(patch_code, "MOCK_RESPONSE"),
+        return_value=MockReturnObject(patch_code, text='MOCK_RESPONSE'),
     ) as mock_patch:
         return_value = get_result(
             app,
             endpoint,
             query_string={
-                "region": "MOCK_REGION",
+                "region": "us-central1",
                 "bucket": "MOCK_BUCKET_NAME",
                 "webhook_name": "MOCK_WEBHOOK_NAME",
             },
@@ -613,10 +616,46 @@ def test_update_service_directory_webhook_fulfillment(  # pylint: disable=too-ma
                 "status": status,
             },
         )
-    assert_response(return_value, patch_code, endpoint, '"MOCK_RESPONSE"')
+    assert_response(return_value, patch_code, endpoint, json.dumps(
+        {'error':'MOCK_RESPONSE'}
+    ))
     mock_get_token_and_project.assert_called_once()
     mock_get_agents.assert_called_once()
     mock_get_webhooks.assert_called_once()
     mock_patch.assert_called_once()
     if status:
         mock_get_cert.assert_called_once()
+
+
+@pytest.mark.hermetic
+@patch.object(
+    su,
+    "get_token_and_project",
+    return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
+)
+@pytest.mark.parametrize("app", [blueprint], indirect=['app'])
+def test_update_service_directory_webhook_fulfillment_bad_region(
+    mock_get_token_and_project,
+    app,
+):
+    """Test bad region provided to /update_service_directory_webhook_fulfillment"""
+    endpoint = "/update_service_directory_webhook_fulfillment"
+    return_value = get_result(
+        app,
+        endpoint,
+        query_string={
+            "region": "BAD_REGION",
+            "bucket": "MOCK_BUCKET_NAME",
+            "webhook_name": "MOCK_WEBHOOK_NAME",
+        },
+        json_data={
+            "status": 'MOCK_STATUS',
+        },
+    )
+    assert_response(
+        return_value,
+        200,
+        endpoint,
+        json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"})
+    )
+    mock_get_token_and_project.assert_called_once()

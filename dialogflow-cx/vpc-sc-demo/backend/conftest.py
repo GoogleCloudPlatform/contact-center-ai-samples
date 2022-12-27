@@ -27,9 +27,10 @@ MOCK_DOMAIN = "MOCK_DOMAIN."
 class MockReturnObject:  # pylint: disable=too-few-public-methods
     """Class to mock out json interface of requests.Response."""
 
-    def __init__(self, status_code, data):
+    def __init__(self, status_code, data=None, text=None):
         self.status_code = status_code
-        self.data = data
+        self.data = {} if data is None else data
+        self._text = text
 
     def json(self):
         """Mock json interface."""
@@ -37,8 +38,10 @@ class MockReturnObject:  # pylint: disable=too-few-public-methods
 
     @property
     def text(self):
-        """Mock text attribute interface."""
-        return json.dumps(self.data)
+        """Mock text interface; fall back to json as string."""
+        if self._text is None:
+            return json.dumps(self.data)
+        return self._text
 
 
 def assert_response(result, status_code, expected):
