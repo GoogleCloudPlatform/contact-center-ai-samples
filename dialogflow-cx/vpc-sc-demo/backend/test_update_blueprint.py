@@ -97,9 +97,7 @@ def test_update_webhook_access_cloudfunctions_error(
             "webhook_name": "MOCK_WEBHOOK_NAME",
         },
     )
-    assert_response(return_value, 500, endpoint, json.dumps(
-        {'error':'MOCK_RESPONSE'}
-    ))
+    assert_response(return_value, 500, endpoint, json.dumps({"error": "MOCK_RESPONSE"}))
     mock_get_token.assert_called_once()
     mock_requests.assert_called_once()
 
@@ -257,8 +255,9 @@ def test_update_webhook_access_change_needed(
                     "webhook_name": "MOCK_WEBHOOK_NAME",
                 },
             )
-    assert_response(return_value, post_return_code, endpoint, json.dumps(
-        {'error':'MOCK_RESPONSE'}))
+    assert_response(
+        return_value, post_return_code, endpoint, json.dumps({"error": "MOCK_RESPONSE"})
+    )
     mock_get_token.assert_called_once()
     mock_request_post.assert_called_once()
     mock_request_get.assert_called_once()
@@ -602,7 +601,7 @@ def test_update_service_directory_webhook_fulfillment(  # pylint: disable=too-ma
     with patch.object(
         requests,
         "patch",
-        return_value=MockReturnObject(patch_code, text='MOCK_RESPONSE'),
+        return_value=MockReturnObject(patch_code, text="MOCK_RESPONSE"),
     ) as mock_patch:
         return_value = get_result(
             app,
@@ -616,9 +615,9 @@ def test_update_service_directory_webhook_fulfillment(  # pylint: disable=too-ma
                 "status": status,
             },
         )
-    assert_response(return_value, patch_code, endpoint, json.dumps(
-        {'error':'MOCK_RESPONSE'}
-    ))
+    assert_response(
+        return_value, patch_code, endpoint, json.dumps({"error": "MOCK_RESPONSE"})
+    )
     mock_get_token_and_project.assert_called_once()
     mock_get_agents.assert_called_once()
     mock_get_webhooks.assert_called_once()
@@ -633,7 +632,7 @@ def test_update_service_directory_webhook_fulfillment(  # pylint: disable=too-ma
     "get_token_and_project",
     return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
 )
-@pytest.mark.parametrize("app", [blueprint], indirect=['app'])
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_update_service_directory_webhook_fulfillment_bad_region(
     mock_get_token_and_project,
     app,
@@ -649,13 +648,13 @@ def test_update_service_directory_webhook_fulfillment_bad_region(
             "webhook_name": "MOCK_WEBHOOK_NAME",
         },
         json_data={
-            "status": 'MOCK_STATUS',
+            "status": "MOCK_STATUS",
         },
     )
     assert_response(
         return_value,
         200,
         endpoint,
-        json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"})
+        json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"}),
     )
     mock_get_token_and_project.assert_called_once()

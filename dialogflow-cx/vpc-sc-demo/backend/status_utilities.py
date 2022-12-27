@@ -330,10 +330,12 @@ def get_agents(token, project_id, region):  # pylint: disable=too-many-branches
     headers["x-goog-user-project"] = project_id
     headers["Authorization"] = f"Bearer {token}"
     if region not in ["us-central1"]:
-        return {'response': flask.Response(
-            status=200,
-            response=json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"}),
-        )}
+        return {
+            "response": flask.Response(
+                status=200,
+                response=json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"}),
+            )
+        }
     result = requests.get(
         (
             f"https://{region}-dialogflow.googleapis.com/v3/"
@@ -398,8 +400,7 @@ def get_agents(token, project_id, region):  # pylint: disable=too-many-branches
         logger.info("  dialogflow API rejected request: %s", result.text)
         response = {
             "response": flask.Response(
-                status=result.status_code,
-                response=json.dumps({'error': result.text})
+                status=result.status_code, response=json.dumps({"error": result.text})
             )
         }
     else:
@@ -448,8 +449,7 @@ def get_webhooks(token, agent_name, project_id, region):
     if result.status_code != 200:
         logger.info("  dialogflow API rejected request: %s", result.text)
         response = flask.Response(
-            status=result.status_code,
-            response=json.dumps({'error': result.text})
+            status=result.status_code, response=json.dumps({"error": result.text})
         )
         return {"response": response}
     agents = result.json()

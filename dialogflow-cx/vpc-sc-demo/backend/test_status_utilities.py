@@ -616,9 +616,7 @@ def test_check_function_exists_success():
 def test_get_agents_bad_region():
     """Test get_agents, bad region provided."""
     result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "BAD_REGION")
-    assert_response(
-        result, 200, {"status": "BLOCKED", "reason": "UNKNOWN_REGION"}
-    )
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "UNKNOWN_REGION"})
 
 
 @pytest.mark.hermetic
@@ -718,7 +716,7 @@ def test_get_agents_server_error():
         requests, "get", return_value=MockReturnObject(500, text="SERVER_ERROR")
     ):
         result = su.get_agents("MOCK_TOKEN", "MOCK_PROJECT_ID", "us-central1")
-        assert_response(result, 500, {'error': "SERVER_ERROR"})
+        assert_response(result, 500, {"error": "SERVER_ERROR"})
 
 
 @pytest.mark.hermetic
@@ -800,7 +798,7 @@ def test_get_webhooks_server_error():
         result = su.get_webhooks(
             "MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_PROJECT_ID", "MOCK_REGION"
         )
-        assert_response(result, 500, {'error': "SERVER_ERROR"})
+        assert_response(result, 500, {"error": "SERVER_ERROR"})
 
 
 @pytest.mark.hermetic

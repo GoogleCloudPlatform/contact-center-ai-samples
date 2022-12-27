@@ -56,8 +56,7 @@ def update_webhook_access():  # pylint: disable=too-many-branches
             "  cloudfunctions API rejected getIamPolicy GET request: %s", response.text
         )
         return flask.Response(
-            status=response.status_code,
-            response=json.dumps({'error':response.text})
+            status=response.status_code, response=json.dumps({"error": response.text})
         )
 
     policy_dict = response.json()
@@ -110,8 +109,7 @@ def update_webhook_access():  # pylint: disable=too-many-branches
             "  cloudfunctions API rejected setIamPolicy POST request: %s", response.text
         )
         return flask.Response(
-            status=response.status_code,
-            response=json.dumps({'error':response.text})
+            status=response.status_code, response=json.dumps({"error": response.text})
         )
     return flask.Response(status=200)
 
@@ -142,8 +140,7 @@ def update_webhook_ingress():
     if response.status_code != 200:
         logger.info("  cloudfunctions API rejected GET request: %s", response.text)
         return flask.Response(
-            status=response.status_code,
-            response=json.dumps({'error':response.text})
+            status=response.status_code, response=json.dumps({"error": response.text})
         )
 
     webhook_data = response.json()
@@ -164,8 +161,7 @@ def update_webhook_ingress():
     if response.status_code != 200:
         logger.info("  cloudfunctions API rejected PATCH request: %s", response.text)
         return flask.Response(
-            status=response.status_code,
-            response=json.dumps({'error':response.text})
+            status=response.status_code, response=json.dumps({"error": response.text})
         )
     return flask.Response(status=200)
 
@@ -300,7 +296,6 @@ def update_service_directory_webhook_fulfillment():  # pylint: disable=too-many-
             response.text,
         )
         return flask.Response(
-            status=response.status_code,
-            response=json.dumps({'error':response.text})
+            status=response.status_code, response=json.dumps({"error": response.text})
         )
     return flask.Response(status=200)
