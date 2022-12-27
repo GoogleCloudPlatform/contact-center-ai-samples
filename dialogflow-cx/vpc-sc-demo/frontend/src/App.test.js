@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import {
+  render,
+  screen,
+  waitForElementToBeRemoved,
+} from '@testing-library/react';
 import App from './App';
+import React from 'react';
 
-test('renders learn react link', async () => {
+test('Smoke test: App', async () => {
   render(<App />);
   const linkElement = screen.getByText(/Tutorial and Interactive Launch Pad/i);
   expect(linkElement).toBeInTheDocument();
-  await waitForElementToBeRemoved(() => screen.queryAllByText(/loading_slides/i))
+  await waitForElementToBeRemoved(() =>
+    screen.queryAllByText(/loading_slides/i)
+  );
 });

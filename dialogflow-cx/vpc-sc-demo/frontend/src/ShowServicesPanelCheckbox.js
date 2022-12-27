@@ -13,18 +13,23 @@
 // limitations under the License.
 
 import React from 'react';
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
-import './styles.css';
-import {MiniDrawer} from './Drawer';
-import {DataModel} from './DataModel.js';
+import Checkbox from '@mui/material/Checkbox';
 
-export default function App() {
-  const dataModel = DataModel();
+function ShowServicesPanelCheckbox(props) {
+  const stateVar = props.dataModel.showServicesPanel;
+
+  function handleChange() {
+    stateVar.set(!stateVar.current);
+  }
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<MiniDrawer dataModel={dataModel} />} />
-      </Routes>
-    </BrowserRouter>
+    <Checkbox
+      checked={stateVar.current}
+      onChange={handleChange}
+      inputProps={{'aria-label': 'controlled'}}
+      sx={props.sx}
+    />
   );
 }
+
+export {ShowServicesPanelCheckbox};

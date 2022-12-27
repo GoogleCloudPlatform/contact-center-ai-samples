@@ -1,15 +1,36 @@
 {
   "extends": [
     "eslint:recommended",
-    "plugin:node/recommended",
-    "prettier"
+    "prettier",
+    "plugin:react/recommended"
   ],
+  "settings": {
+    "react": {
+      "createClass": "createReactClass",
+      "pragma": "React",
+      "fragment": "Fragment",
+      "version": "detect",
+      "flowVersion": "0.53"
+    }
+  },
+  "env": {
+    "es2021": true,
+    "browser": true,
+    "jest": true
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 12
+  },
   "plugins": [
     "json",
     "node",
-    "prettier"
+    "prettier",
+    "react",
+    "react-hooks"
   ],
   "rules": {
+    "react/prop-types": "off",
     "node/no-missing-require": "off",
     "prettier/prettier": "error",
     "block-scoped-var": "error",

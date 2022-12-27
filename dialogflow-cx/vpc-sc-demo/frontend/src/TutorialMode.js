@@ -13,18 +13,32 @@
 // limitations under the License.
 
 import React from 'react';
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
-import './styles.css';
-import {MiniDrawer} from './Drawer';
-import {DataModel} from './DataModel.js';
+import Switch from '@mui/material/Switch';
 
-export default function App() {
-  const dataModel = DataModel();
+function StatusTutorialMode(props) {
+  return <div>{props.state.status.current ? 'True' : 'False'}</div>;
+}
+
+function ToggleStatusTutorialMode(props) {
+  function onChange() {
+    props.state.status.set(!props.state.status.current);
+  }
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<MiniDrawer dataModel={dataModel} />} />
-      </Routes>
-    </BrowserRouter>
+    <>
+      {
+        <Switch
+          onChange={onChange}
+          checked={
+            typeof props.state.status.current === 'boolean'
+              ? props.state.status.current
+              : false
+          }
+          color="primary"
+        />
+      }
+    </>
   );
 }
+
+export {StatusTutorialMode, ToggleStatusTutorialMode};

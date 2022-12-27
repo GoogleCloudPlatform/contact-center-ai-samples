@@ -12,19 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
-import './styles.css';
-import {MiniDrawer} from './Drawer';
-import {DataModel} from './DataModel.js';
-
-export default function App() {
-  const dataModel = DataModel();
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<MiniDrawer dataModel={dataModel} />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
+// jest-dom adds custom jest matchers for asserting on DOM nodes.
+// allows you to do things like:
+// expect(element).toHaveTextContent(/react/i)
+// learn more: https://github.com/testing-library/jest-dom
+import '@testing-library/jest-dom';
