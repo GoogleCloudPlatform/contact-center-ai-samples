@@ -103,4 +103,5 @@ jobs:
           TERRAFORM_TERRASCAN_CONFIG_FILE: terrascan.toml
           PYTHONPATH: "/github/workspace:/github/workflow/.venv/lib/python3.10/site-packages"
           YAML_ERROR_ON_WARNING: true
+          CSS_FILE_NAME: .stylelintrc.json
 ...
