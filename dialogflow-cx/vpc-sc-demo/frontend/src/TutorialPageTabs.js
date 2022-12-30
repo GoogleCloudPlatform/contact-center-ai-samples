@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import React from 'react';
-import {useState, useEffect} from 'react';
+import axios from 'axios';
+import {useState, useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -25,9 +26,40 @@ import Paper from '@mui/material/Paper';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import {QueryClient, QueryClientProvider, useQuery} from 'react-query';
 
 function TabPanel(props) {
   const {children, value, index, ...other} = props;
+  const didMountRef = useRef(false);
+
+  function queryFunction() {
+    return axios
+      .post(
+        props.analytics_endpoint,
+        {
+          current_tab: value,
+        },
+        {}
+      )
+      .then(res => res.data);
+  }
+
+  const {refetch} = useQuery(props.analytics_endpoint, queryFunction, {
+    retry: false,
+    enabled: false,
+  });
+
+  useEffect(
+    () => {
+      if (value === index && didMountRef.current) {
+        refetch();
+      }
+      didMountRef.current = true;
+    },
+    /* eslint-disable react-hooks/exhaustive-deps */
+    [value]
+    /* eslint-enable react-hooks/exhaustive-deps */
+  );
 
   return (
     <div
@@ -84,29 +116,43 @@ function securityLevelToRGB(securityIndex) {
 }
 
 function TutorialTab(props) {
+  const queryClient = new QueryClient();
   return (
-    <TabPanel value={props.value} index={props.index}>
-      <Grid container direction="row">
-        <Grid item>
-          <Typography variant="h5" sx={{my: 3}}>
-            {props.title}
-          </Typography>
-        </Grid>
-      </Grid>
-      <Grid container direction="row" justifyContent="flex-start" spacing={2}>
-        <Grid item sx={{width: '60%'}}>
-          {props.body}
-        </Grid>
-        <Grid item>
-          <Paper sx={{px: 2, py: 2}} elevation={2}>
-            <Typography variant="body1">Security Level:</Typography>
-            <Typography component={'span'} variant="body1" align="center">
-              {securityLevelToRGB(props.security)}
-            </Typography>
-          </Paper>
-        </Grid>
-      </Grid>
-    </TabPanel>
+    <div>
+      <QueryClientProvider client={queryClient}>
+        <TabPanel
+          value={props.value}
+          index={props.index}
+          analytics_endpoint="/register_set_active_tutorial_tab"
+        >
+          <Grid container direction="row">
+            <Grid item>
+              <Typography variant="h5" sx={{my: 3}}>
+                {props.title}
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid
+            container
+            direction="row"
+            justifyContent="flex-start"
+            spacing={2}
+          >
+            <Grid item sx={{width: '60%'}}>
+              {props.body}
+            </Grid>
+            <Grid item>
+              <Paper sx={{px: 2, py: 2}} elevation={2}>
+                <Typography variant="body1">Security Level:</Typography>
+                <Typography component={'span'} variant="body1" align="center">
+                  {securityLevelToRGB(props.security)}
+                </Typography>
+              </Paper>
+            </Grid>
+          </Grid>
+        </TabPanel>
+      </QueryClientProvider>
+    </div>
   );
 }
 

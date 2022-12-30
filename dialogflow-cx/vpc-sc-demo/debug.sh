@@ -14,6 +14,8 @@
 # limitations under the License.
 set -e
 
+source config.env
+
 export USER_SERVICE_IMAGE='vpc-sc-demo'
 export USER_SERVICE_TAG_BASE='latest'
 export USER_SERVICE_TAG='debug'
@@ -26,6 +28,8 @@ sudo docker run -it \
   -p 3001:3001 \
   --rm \
   --entrypoint=/backend/debug_runner.sh \
+  --env ANALYTICS_DATABASE="${ANALYTICS_DATABASE?}" \
+  --env TF_PLAN_STORAGE_BUCKET="${TF_PLAN_STORAGE_BUCKET?}" \
   -v "$(pwd)"/backend:/backend \
   -v "$(pwd)"/frontend:/frontend \
   -v "$(pwd)"/deploy:/deploy \

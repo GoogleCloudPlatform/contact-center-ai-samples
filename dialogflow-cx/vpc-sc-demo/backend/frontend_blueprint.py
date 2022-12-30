@@ -18,6 +18,7 @@
 import logging
 import os
 
+import analytics_utilities as au
 import flask
 import werkzeug
 
@@ -36,4 +37,8 @@ def root(path):
         os.path.join(frontend.static_folder, secure_path)
     ):
         return flask.send_from_directory(frontend.static_folder, secure_path)
-    return flask.send_from_directory(frontend.static_folder, "index.html")
+
+    response = flask.send_from_directory(frontend.static_folder, "index.html")
+    return au.register_action(
+        flask.request, response, au.ACTIONS.UPDATE_STATUS, {"service": "ingress"}
+    )

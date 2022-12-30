@@ -17,6 +17,7 @@
 
 import json
 import logging
+import os
 
 import flask
 import google.auth.transport.requests
@@ -26,9 +27,6 @@ from google.oauth2 import service_account
 from invoke import task
 
 logger = logging.getLogger(__name__)
-
-
-TF_PLAN_STORAGE_BUCKET = "vpc-sc-demo-nicholascain15-tf"
 
 
 RESOURCE_GROUP = {
@@ -87,6 +85,14 @@ RESOURCE_GROUP = {
 }
 
 
+def get_credentials():
+    """Helper function to get service account credentials."""
+    return service_account.Credentials.from_service_account_file(
+        "/backend/demo-server-key.json",
+        scopes=["https://www.googleapis.com/auth/cloud-platform"],
+    )
+
+
 def get_access_policy_title(token, access_policy_id):
     """Get access_policy_title using the accesscontextmanager API."""
     headers = {}
@@ -124,10 +130,7 @@ def tf_init(context, module, workdir, env, prefix):
     user_access_token = env.pop("GOOGLE_OAUTH_ACCESS_TOKEN")
     debug = "TF_LOG" in env
 
-    credentials = service_account.Credentials.from_service_account_file(
-        "/backend/demo-server-key.json",
-        scopes=["https://www.googleapis.com/auth/cloud-platform"],
-    )
+    credentials = get_credentials()
     request = google.auth.transport.requests.Request()
     credentials.refresh(request)
     env["GOOGLE_OAUTH_ACCESS_TOKEN"] = credentials.token
@@ -137,7 +140,7 @@ def tf_init(context, module, workdir, env, prefix):
             f"terraform -chdir={workdir} init "
             "-upgrade -reconfigure "
             f'-backend-config="access_token={env["GOOGLE_OAUTH_ACCESS_TOKEN"]}" '
-            f'-backend-config="bucket={TF_PLAN_STORAGE_BUCKET}" '
+            f'-backend-config="bucket={os.environ["TF_PLAN_STORAGE_BUCKET"]}" '
             f'-backend-config="prefix={prefix}"'
         ),
         warn=True,

@@ -16,6 +16,7 @@
 
 import logging
 
+from analytics_blueprint import analytics
 from asset_blueprint import asset
 from flask import Flask
 from frontend_blueprint import frontend
@@ -29,8 +30,9 @@ STATIC_FOLDER = "/frontend/build/static"
 
 def configure_logging():
     """Set up logging for webserver."""
-    logging.basicConfig(level=logging.INFO)
-    logging.getLogger("werkzeug").setLevel(logging.INFO)
+    level = logging.ERROR
+    logging.basicConfig(level=level)
+    logging.getLogger("werkzeug").setLevel(level)
 
 
 def create_app():
@@ -42,6 +44,7 @@ def create_app():
     curr_app.register_blueprint(status)
     curr_app.register_blueprint(asset)
     curr_app.register_blueprint(update)
+    curr_app.register_blueprint(analytics)
     configure_logging()
     return curr_app
 
