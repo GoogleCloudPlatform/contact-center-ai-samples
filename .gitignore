@@ -190,7 +190,6 @@ build/
 system-test/secrets.js
 system-test/*key.json
 *.lock
-package-lock.json
 
 # VPC-SC Auth Server
 dialogflow-cx/vpc-sc-auth-server/application-client-id

@@ -95,6 +95,10 @@ _LINTER_CONFIG = {
         "validate": "VALIDATE_TERRAFORM_TERRASCAN=true",
         "config": f"TERRAFORM_TERRASCAN_CONFIG_FILE={_LINTER_ENV[_TERRASCAN_CONFIG]}",
     },
+    "stylelint": {
+        "validate": "VALIDATE_CSS=true",
+        "config": f'CSS_FILE_NAME={_LINTER_ENV["CSS_FILE_NAME"]}',
+    },
 }
 
 
