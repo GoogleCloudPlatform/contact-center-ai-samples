@@ -40,11 +40,14 @@ def asset_status():  # pylint: disable=too-many-locals
     token_dict = get_token.get_token(flask.request, token_type="access_token")
     if "response" in token_dict:
         return token_dict["response"]
-    debug = flask.request.args.get("debug") == "true"
     target = flask.request.args.get("target", None)
     update = flask.request.args.get("update", True)
     access_token = token_dict["access_token"]
-    env = asu.get_terraform_env(access_token, flask.request.args, debug=debug)
+    env = asu.get_terraform_env(
+        access_token,
+        flask.request.args,
+        debug=asu.get_debug(flask.request),
+    )
     ctx = context.Context()
     module = "/deploy/terraform/main.tf"
     prefix = f'terraform/{flask.request.args["project_id"]}'
@@ -104,8 +107,11 @@ def update_target():
     content = flask.request.get_json(silent=True)
     access_token = token_dict["access_token"]
 
-    debug = flask.request.args.get("debug") == "true"
-    env = asu.get_terraform_env(access_token, flask.request.args, debug=debug)
+    env = asu.get_terraform_env(
+        access_token,
+        flask.request.args,
+        debug=asu.get_debug(flask.request),
+    )
     targets = content.get("targets")
     destroy = content["destroy"]
 
