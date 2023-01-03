@@ -16,6 +16,7 @@
 
 import logging
 
+import session_utilities as su
 from analytics_blueprint import analytics
 from asset_blueprint import asset
 from flask import Flask
@@ -30,7 +31,7 @@ STATIC_FOLDER = "/frontend/build/static"
 
 def configure_logging():
     """Set up logging for webserver."""
-    level = logging.ERROR
+    level = logging.ERROR if su.is_prod() else logging.DEBUG
     logging.basicConfig(level=level)
     logging.getLogger("werkzeug").setLevel(level)
 
