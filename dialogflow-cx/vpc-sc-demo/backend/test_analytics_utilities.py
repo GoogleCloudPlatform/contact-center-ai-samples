@@ -39,6 +39,7 @@ def test_actions():
     """Test that the ACTIONS maximum boundary makes sense."""
     assert len(au.ACTIONS) == au.SCHEMA["properties"]["action"]["maximum"] + 1
 
+
 # pylint: disable=too-few-public-methods
 class MockAction:
     """Mock analytics_utilities.ACTION Enum."""
@@ -77,7 +78,10 @@ class MockClient:
         """Mock insert_rows_json interface."""
         del kwargs
         return self.insert_response
+
+
 # pylint: enable=too-few-public-methods
+
 
 @patch.dict(os.environ, {"ANALYTICS_DATABASE": "MOCK_DATABASE"})
 @pytest.mark.parametrize(
