@@ -77,6 +77,8 @@ jobs:
           pip install -r dialogflow-cx/requirements-test.txt
           pip install -r dialogflow-cx/vpc-sc-auth-server/server/requirements.txt
           pip install -r dialogflow-cx/vpc-sc-auth-server/server/requirements-test.txt
+          pip install -r dialogflow-cx/vpc-sc-demo/backend/requirements.txt
+          pip install -r dialogflow-cx/vpc-sc-demo/backend/requirements-test.txt
           mv .venv /home/runner/work/_temp/_github_workflow
       - name: Lint Code Base
         uses: github/super-linter/slim@bb2d833b08b6c288608686672b93a8a4589cdc49 # v4.9.7

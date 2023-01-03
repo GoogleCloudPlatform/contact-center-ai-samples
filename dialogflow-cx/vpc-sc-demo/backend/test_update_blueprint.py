@@ -16,13 +16,14 @@
 
 import json
 
-import flask
+import analytics_utilities as au
 import pytest
 import requests
 import status_utilities as su
 import update_utilities as uu
 from conftest import MOCK_DOMAIN, MockReturnObject
 from conftest import assert_response_ep as assert_response
+from conftest import generate_mock_register_action
 from mock import patch
 from update_blueprint import update as blueprint
 
@@ -60,7 +61,10 @@ def get_result(
 @patch.object(su, "get_token_and_project", return_value={"response": "MOCK_RESPONSE"})
 def test_endpoints_bad_token(get_token_mock, app, endpoint):
     """Test endpoints, bad token"""
-    return_value = get_result(app, endpoint)
+    with patch.object(
+        au, "register_action", new_callable=generate_mock_register_action
+    ):
+        return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
     get_token_mock.assert_called_once()
 
@@ -229,7 +233,9 @@ def test_update_webhook_access_no_change_needed(
     "get_token_and_project",
     return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
 )
-def test_update_webhook_access_change_needed(
+@patch.object(au, "register_action", new_callable=generate_mock_register_action)
+def test_update_webhook_access_change_needed(  # pylint: disable=too-many-arguments
+    mock_register_action,
     mock_get_token,
     app,
     policy_dict,
@@ -261,6 +267,8 @@ def test_update_webhook_access_change_needed(
     mock_get_token.assert_called_once()
     mock_request_post.assert_called_once()
     mock_request_get.assert_called_once()
+    if status is True and post_return_code == 200:
+        mock_register_action.assert_called_once()
 
 
 @pytest.mark.hermetic
@@ -320,7 +328,9 @@ def test_update_webhook_ingress_no_change_needed(
     ],
     indirect=["app"],
 )
-def test_update_webhook_ingress_change_needed(
+@patch.object(au, "register_action", new_callable=generate_mock_register_action)
+def test_update_webhook_ingress_change_needed(  # pylint: disable=too-many-arguments
+    mock_register_action,
     mock_get_token,
     app,
     status,
@@ -354,19 +364,17 @@ def test_update_webhook_ingress_change_needed(
     mock_get_token.assert_called_once()
     mock_requests_get.assert_called_once()
     mock_requests_patch.assert_called_once()
+    if patch_return_code == 200:
+        mock_register_action.assert_called_once()
 
 
 @pytest.mark.hermetic
 @patch.object(
-    su,
-    "get_token_and_project",
-    return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
+    uu,
+    "update_security_perimeter",
+    return_value="MOCK_RESPONSE",
 )
-@patch.object(
-    su,
-    "get_access_policy_name",
-    return_value={"response": "MOCK_RESPONSE"},
-)
+@patch.object(au, "register_action", new_callable=generate_mock_register_action)
 @pytest.mark.parametrize(
     "app,endpoint",
     [
@@ -376,8 +384,8 @@ def test_update_webhook_ingress_change_needed(
     indirect=["app"],
 )
 def test_update_perimeter_bad_policy_name(
-    mock_get_token,
-    mock_get_access_policy_name,
+    mock_update_security_perimeter,
+    mock_register_action,
     app,
     endpoint,
 ):
@@ -388,77 +396,8 @@ def test_update_perimeter_bad_policy_name(
         query_string={"access_policy_title": "MOCK_ACCESS_POLICY_TITLE"},
     )
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
-    mock_get_token.assert_called_once()
-    mock_get_access_policy_name.assert_called_once()
-
-
-def mock_update_security_perimeter_fcn(*args):
-    """Mock function for testing perimeter updates."""
-    return flask.Response(status=200, response=json.dumps(args))
-
-
-@pytest.mark.hermetic
-@pytest.mark.parametrize(
-    "app,endpoint,target_api",
-    [
-        (
-            blueprint,
-            "/update_security_perimeter_cloudfunctions",
-            "cloudfunctions.googleapis.com",
-        ),
-        (
-            blueprint,
-            "/update_security_perimeter_dialogflow",
-            "dialogflow.googleapis.com",
-        ),
-    ],
-    indirect=["app"],
-)
-@patch.object(
-    su,
-    "get_token_and_project",
-    return_value={"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"},
-)
-@patch.object(
-    su,
-    "get_access_policy_name",
-    return_value={"access_policy_name": "MOCK_ACCESS_POLICY_NAME"},
-)
-@patch.object(
-    uu,
-    "update_security_perimeter",
-    new=mock_update_security_perimeter_fcn,
-)
-def test_update_perimeter_success(
-    mock_get_token,
-    mock_get_access_policy_name,
-    app,
-    endpoint,
-    target_api,
-):
-    """Test perimeter update methods, success."""
-    return_value = get_result(
-        app,
-        endpoint,
-        query_string={"access_policy_title": "MOCK_ACCESS_POLICY_TITLE"},
-        json_data={"status": True},
-    )
-    mock_get_token.assert_called_once()
-    mock_get_access_policy_name.assert_called_once()
-    assert_response(
-        return_value,
-        200,
-        endpoint,
-        json.dumps(
-            [
-                "MOCK_ACCESS_TOKEN",
-                target_api,
-                True,
-                "MOCK_PROJECT_ID",
-                "MOCK_ACCESS_POLICY_NAME",
-            ]
-        ),
-    )
+    mock_update_security_perimeter.assert_called_once()
+    mock_register_action.assert_called_once()
 
 
 @pytest.mark.hermetic
@@ -587,7 +526,9 @@ def test_update_service_directory_webhook_fulfillment_bad_webhook(
     "get_cert",
     return_value="MOCK_CERT".encode(),
 )
+@patch.object(au, "register_action", new_callable=generate_mock_register_action)
 def test_update_service_directory_webhook_fulfillment(  # pylint: disable=too-many-arguments
+    mock_register_action,
     mock_get_cert,
     mock_get_webhooks,
     mock_get_agents,
@@ -624,6 +565,8 @@ def test_update_service_directory_webhook_fulfillment(  # pylint: disable=too-ma
     mock_patch.assert_called_once()
     if status:
         mock_get_cert.assert_called_once()
+        if patch_code == 200:
+            mock_register_action.assert_called_once()
 
 
 @pytest.mark.hermetic

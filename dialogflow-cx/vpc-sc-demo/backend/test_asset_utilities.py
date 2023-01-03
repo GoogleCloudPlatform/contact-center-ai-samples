@@ -15,6 +15,7 @@
 """Module for testing asset_utilities.py."""
 
 import json
+import os
 
 import asset_utilities
 import pytest
@@ -164,6 +165,7 @@ def test_get_terraform_env(  # pylint: disable=redefined-outer-name
         (True, True),
     ],
 )
+@patch.dict(os.environ, {"TF_PLAN_STORAGE_BUCKET": "MOCK_STORAGE_BUCKET"})
 def test_tf_init(debug, exited, request_args):  # pylint: disable=redefined-outer-name
     """Test tf_init."""
     with patch.object(service_account, "Credentials", return_value="MOCK_CREDENTIALS"):

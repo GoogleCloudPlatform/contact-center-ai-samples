@@ -14,6 +14,8 @@
 # limitations under the License.
 set -e
 
+source config.env
+
 export USER_SERVICE_IMAGE='vpc-sc-demo'
 export USER_SERVICE_TAG_BASE='development'
 
@@ -24,6 +26,8 @@ sudo docker run -it \
   --rm \
   --env PROD=false \
   --env FLASK_DEBUG=1 \
+  --env ANALYTICS_DATABASE="${ANALYTICS_DATABASE?}" \
+  --env TF_PLAN_STORAGE_BUCKET="${TF_PLAN_STORAGE_BUCKET?}" \
   -v "$(pwd)"/backend:/backend \
   -v "$(pwd)"/deploy:/deploy \
   -v "$(pwd)"/components/webhook/telecom-webhook-src:/components/telecom-webhook-src \

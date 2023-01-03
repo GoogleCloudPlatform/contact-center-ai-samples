@@ -14,6 +14,7 @@
 
 import * as React from 'react';
 import {styled, useTheme} from '@mui/material/styles';
+import {QueryRegisterSetActivePage} from './Analytics.js';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
@@ -182,16 +183,6 @@ function MiniDrawer(props) {
   [props.dataModel.activePage.current, props.dataModel.activePage.set] =
     useQueryState('page');
 
-  // CRITICAL: TODO in the future, callback to send message to analytics!!
-  // var setActivePage;
-  // [props.dataModel.activePage.current, setActivePage] =  useQueryState('page');
-
-  // function setActivePageWithCallback(newVal) {
-  //   console.log('FOO', newVal);
-  //   setActivePage(newVal);
-  // }
-  // props.dataModel.activePage.set = setActivePageWithCallback
-
   props.dataModel.projectData.project_id = {current: null, set: null};
   [
     props.dataModel.projectData.project_id.current,
@@ -288,6 +279,7 @@ function MiniDrawer(props) {
 
   return (
     <div>
+      <QueryRegisterSetActivePage dataModel={props.dataModel} />
       <SessionExpiredModal dataModel={props.dataModel} />
       <Box sx={{display: 'flex'}}>
         <CssBaseline />

@@ -197,6 +197,8 @@ dialogflow-cx/vpc-sc-auth-server/application-client-secret
 dialogflow-cx/vpc-sc-auth-server/auth-server-project
 
 # VPC-SC Demo:
+dialogflow-cx/vpc-sc-demo/analytics-database
+dialogflow-cx/vpc-sc-demo/terraform-plan-storage-bucket
 dialogflow-cx/vpc-sc-demo/backend/demo-server-key.json
 dialogflow-cx/vpc-sc-demo/backend/public_key.pem
 dialogflow-cx/vpc-sc-demo/backend/private_key.pem

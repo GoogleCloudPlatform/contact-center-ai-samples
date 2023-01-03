@@ -16,13 +16,15 @@
 
 import json
 
-import asset_utilities as au
+import analytics_utilities as au
+import asset_utilities as asu
 import get_token
 import pytest
 from asset_blueprint import ACCESS_POLICY_RESOURCE
 from asset_blueprint import asset as blueprint
 from conftest import MOCK_DOMAIN
 from conftest import assert_response_ep as assert_response
+from conftest import generate_mock_register_action
 from mock import patch
 
 
@@ -83,7 +85,7 @@ def test_asset_status_init_exit(app):
     with patch.object(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
     ):
-        with patch.object(au, "tf_init", return_value="MOCK_INIT"):
+        with patch.object(asu, "tf_init", return_value="MOCK_INIT"):
             return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, "MOCK_INIT")
 
@@ -95,9 +97,9 @@ def test_asset_status_plan_exit(app):
     with patch.object(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
     ):
-        with patch.object(au, "tf_init", return_value=None):
+        with patch.object(asu, "tf_init", return_value=None):
             with patch.object(
-                au, "tf_plan", return_value={"response": "MOCK_RESPONSE"}
+                asu, "tf_plan", return_value={"response": "MOCK_RESPONSE"}
             ):
                 return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
@@ -110,9 +112,9 @@ def test_asset_status_access_policy_err(app):
     with patch.object(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
     ):
-        with patch.object(au, "tf_init", return_value=None):
+        with patch.object(asu, "tf_init", return_value=None):
             with patch.object(
-                au,
+                asu,
                 "tf_plan",
                 return_value={
                     "hooks": {
@@ -126,7 +128,7 @@ def test_asset_status_access_policy_err(app):
                 },
             ):
                 with patch.object(
-                    au,
+                    asu,
                     "get_access_policy_title",
                     return_value={"response": "MOCK_RESPONSE"},
                 ):
@@ -168,8 +170,10 @@ def test_asset_status_access_policy_err(app):
     ],
     indirect=["app"],
 )
-@patch.object(au, "tf_init", return_value=None)
-def test_asset_status(
+@patch.object(asu, "tf_init", return_value=None)
+@patch.object(au, "register_action", new_callable=generate_mock_register_action)
+def test_asset_status(  # pylint: disable=too-many-arguments
+    mock_register_action,
     mock_tf_init,
     app,
     mock_policy,
@@ -193,7 +197,7 @@ def test_asset_status(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
     ):
         with patch.object(
-            au,
+            asu,
             "tf_plan",
             return_value={
                 "hooks": {
@@ -207,14 +211,16 @@ def test_asset_status(
             },
         ):
             with patch.object(
-                au, "get_access_policy_title", return_value=policy_return_value
+                asu, "get_access_policy_title", return_value=policy_return_value
             ):
                 with patch.object(
-                    au, "tf_state_list", return_value=state_list_return_value
+                    asu, "tf_state_list", return_value=state_list_return_value
                 ):
                     return_value = get_result(app, endpoint)
     assert_response(return_value, 200, endpoint, expected)
     mock_tf_init.assert_called_once()
+    if not tf_state_list_err:
+        mock_register_action.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -259,12 +265,14 @@ def test_asset_status(
     ],
     indirect=["app"],
 )
-@patch.object(au, "tf_init", return_value=None)
-@patch.object(au, "tf_plan", return_value=None)
+@patch.object(asu, "tf_init", return_value=None)
+@patch.object(asu, "tf_plan", return_value=None)
 @patch.object(
     get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
 )
+@patch.object(au, "register_action", new_callable=generate_mock_register_action)
 def test_update_target(  # pylint: disable=too-many-arguments
+    mock_register_action,
     mock_get_token,
     mock_tf_plan,
     mock_tf_init,
@@ -276,8 +284,10 @@ def test_update_target(  # pylint: disable=too-many-arguments
 ):
     """test /update_target,"""
     endpoint = "/update_target"
-    with patch.object(au, "tf_apply", return_value=apply_return_value) as mock_tf_apply:
-        with patch.object(au, "tf_state_list", return_value=state):
+    with patch.object(
+        asu, "tf_apply", return_value=apply_return_value
+    ) as mock_tf_apply:
+        with patch.object(asu, "tf_state_list", return_value=state):
             return_value = get_result(
                 app,
                 endpoint,
@@ -299,12 +309,13 @@ def test_update_target(  # pylint: disable=too-many-arguments
             endpoint,
             json.dumps({"status": "OK", "resources": ["MOCK_RESOURCE"]}),
         )
+        mock_register_action.assert_called_once()
 
 
 @patch.object(
     get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
 )
-@patch.object(au, "tf_init", return_value="MOCK_RESPONSE")
+@patch.object(asu, "tf_init", return_value="MOCK_RESPONSE")
 @pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_update_target_bad_init(
     mock_tf_init,
@@ -327,8 +338,8 @@ def test_update_target_bad_init(
 @patch.object(
     get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
 )
-@patch.object(au, "tf_init", return_value=None)
-@patch.object(au, "tf_plan", return_value={"response": "MOCK_RESPONSE"})
+@patch.object(asu, "tf_init", return_value=None)
+@patch.object(asu, "tf_plan", return_value={"response": "MOCK_RESPONSE"})
 @pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_update_target_bad_plan(
     mock_tf_plan,
