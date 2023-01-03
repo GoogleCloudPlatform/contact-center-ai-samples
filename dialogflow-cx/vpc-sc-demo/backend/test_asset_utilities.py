@@ -72,9 +72,7 @@ def test_get_access_policy_title_success():
             {"title": "MOCK_TITLE"},
         ),
     ):
-        result = asu.get_access_policy_title(
-            "MOCK_TOKEN", "MOCK_ACCESS_POLICY_ID"
-        )
+        result = asu.get_access_policy_title("MOCK_TOKEN", "MOCK_ACCESS_POLICY_ID")
     assert result == {"access_policy_title": "MOCK_TITLE"}
 
 
@@ -89,9 +87,7 @@ def test_get_access_policy_title_server_error():
             ["SERVER_ERROR"],
         ),
     ):
-        result = asu.get_access_policy_title(
-            "MOCK_TOKEN", "MOCK_ACCESS_POLICY_ID"
-        )
+        result = asu.get_access_policy_title("MOCK_TOKEN", "MOCK_ACCESS_POLICY_ID")
     assert_response(result, 500, ["SERVER_ERROR"])
 
 
@@ -351,15 +347,18 @@ def test_tf_state_list(
             assert result == {"resources": ["MOCK_STDOUT"]}
 
 
-@pytest.mark.parametrize('request_debug', ['true', 'false'])
-@pytest.mark.parametrize('logging_level', [
-    logging.DEBUG,
-    logging.INFO,
-    logging.ERROR,
-])
+@pytest.mark.parametrize("request_debug", ["true", "false"])
+@pytest.mark.parametrize(
+    "logging_level",
+    [
+        logging.DEBUG,
+        logging.INFO,
+        logging.ERROR,
+    ],
+)
 def test_get_debug(request_debug, logging_level, mock_request):
     """Test get_debug method."""
     logging.root.level = logging_level
-    mock_request.args = {'debug': request_debug}
-    expected = (request_debug=='true' or logging_level <= logging.DEBUG)
+    mock_request.args = {"debug": request_debug}
+    expected = request_debug == "true" or logging_level <= logging.DEBUG
     assert asu.get_debug(mock_request) == expected
