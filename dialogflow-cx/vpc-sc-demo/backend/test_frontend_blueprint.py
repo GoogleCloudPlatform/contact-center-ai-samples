@@ -16,8 +16,10 @@
 
 import os
 
+import analytics_utilities as au
 import flask
 import pytest
+from conftest import generate_mock_register_action
 from frontend_blueprint import STATIC_FOLDER
 from frontend_blueprint import frontend as blueprint
 from mock import patch
@@ -43,11 +45,15 @@ def client():
 
 
 @pytest.mark.hermetic
-def test_frontend_blueprint_no_path(client):  # pylint: disable=redefined-outer-name
+@patch.object(au, "register_action", new_callable=generate_mock_register_action)
+def test_frontend_blueprint_no_path(
+    mock_register_action, client
+):  # pylint: disable=redefined-outer-name
     """Test frontent without path."""
     return_value = client.get("/")
     for curr_response in return_value.response:
         assert curr_response.decode() == "index.html"
+    mock_register_action.assert_called_once()
 
 
 @pytest.mark.hermetic

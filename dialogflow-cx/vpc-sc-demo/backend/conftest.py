@@ -88,3 +88,32 @@ def mock_request():
     """Mock request for testing functions that take a request as an arg."""
     builder = EnvironBuilder()
     return builder.get_request()
+
+
+@pytest.fixture
+def mock_response():
+    """Mock request for testing functions that take a request as an arg."""
+    return flask.Response()
+
+
+def generate_mock_register_action():
+    """Factory function to provide a MockRegisterAction fixture."""
+
+    class MockRegisterAction:
+        """Mock Register action function with call counter."""
+
+        def __init__(self):
+            self.called_counter = 0
+
+        def __call__(self, request, response, action, data=None):
+            self.called_counter += 1
+            del request
+            del action
+            del data
+            return response
+
+        def assert_called_once(self):
+            """Method to ensure that the mock fixture is envoked once."""
+            assert self.called_counter == 1
+
+    return MockRegisterAction()
