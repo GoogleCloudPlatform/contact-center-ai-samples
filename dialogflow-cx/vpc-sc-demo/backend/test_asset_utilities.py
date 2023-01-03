@@ -15,9 +15,10 @@
 """Module for testing asset_utilities.py."""
 
 import json
+import logging
 import os
 
-import asset_utilities
+import asset_utilities as asu
 import pytest
 import requests
 from conftest import MockReturnObject, assert_response
@@ -71,7 +72,7 @@ def test_get_access_policy_title_success():
             {"title": "MOCK_TITLE"},
         ),
     ):
-        result = asset_utilities.get_access_policy_title(
+        result = asu.get_access_policy_title(
             "MOCK_TOKEN", "MOCK_ACCESS_POLICY_ID"
         )
     assert result == {"access_policy_title": "MOCK_TITLE"}
@@ -88,7 +89,7 @@ def test_get_access_policy_title_server_error():
             ["SERVER_ERROR"],
         ),
     ):
-        result = asset_utilities.get_access_policy_title(
+        result = asu.get_access_policy_title(
             "MOCK_TOKEN", "MOCK_ACCESS_POLICY_ID"
         )
     assert_response(result, 500, ["SERVER_ERROR"])
@@ -151,7 +152,7 @@ def test_get_terraform_env(  # pylint: disable=redefined-outer-name
     if access_policy_title:
         request_args["access_policy_title"] = "MOCK_ACCESS_POLICY_TITLE"
 
-    result = asset_utilities.get_terraform_env("MOCK_TOKEN", request_args, debug=debug)
+    result = asu.get_terraform_env("MOCK_TOKEN", request_args, debug=debug)
     assert result == expected
 
 
@@ -174,11 +175,11 @@ def test_tf_init(debug, exited, request_args):  # pylint: disable=redefined-oute
         context.set_result(
             MockPromise(MockResult(exited, "MOCK_STDOUT", "MOCK_STDERR"))
         )
-        result = asset_utilities.tf_init(
+        result = asu.tf_init(
             context,
             "MOCK_MODULE",
             "MOCK_WORKDIR",
-            asset_utilities.get_terraform_env(
+            asu.get_terraform_env(
                 "MOCK_ACCESS_TOKEN",
                 request_args,
                 debug=debug,
@@ -222,11 +223,11 @@ def test_tf_plan(debug, message, request_args):  # pylint: disable=redefined-out
     context = MockContext()
     context.set_result(MockPromise(MockResult(False, mock_stdout, "MOCK_STDERR")))
     with patch.object(service_account, "Credentials", return_value="MOCK_CREDENTIALS"):
-        result = asset_utilities.tf_plan(
+        result = asu.tf_plan(
             context,
             "MOCK_MODULE",
             "MOCK_WORKDIR",
-            asset_utilities.get_terraform_env(
+            asu.get_terraform_env(
                 "MOCK_ACCESS_TOKEN",
                 request_args,
                 debug=debug,
@@ -276,11 +277,11 @@ def test_tf_apply(debug, message, request_args):  # pylint: disable=redefined-ou
     context = MockContext()
     context.set_result(MockPromise(MockResult(False, mock_stdout, "MOCK_STDERR")))
     with patch.object(service_account, "Credentials", return_value="MOCK_CREDENTIALS"):
-        result = asset_utilities.tf_apply(
+        result = asu.tf_apply(
             context,
             "MOCK_MODULE",
             "MOCK_WORKDIR",
-            asset_utilities.get_terraform_env(
+            asu.get_terraform_env(
                 "MOCK_ACCESS_TOKEN",
                 request_args,
                 debug=debug,
@@ -310,7 +311,7 @@ def test_tf_apply(debug, message, request_args):  # pylint: disable=redefined-ou
     ]
     + [
         (False, False, "\n".join(resource_list))
-        for resource_list in asset_utilities.RESOURCE_GROUP.values()
+        for resource_list in asu.RESOURCE_GROUP.values()
     ],
 )
 def test_tf_state_list(
@@ -323,11 +324,11 @@ def test_tf_state_list(
     context = MockContext()
     context.set_result(MockPromise(MockResult(exited, stdout, "MOCK_STDERR")))
     with patch.object(service_account, "Credentials", return_value="MOCK_CREDENTIALS"):
-        result = asset_utilities.tf_state_list(
+        result = asu.tf_state_list(
             context,
             "MOCK_MODULE",
             "MOCK_WORKDIR",
-            asset_utilities.get_terraform_env(
+            asu.get_terraform_env(
                 "MOCK_ACCESS_TOKEN",
                 request_args,
                 debug=debug,
@@ -348,3 +349,17 @@ def test_tf_state_list(
             assert len(result["resources"]) == 1 + len(stdout.split())
         else:
             assert result == {"resources": ["MOCK_STDOUT"]}
+
+
+@pytest.mark.parametrize('request_debug', ['true', 'false'])
+@pytest.mark.parametrize('logging_level', [
+    logging.DEBUG,
+    logging.INFO,
+    logging.ERROR,
+])
+def test_get_debug(request_debug, logging_level, mock_request):
+    """Test get_debug method."""
+    logging.root.level = logging_level
+    mock_request.args = {'debug': request_debug}
+    expected = (request_debug=='true' or logging_level <= logging.DEBUG)
+    assert asu.get_debug(mock_request) == expected
