@@ -322,3 +322,10 @@ def tf_state_list(context, module, workdir, env):
             status_dict["resources"].append(group_name)
     logging.debug(status_dict["resources"])
     return status_dict
+
+
+def get_debug(request):
+    """Get boolean to engage debug mode for terraform"""
+    if (request.args.get("debug") == "true") or (logging.DEBUG >= logging.root.level):
+        return True
+    return False
