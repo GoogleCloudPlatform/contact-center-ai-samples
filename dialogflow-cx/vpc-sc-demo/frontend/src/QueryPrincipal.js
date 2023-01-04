@@ -68,7 +68,7 @@ function GetPrincipal(props) {
         disabled={true}
         InputLabelProps={{shrink: shrink}}
         InputProps={{
-          notched: false,
+          notched: !loginEnabled.current,
           style: {
             backgroundColor: loginEnabled.current ? '#ffcdd2' : 'transparent',
           },
