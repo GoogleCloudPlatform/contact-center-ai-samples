@@ -86,13 +86,20 @@ function AccessPolicyField(props) {
   function onChange(e) {
     props.dataModel.projectData.accessPolicyTitle.set(e.target.value);
   }
+  const shrink = !(
+    props.dataModel.projectData.accessPolicyTitle.current === null ||
+    props.dataModel.projectData.accessPolicyTitle.current === '' ||
+    typeof props.dataModel.projectData.accessPolicyTitle.current === 'undefined'
+  );
   return (
     <TextField
       sx={props.sx ? props.sx : {mx: 2, width: 350}}
       label={props.label}
       variant="outlined"
       value={
-        props.dataModel.projectData.accessPolicyTitle.current === null
+        props.dataModel.projectData.accessPolicyTitle.current === null ||
+        typeof props.dataModel.projectData.accessPolicyTitle.current ===
+          'undefined'
           ? ''
           : props.dataModel.projectData.accessPolicyTitle.current
       }
@@ -102,7 +109,7 @@ function AccessPolicyField(props) {
       disabled={props.dataModel.terraformLocked.current}
       color="primary"
       InputLabelProps={{
-        shrink: props.dataModel.projectData.accessPolicyTitle.current,
+        shrink: shrink,
       }}
     />
   );
