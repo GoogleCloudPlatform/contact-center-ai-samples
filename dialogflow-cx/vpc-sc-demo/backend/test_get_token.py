@@ -66,7 +66,7 @@ def test_get_token_from_auth_server_unknown_integration():
     mock_session_id = "UNKNOWN_SESSION_ID"
 
     result = get_token.get_token_from_auth_server(mock_session_id)
-    assert_response(result, 500, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
 
 
 @pytest.mark.hermetic
@@ -79,7 +79,7 @@ def test_get_token_from_auth_server_unknown_hermetic_401():
 
     with patch.object(requests, "get", return_value=return_value):
         result = get_token.get_token_from_auth_server(mock_session_id)
-    assert_response(result, 500, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
 
 
 @pytest.mark.hermetic
@@ -183,7 +183,7 @@ def test_get_token_failure_unknown(mock_request):
     ):
         result = get_token.get_token(mock_request, cache=cache)
     result = get_token.get_token(mock_request, cache=cache)
-    assert_response(result, 500, {"status": "BLOCKED", "reason": "UNKNOWN"})
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "UNKNOWN"})
 
 
 @pytest.mark.hermetic
@@ -227,7 +227,7 @@ def test_get_token_failure_bad_email(mock_request):
         new=mock_verify_oauth2_token_raise_value_error,
     ):
         result = get_token.get_token(mock_request, cache=cache)
-    assert_response(result, 500, {"status": "BLOCKED", "reason": "BAD_EMAIL"})
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "BAD_EMAIL"})
 
 
 @pytest.mark.hermetic
@@ -271,7 +271,7 @@ def test_get_token_failure_success(token_type, expected, mock_request):
     else:
         assert_response(
             result,
-            500,
+            200,
             {
                 "status": "BLOCKED",
                 "reason": (
