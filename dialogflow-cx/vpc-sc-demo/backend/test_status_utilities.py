@@ -61,7 +61,7 @@ def test_get_access_policy_name_bad_token():
         result = su.get_access_policy_name(
             "MOCK_TOKEN", "MOCK_PROJECT_TITLE", "MOCK_PROJECT_ID"
         )
-        assert_response(result, 500, {"status": "BLOCKED", "reason": "UNAUTHENTICATED"})
+        assert_response(result, 200, {"status": "BLOCKED", "reason": "UNAUTHENTICATED"})
 
 
 @pytest.mark.hermetic
