@@ -68,7 +68,7 @@ def get_access_policy_name(token, access_policy_title, project_id):
     if response.status_code != 200:
         return {
             "response": flask.Response(
-                status=500,
+                status=200,
                 response=json.dumps(
                     {
                         "status": "BLOCKED",
