@@ -41,7 +41,7 @@ RESOURCE_GROUP = {
     },
     "module.services": {
         "module.services.google_project_service.appengine",
-        "module.services.google_project_service.artifactregistry",
+        "google_project_service.artifactregistry",
         "module.services.google_project_service.run",
         "module.services.google_project_service.vpcaccess",
         "google_project_service.accesscontextmanager",
