@@ -302,6 +302,12 @@ resource "google_project_iam_member" "rpcsa_cfinvoker" {
   member = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
 }
 
+resource "google_project_iam_member" "rpcsa_storage_admin" {
+  project = var.project_id
+  role    = "roles/storage.admin"
+  member = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
+}
+
 resource "google_compute_instance" "reverse_proxy_server" {
   name         = "webhook-server"
   project      =  var.project_id
@@ -313,7 +319,7 @@ resource "google_compute_instance" "reverse_proxy_server" {
       "compute-ro",
       "logging-write",
       "monitoring-write",
-      "storage-ro",
+      "storage-rw",
       "trace",
     ]
     email  = google_service_account.rpcsa_service_account.email
@@ -357,5 +363,6 @@ resource "google_compute_instance" "reverse_proxy_server" {
     google_project_iam_member.dfsa_sd_pscAuthorizedService,
     google_project_iam_member.rpcsa_artifactregistry,
     google_project_iam_member.rpcsa_cfinvoker,
+    google_project_iam_member.rpcsa_storage_admin,
   ]
 }
