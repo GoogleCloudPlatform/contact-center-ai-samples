@@ -237,8 +237,7 @@ function AssetStatus() {
   return {
     'module.services': servicesModule,
     'module.services.google_project_service.appengine': appengineService,
-    'module.services.google_project_service.artifactregistry':
-      artifactregistryService,
+    'google_project_service.artifactregistry': artifactregistryService,
     'module.services.google_project_service.run': runService,
     'module.services.google_project_service.vpcaccess': vpcaccessService,
     'google_project_service.accesscontextmanager': accesscontextmanagerService,

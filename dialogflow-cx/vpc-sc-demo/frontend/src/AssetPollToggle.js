@@ -182,9 +182,8 @@ function ResourceCollectionDeployment(target, dataModel) {
       true
         ? 1
         : 0,
-      dataModel.assetStatus[
-        'module.services.google_project_service.artifactregistry'
-      ].current === true
+      dataModel.assetStatus['google_project_service.artifactregistry']
+        .current === true
         ? 1
         : 0,
       dataModel.assetStatus['google_project_service.accesscontextmanager']
@@ -939,7 +938,7 @@ function ServicesPanel(props) {
         />
         <QueryToggleAsset
           name="artifactregistry"
-          target="module.services.google_project_service.artifactregistry"
+          target="google_project_service.artifactregistry"
           dataModel={props.dataModel}
           href={servicesLink('artifactregistry', project_id)}
         />
