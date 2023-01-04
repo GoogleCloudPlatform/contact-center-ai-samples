@@ -55,6 +55,8 @@ function GetPrincipal(props) {
     }
   });
 
+  const shrink = !(principal.current === null || principal.current === '');
+
   return (
     <div>
       <TextField
@@ -64,7 +66,7 @@ function GetPrincipal(props) {
         value={principal.current === null ? '' : principal.current}
         placeholder={'Principal'}
         disabled={true}
-        InputLabelProps={{shrink: principal.current}}
+        InputLabelProps={{shrink: shrink}}
         InputProps={{
           notched: false,
           style: {
