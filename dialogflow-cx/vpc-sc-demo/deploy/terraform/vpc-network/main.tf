@@ -315,7 +315,7 @@ resource "google_compute_instance" "reverse_proxy_server" {
       "compute-ro",
       "logging-write",
       "monitoring-write",
-      "storage-ro",
+      "storage-rw",
       "trace",
     ]
     email  = google_service_account.rpcsa_service_account.email
