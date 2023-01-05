@@ -33,6 +33,7 @@ const style = {
 function SessionExpiredModal(props) {
   function handleClose() {
     props.dataModel.sessionExpiredModalOpen.set(false);
+    props.dataModel.loginRedirect.set(true);
   }
   const queryStr = new URLSearchParams(props.dataModel.queryParams).toString();
   return (
