@@ -36,7 +36,7 @@ class Resource:  # pylint: disable=too-few-public-methods
 def reverse_proxy_vm():
     """Resource fixture"""
     return Resource(
-        '[root] module.vpc_network.google_compute_instance.reverse_proxy_server (expand)'
+        "[root] module.vpc_network.google_compute_instance.reverse_proxy_server (expand)"
     )
 
 
@@ -44,10 +44,12 @@ def reverse_proxy_vm():
 def reverse_proxy_address():
     """Resource fixture"""
     return Resource(
-        '[root] module.vpc_network.google_compute_address.reverse_proxy_address (expand)'
+        "[root] module.vpc_network.google_compute_address.reverse_proxy_address (expand)"
     )
 
 
-def test_reverse_proxy(reverse_proxy_vm, reverse_proxy_address):  # pylint: disable=redefined-outer-name
+def test_reverse_proxy(
+    reverse_proxy_vm, reverse_proxy_address
+):  # pylint: disable=redefined-outer-name
     """Test if reverse proxy server depends on its address."""
     assert reverse_proxy_vm.depends_on(reverse_proxy_address)
