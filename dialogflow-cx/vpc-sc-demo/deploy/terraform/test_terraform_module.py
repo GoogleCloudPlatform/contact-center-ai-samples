@@ -44,5 +44,4 @@ def reverse_proxy_address():
 
 def test_reverse_proxy(reverse_proxy_vm, reverse_proxy_address):
     """Test if reverse proxy server depends on its address."""
-    # assert reverse_proxy_vm.depends_on(reverse_proxy_address)
-    assert False
+    assert reverse_proxy_vm.depends_on(reverse_proxy_address)

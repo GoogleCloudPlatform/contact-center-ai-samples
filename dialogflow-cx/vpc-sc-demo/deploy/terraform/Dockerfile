@@ -30,6 +30,7 @@ WORKDIR /deploy/terraform
 
 RUN pip install --no-cache-dir --upgrade pip==22.3.1 && pip install --no-cache-dir -r requirements-test.txt
 RUN sed -i '/^#START_BACKEND/,/^#END_BACKEND/{/^#START_BACKEND/!{/^#END_BACKEND/!d;};}' main.tf
+RUN terraform init
 RUN terraform graph -type plan > dependencies.dot
 
 ENTRYPOINT ["pytest"]
