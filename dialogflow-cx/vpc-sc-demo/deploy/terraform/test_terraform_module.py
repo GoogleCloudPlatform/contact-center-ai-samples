@@ -14,34 +14,40 @@
 
 """Module to test Terraform module graph."""
 
-import pytest
 import networkx as nx
 import pygraphviz as pgv
+import pytest
 
 GRAPH = nx.nx_agraph.from_agraph(pgv.AGraph("dependencies.dot"))
 
 
-class Resource:
-    
+class Resource:  # pylint: disable=too-few-public-methods
+    """Class to provide a readable interface to check dependencies."""
+
     def __init__(self, name):
         self.name = name
-        
+
     def depends_on(self, other):
+        """Check if a resource depends on another resource."""
         return other.name in nx.descendants(GRAPH, self.name)
 
 
 @pytest.fixture
 def reverse_proxy_vm():
     """Resource fixture"""
-    return Resource('[root] module.vpc_network.google_compute_instance.reverse_proxy_server (expand)')
+    return Resource(
+        '[root] module.vpc_network.google_compute_instance.reverse_proxy_server (expand)'
+    )
 
 
 @pytest.fixture
 def reverse_proxy_address():
     """Resource fixture"""
-    return Resource('[root] module.vpc_network.google_compute_address.reverse_proxy_address (expand)')
+    return Resource(
+        '[root] module.vpc_network.google_compute_address.reverse_proxy_address (expand)'
+    )
 
 
-def test_reverse_proxy(reverse_proxy_vm, reverse_proxy_address):
+def test_reverse_proxy(reverse_proxy_vm, reverse_proxy_address):  # pylint: disable=redefined-outer-name
     """Test if reverse proxy server depends on its address."""
     assert reverse_proxy_vm.depends_on(reverse_proxy_address)
