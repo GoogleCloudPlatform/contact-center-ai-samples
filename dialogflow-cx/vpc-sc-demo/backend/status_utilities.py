@@ -72,9 +72,7 @@ def get_access_policy_name(token, access_policy_title, project_id, error_code=20
                 response=json.dumps(
                     {
                         "status": "BLOCKED",
-                        "reason": json.loads(response.text)["error"].get(
-                            "status", "UNKNOWN_STATUS"
-                        ),
+                        "reason": "UNKNOWN_STATUS"
                     }
                 ),
             )

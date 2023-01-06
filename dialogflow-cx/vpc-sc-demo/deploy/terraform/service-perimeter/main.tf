@@ -48,7 +48,7 @@ data "google_project" "project" {
 
 resource "google_access_context_manager_service_perimeter" "service_perimeter" {
   count = var.access_policy_name=="null" ? 0 : 1
-  parent = "${var.access_policy_name}"
+  parent = var.access_policy_name
   name   = "${var.access_policy_name}/servicePerimeters/${var.service_perimeter}"
   title  = var.service_perimeter
   status {
@@ -57,4 +57,8 @@ resource "google_access_context_manager_service_perimeter" "service_perimeter" {
     ]
     restricted_services = []
   }
+  depends_on = [
+    var.accesscontextmanager_api,
+    var.cloudbilling_api,
+  ]
 }

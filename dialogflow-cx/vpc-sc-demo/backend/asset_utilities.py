@@ -22,10 +22,10 @@ import os
 import flask
 import google.auth.transport.requests
 import requests
+import status_utilities as su
 from flask import Response
 from google.oauth2 import service_account
 from invoke import task
-import status_utilities as su
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +123,7 @@ def get_terraform_env(access_token, request_args, debug=False):
             request_args["project_id"],
             error_code=500,
         )
-        if 'response' in response:
+        if "response" in response:
             return response
         env["TF_VAR_access_policy_name"] = response["access_policy_name"]
     else:
