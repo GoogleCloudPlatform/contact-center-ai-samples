@@ -35,17 +35,13 @@ class Resource:  # pylint: disable=too-few-public-methods
 @pytest.fixture
 def dialogflow_intent():
     """Resource fixture"""
-    return Resource(
-        "[root] google_dialogflow_cx_intent.order_new (expand)"
-    )
+    return Resource("[root] google_dialogflow_cx_intent.order_new (expand)")
 
 
 @pytest.fixture
 def dialogflow_entity_type():
     """Resource fixture"""
-    return Resource(
-        "[root] google_dialogflow_cx_entity_type.size (expand)"
-    )
+    return Resource("[root] google_dialogflow_cx_entity_type.size (expand)")
 
 
 def test_reverse_proxy(
