@@ -7,14 +7,14 @@ quickstart.
 
 ![Dialogflow CX Shirt Ordering Agent](images/store-order-agent.png)
 
-# Prerequisites
+## Prerequisites
 
-* Register for a Google Cloud account (https://cloud.google.com/docs/get-started)
-* Enable the Dialogflow API (https://cloud.google.com/dialogflow/cx/docs/quick/setup)
-* Install and initialize the Google Cloud `gcloud` CLI tool (https://cloud.google.com/sdk/docs/install)
-* Install Terraform (https://developer.hashicorp.com/terraform/downloads)
+* Register for a Google Cloud account (<https://cloud.google.com/docs/get-started>)
+* Enable the Dialogflow API (<https://cloud.google.com/dialogflow/cx/docs/quick/setup>)
+* Install and initialize the Google Cloud `gcloud` command-line tool (<https://cloud.google.com/sdk/docs/install>)
+* Install Terraform (<https://developer.hashicorp.com/terraform/downloads>)
 
-# Usage
+## Usage
 
 1. Clone this repository and `cd` into this directory at `dialogflow-cx/shirt-ordering-agent`
 1. Edit the values in `variables.tf`
