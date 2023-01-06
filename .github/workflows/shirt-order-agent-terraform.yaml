@@ -13,28 +13,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Dialogflow Shirt Ordering Agent Terraform Plan
+name: Dialogflow Shirt Order Agent Terraform Plan
 on:
   push:
     branches:
       - main
     paths:
-      - 'dialogflow-cx/shirt-ordering-agent/**'
+      - 'dialogflow-cx/shirt-order-agent/**'
   pull_request:
     branches:
       - main
     paths:
-      - 'dialogflow-cx/shirt-ordering-agent/**'
+      - 'dialogflow-cx/shirt-order-agent/**'
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
 
 jobs:
   pytest:
-    name: Dialogflow Shirt Ordering Agent Terraform TestJob
+    name: Dialogflow Shirt Order Agent Terraform Test
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dialogflow-cx/shirt-ordering-agent
+        working-directory: dialogflow-cx/shirt-order-agent
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # v2.0.0

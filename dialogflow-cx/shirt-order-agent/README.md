@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Shirt Ordering Agent - Using Terraform with Dialogflow CX
+# Shirt Order Agent - Using Terraform with Dialogflow CX
 
 Use Terraform to provision a Dialogflow CX agent in Google Cloud based on
 [Create a Dialogflow CX
 agent](https://cloud.google.com/dialogflow/cx/docs/quick/build-agent)
 quickstart.
 
-![Dialogflow CX Shirt Ordering Agent](images/store-order-agent.png)
+![Dialogflow CX Shirt Order Agent](images/store-order-agent.png)
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ quickstart.
 
 ## Usage
 
-1. Clone this repository and `cd` into this directory at `dialogflow-cx/shirt-ordering-agent`
+1. Clone this repository and `cd` into this directory at `dialogflow-cx/shirt-order-agent`
 1. Edit the values in `variables.tf`
 1. Run `terraform init`
 1. Run `terraform apply`
