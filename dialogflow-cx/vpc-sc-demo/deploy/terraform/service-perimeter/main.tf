@@ -29,8 +29,8 @@ variable "service_perimeter" {
   default     = "df_webhook"
 }
 
-variable "access_policy_title" {
-  description = "Access Policy"
+variable "access_policy_name" {
+  description = "Access Policy Name"
   type        = string
 }
 
@@ -46,21 +46,10 @@ data "google_project" "project" {
   project_id     = var.project_id
 }
 
-resource "google_access_context_manager_access_policy" "access_policy" {
-  count = var.access_policy_title=="null" ? 0 : 1
-  parent = "organizations/${data.google_project.project.org_id}"
-  title  = var.access_policy_title
-  scopes = ["projects/${data.google_project.project.number}"]
-  depends_on = [
-    var.accesscontextmanager_api,
-    var.cloudbilling_api,
-  ]
-}
-
 resource "google_access_context_manager_service_perimeter" "service_perimeter" {
-  count = var.access_policy_title=="null" ? 0 : 1
-  parent = "accessPolicies/${google_access_context_manager_access_policy.access_policy[0].name}"
-  name   = "accessPolicies/${google_access_context_manager_access_policy.access_policy[0].name}/servicePerimeters/${var.service_perimeter}"
+  count = var.access_policy_name=="null" ? 0 : 1
+  parent = "${var.access_policy_name}"
+  name   = "${var.access_policy_name}/servicePerimeters/${var.service_perimeter}"
   title  = var.service_perimeter
   status {
     resources = [

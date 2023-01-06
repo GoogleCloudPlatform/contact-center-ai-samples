@@ -324,11 +324,35 @@ function GenericErrorDialog(props) {
   );
 }
 
+function AccessPolicyErrorDialog(props) {
+  return (
+    <Dialog open={props.open} onClose={() => {}}>
+      <DialogTitle>{'Policy Not Found:'}</DialogTitle>
+      <DialogContent>
+        <DialogContentText style={{whiteSpace: 'pre'}}>
+          Error using Access Policy "{props.badAccessPolicyTitle}": {props.error.response.data.reason}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={props.onClickCancel} variant="contained">
+          OK
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 function ErrorDialog(props) {
   let resourceName;
   let responseType = null;
 
   if (
+    props.error !== null &&
+    Object.hasOwn(props.error.response.data, 'status') &&
+    props.error.response.data.status === "BLOCKED"
+    ) {
+    responseType = 'ACCESS_POLICY_ERROR';
+  } else if (
     props.error !== null &&
     props.error.response.data.errors[0]['diagnostic']['summary'] ===
       'googleapi: Error 409: Your previous request to create the named bucket succeeded and you already own it., conflict'
@@ -395,6 +419,12 @@ function ErrorDialog(props) {
     }
   }, [props, resourceName]);
 
+  useEffect(() => {
+    if (responseType === 'ACCESS_POLICY_ERROR') {
+      props.dataModel.validAccessPolicy.set(false);
+    }
+  }, [responseType]);
+
   if (responseType === 'STATE_LOCK') {
     return (
       <StateLockErrorDialog
@@ -434,6 +464,15 @@ function ErrorDialog(props) {
         onClickCancel={props.onClickCancel}
       />
     );
+  } else if (responseType === 'ACCESS_POLICY_ERROR') {
+    return (
+      <AccessPolicyErrorDialog
+        open={props.open}
+        onClickCancel={props.onClickCancel}
+        error={props.error}
+        badAccessPolicyTitle={props.dataModel.projectData.accessPolicyTitle.current}
+      />
+    );
   } else if (responseType === null) {
     return <></>;
   }
@@ -457,6 +496,7 @@ function ToggleAsset(props) {
 
   function queryFunction() {
     let destroy = asset.current === true ? true : false;
+    props.dataModel.validAccessPolicy.set(true);
     if (
       props.isModuleSwitch &&
       props.dataModel.invertAssetCollectionSwitches.current &&
@@ -656,13 +696,6 @@ function ToggleAsset(props) {
 
   return (
     <>
-      {/* <AlertDialog
-        open={alertBoxOpen}
-        onClickCancel={handleAlertBoxClose}
-        onClickDestroy={handleAlertBoxDestroy}
-        target={props.target}
-        name={props.name}
-      /> */}
       <ErrorDialog
         open={errorBoxOpen}
         onClickCancel={handleErrorBoxCancel}
@@ -705,6 +738,7 @@ function PollAssetStatus(props) {
 
   function queryFunction() {
     props.dataModel.terraformLocked.set(true);
+    props.dataModel.validAccessPolicy.set(true);
     return axios
       .get('/asset_status', {
         params: {
@@ -746,12 +780,18 @@ function PollAssetStatus(props) {
             assetStatus.data.resources.includes(key)
           );
         }
-        props.dataModel.projectData.accessPolicyTitle.set(
-          assetStatus.data.accessPolicyTitle
-        );
       }
     }
   });
+
+  useEffect(() => {
+    if (props.dataModel.refetchAssetStatus.current===true)
+    {
+      assetStatus.refetch();
+      props.dataModel.refetchAssetStatus.set(false);
+    }
+  });
+  
 
   const handleErrorBoxCancel = () => {
     setErrorBoxOpen(false);

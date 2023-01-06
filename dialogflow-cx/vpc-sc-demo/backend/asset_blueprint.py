@@ -48,6 +48,8 @@ def asset_status():  # pylint: disable=too-many-locals
         flask.request.args,
         debug=asu.get_debug(flask.request),
     )
+    if 'response' in env:
+        return env['response']
     ctx = context.Context()
     module = "/deploy/terraform/main.tf"
     prefix = f'terraform/{flask.request.args["project_id"]}'
@@ -112,6 +114,8 @@ def update_target():
         flask.request.args,
         debug=asu.get_debug(flask.request),
     )
+    if 'response' in env:
+        return env['response']
     targets = content.get("targets")
     destroy = content["destroy"]
 
