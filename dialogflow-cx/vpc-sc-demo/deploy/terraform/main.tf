@@ -110,10 +110,12 @@ terraform {
   required_providers {
     google = "~> 4.37.0"
   }
+#START_BACKEND
   backend "gcs" {
     bucket  = null
     prefix  = null
   }
+#END_BACKEND
 }
 
 resource "google_project_service" "serviceusage" {
