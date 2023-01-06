@@ -92,12 +92,11 @@ function AccessPolicyField(props) {
     typeof props.dataModel.projectData.accessPolicyTitle.current === 'undefined'
   );
 
-  function keyPress(e){
-    if(e.keyCode === 13){
+  function keyPress(e) {
+    if (e.keyCode === 13) {
       props.dataModel.refetchAssetStatus.set(true);
     }
-  };
-
+  }
 
   const textFieldColor = props.dataModel.validAccessPolicy.current
     ? 'primary'
@@ -125,7 +124,7 @@ function AccessPolicyField(props) {
       InputLabelProps={{
         shrink: shrink,
       }}
-      focused={textFieldColor==='error' ? true : false}
+      focused={textFieldColor === 'error' ? true : false}
     />
   );
 }

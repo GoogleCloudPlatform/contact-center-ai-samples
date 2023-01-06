@@ -330,7 +330,8 @@ function AccessPolicyErrorDialog(props) {
       <DialogTitle>{'Policy Not Found:'}</DialogTitle>
       <DialogContent>
         <DialogContentText style={{whiteSpace: 'pre'}}>
-          Error using Access Policy "{props.badAccessPolicyTitle}": {props.error.response.data.reason}
+          Error using Access Policy &quot;{props.badAccessPolicyTitle}&quot;:{' '}
+          {props.error.response.data.reason}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
@@ -349,8 +350,8 @@ function ErrorDialog(props) {
   if (
     props.error !== null &&
     Object.hasOwn(props.error.response.data, 'status') &&
-    props.error.response.data.status === "BLOCKED"
-    ) {
+    props.error.response.data.status === 'BLOCKED'
+  ) {
     responseType = 'ACCESS_POLICY_ERROR';
   } else if (
     props.error !== null &&
@@ -419,11 +420,16 @@ function ErrorDialog(props) {
     }
   }, [props, resourceName]);
 
-  useEffect(() => {
-    if (responseType === 'ACCESS_POLICY_ERROR') {
-      props.dataModel.validAccessPolicy.set(false);
-    }
-  }, [responseType]);
+  useEffect(
+    () => {
+      if (responseType === 'ACCESS_POLICY_ERROR') {
+        props.dataModel.validAccessPolicy.set(false);
+      }
+    },
+    /* eslint-disable react-hooks/exhaustive-deps */
+    [responseType]
+    /* eslint-enable react-hooks/exhaustive-deps */
+  );
 
   if (responseType === 'STATE_LOCK') {
     return (
@@ -470,7 +476,9 @@ function ErrorDialog(props) {
         open={props.open}
         onClickCancel={props.onClickCancel}
         error={props.error}
-        badAccessPolicyTitle={props.dataModel.projectData.accessPolicyTitle.current}
+        badAccessPolicyTitle={
+          props.dataModel.projectData.accessPolicyTitle.current
+        }
       />
     );
   } else if (responseType === null) {
@@ -785,13 +793,11 @@ function PollAssetStatus(props) {
   });
 
   useEffect(() => {
-    if (props.dataModel.refetchAssetStatus.current===true)
-    {
+    if (props.dataModel.refetchAssetStatus.current === true) {
       assetStatus.refetch();
       props.dataModel.refetchAssetStatus.set(false);
     }
   });
-  
 
   const handleErrorBoxCancel = () => {
     setErrorBoxOpen(false);
