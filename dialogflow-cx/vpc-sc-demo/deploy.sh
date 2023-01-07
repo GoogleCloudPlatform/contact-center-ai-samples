@@ -69,4 +69,5 @@ gcloud run deploy "${SERVICE_NAME?}"\
   --region=us-central1\
   --image="${IMAGE?}":"${TAG?}"\
   --allow-unauthenticated \
+  --update-env-vars=ANALYTICS_DATABASE="${ANALYTICS_DATABASE?}",TF_PLAN_STORAGE_BUCKET="${TF_PLAN_STORAGE_BUCKET?}" \
   --tag="${SERVICE_TAG?}"
