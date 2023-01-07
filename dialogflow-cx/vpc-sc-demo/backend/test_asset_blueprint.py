@@ -33,16 +33,20 @@ def get_result(
     endpoint,
     method="get",
     json_data=None,
+    query_dict=None,
 ):
     """Helper function to get result from a test client."""
+    if query_dict is None:
+        query_dict = {
+            "project_id": "MOCK_PROJECT_ID",
+            "region": "MOCK_REGION",
+            "bucket": "MOCK_BUCKET_NAME",
+        }
+
     with app.test_client() as curr_client:
         fcn = curr_client.get if method == "get" else curr_client.post
         kwargs = {
-            "query_string": {
-                "project_id": "MOCK_PROJECT_ID",
-                "region": "MOCK_REGION",
-                "bucket": "MOCK_BUCKET_NAME",
-            },
+            "query_string": query_dict,
         }
         if json_data:
             kwargs["json"] = json_data
@@ -62,7 +66,7 @@ def get_result(
     indirect=["app"],
 )
 def test_asset_status_bad_token(app, endpoint, how):
-    """Test /asset_status, bad token"""
+    """Test asset endpoints, bad token"""
     with patch.object(
         get_token, "get_token", return_value={"response": "MOCK_RESPONSE"}
     ):
@@ -76,6 +80,35 @@ def test_asset_status_bad_token(app, endpoint, how):
                     endpoint, base_url=f"https://{MOCK_DOMAIN}"
                 )
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
+
+
+@pytest.mark.parametrize(
+    "app,endpoint,how",
+    [
+        (blueprint, "/asset_status", "get"),
+        (blueprint, "/update_target", "post"),
+    ],
+    indirect=["app"],
+)
+@patch.object(
+    get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
+)
+def test_asset_status_no_project_id(mock_get_token, app, endpoint, how):
+    """Test asset endpoints, no project_id"""
+    return_value = get_result(
+        app,
+        endpoint,
+        method=how,
+        json_data={},
+        query_dict={},
+    )
+    assert_response(
+        return_value,
+        200,
+        endpoint,
+        json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
+    )
+    mock_get_token.assert_called_once()
 
 
 @pytest.mark.parametrize(

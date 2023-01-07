@@ -636,6 +636,7 @@ function ToggleAsset(props) {
   let visibility;
   if (
     !props.dataModel.validProjectId.current ||
+    !props.dataModel.validAccessPolicy.current ||
     update.isFetching ||
     tfImport.isFetching ||
     typeof asset.current !== 'boolean' ||
@@ -779,9 +780,7 @@ function PollAssetStatus(props) {
 
   useEffect(() => {
     if (assetStatus.data && completed.current) {
-      if (assetStatus.data.status === 'BLOCKED') {
-        console.log(assetStatus.data.reason);
-      } else {
+      if (assetStatus.data.status !== 'BLOCKED') {
         completed.current = false;
         for (const key in props.dataModel.assetStatus) {
           props.dataModel.assetStatus[key].set(
