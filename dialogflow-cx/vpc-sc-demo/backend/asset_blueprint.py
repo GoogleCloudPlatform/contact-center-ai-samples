@@ -43,7 +43,7 @@ def asset_status():  # pylint: disable=too-many-locals,too-many-return-statement
     if not flask.request.args.get("project_id"):
         return flask.Response(
             status=200,
-            response=json.dumps({'status': 'BLOCKED', 'reason':'NO_PROJECT_ID'})
+            response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
         )
     target = flask.request.args.get("target", None)
     update = flask.request.args.get("update", True)
@@ -114,7 +114,7 @@ def update_target():  # pylint: disable=too-many-return-statements
     if not flask.request.args.get("project_id"):
         return flask.Response(
             status=200,
-            response=json.dumps({'status': 'BLOCKED', 'reason':'NO_PROJECT_ID'})
+            response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
         )
     content = flask.request.get_json(silent=True)
     access_token = token_dict["access_token"]
