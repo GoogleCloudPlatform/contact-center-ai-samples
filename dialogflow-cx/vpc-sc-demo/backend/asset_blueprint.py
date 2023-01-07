@@ -35,11 +35,16 @@ ACCESS_POLICY_RESOURCE = (
 
 
 @asset.route("/asset_status", methods=["GET"])
-def asset_status():  # pylint: disable=too-many-locals,too-many-return-statements
+def asset_status():  # pylint: disable=too-many-locals,too-many-return-statements,too-many-branches
     """Get status of terraform-tracked assets."""
     token_dict = get_token.get_token(flask.request, token_type="access_token")
     if "response" in token_dict:
         return token_dict["response"]
+    if not flask.request.args.get("project_id"):
+        return flask.Response(
+            status=200,
+            response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
+        )
     target = flask.request.args.get("target", None)
     update = flask.request.args.get("update", True)
     access_token = token_dict["access_token"]
@@ -106,6 +111,11 @@ def update_target():  # pylint: disable=too-many-return-statements
     token_dict = get_token.get_token(flask.request, token_type="access_token")
     if "response" in token_dict:
         return token_dict["response"]
+    if not flask.request.args.get("project_id"):
+        return flask.Response(
+            status=200,
+            response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
+        )
     content = flask.request.get_json(silent=True)
     access_token = token_dict["access_token"]
 
