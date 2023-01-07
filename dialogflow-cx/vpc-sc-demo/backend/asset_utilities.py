@@ -22,6 +22,7 @@ import os
 import flask
 import google.auth.transport.requests
 import requests
+import status_utilities as su
 from flask import Response
 from google.oauth2 import service_account
 from invoke import task
@@ -115,10 +116,18 @@ def get_terraform_env(access_token, request_args, debug=False):
     env["TF_VAR_project_id"] = request_args["project_id"]
     env["TF_VAR_bucket"] = request_args["bucket"]
     env["TF_VAR_region"] = request_args["region"]
-    if "access_policy_title" in request_args:
-        env["TF_VAR_access_policy_title"] = request_args["access_policy_title"]
+    if request_args.get("access_policy_title", None):
+        response = su.get_access_policy_name(
+            access_token,
+            request_args["access_policy_title"],
+            request_args["project_id"],
+            error_code=500,
+        )
+        if "response" in response:
+            return response
+        env["TF_VAR_access_policy_name"] = response["access_policy_name"]
     else:
-        env["TF_VAR_access_policy_title"] = "null"
+        env["TF_VAR_access_policy_name"] = "null"
     if debug:
         env["TF_LOG"] = "DEBUG"
     return env

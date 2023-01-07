@@ -91,6 +91,17 @@ function AccessPolicyField(props) {
     props.dataModel.projectData.accessPolicyTitle.current === '' ||
     typeof props.dataModel.projectData.accessPolicyTitle.current === 'undefined'
   );
+
+  function keyPress(e) {
+    if (e.keyCode === 13) {
+      props.dataModel.refetchAssetStatus.set(true);
+    }
+  }
+
+  const textFieldColor = props.dataModel.validAccessPolicy.current
+    ? 'primary'
+    : 'error';
+
   return (
     <TextField
       sx={props.sx ? props.sx : {mx: 2, width: 350}}
@@ -104,13 +115,16 @@ function AccessPolicyField(props) {
           : props.dataModel.projectData.accessPolicyTitle.current
       }
       onChange={onChange}
+      onKeyDown={keyPress}
       placeholder={''}
       InputProps={{spellCheck: 'false'}}
       disabled={props.dataModel.terraformLocked.current}
-      color="primary"
+      // color="primary"
+      color={textFieldColor}
       InputLabelProps={{
         shrink: shrink,
       }}
+      focused={textFieldColor === 'error' ? true : false}
     />
   );
 }

@@ -21,6 +21,7 @@ import os
 import asset_utilities as asu
 import pytest
 import requests
+import status_utilities as su
 from conftest import MockReturnObject, assert_response
 from google.oauth2 import service_account
 from invoke import MockContext as MockContextBase
@@ -113,7 +114,18 @@ def request_args():
                 "TF_VAR_project_id": "MOCK_PROJECT_ID",
                 "TF_VAR_bucket": "MOCK_BUCKET",
                 "TF_VAR_region": "MOCK_REGION",
-                "TF_VAR_access_policy_title": "null",
+                "TF_VAR_access_policy_name": "null",
+            },
+        ),
+        (
+            "",
+            False,
+            {
+                "GOOGLE_OAUTH_ACCESS_TOKEN": "MOCK_TOKEN",
+                "TF_VAR_project_id": "MOCK_PROJECT_ID",
+                "TF_VAR_bucket": "MOCK_BUCKET",
+                "TF_VAR_region": "MOCK_REGION",
+                "TF_VAR_access_policy_name": "null",
             },
         ),
         (
@@ -124,7 +136,7 @@ def request_args():
                 "TF_VAR_project_id": "MOCK_PROJECT_ID",
                 "TF_VAR_bucket": "MOCK_BUCKET",
                 "TF_VAR_region": "MOCK_REGION",
-                "TF_VAR_access_policy_title": "MOCK_ACCESS_POLICY_TITLE",
+                "TF_VAR_access_policy_name": "MOCK_ACCESS_POLICY_NAME",
             },
         ),
         (
@@ -135,9 +147,14 @@ def request_args():
                 "TF_VAR_project_id": "MOCK_PROJECT_ID",
                 "TF_VAR_bucket": "MOCK_BUCKET",
                 "TF_VAR_region": "MOCK_REGION",
-                "TF_VAR_access_policy_title": "MOCK_ACCESS_POLICY_TITLE",
+                "TF_VAR_access_policy_name": "MOCK_ACCESS_POLICY_NAME",
                 "TF_LOG": "DEBUG",
             },
+        ),
+        (
+            "BAD_ACCESS_POLICY_TITLE",
+            False,
+            {"response": "ERROR_RESPONSE"},
         ),
     ],
 )
@@ -145,10 +162,17 @@ def test_get_terraform_env(  # pylint: disable=redefined-outer-name
     access_policy_title, debug, expected, request_args
 ):
     """Test get_terraform_env."""
-    if access_policy_title:
-        request_args["access_policy_title"] = "MOCK_ACCESS_POLICY_TITLE"
+    if access_policy_title is None:
+        result = asu.get_terraform_env("MOCK_TOKEN", request_args, debug=debug)
 
-    result = asu.get_terraform_env("MOCK_TOKEN", request_args, debug=debug)
+    else:
+        request_args["access_policy_title"] = access_policy_title
+        if access_policy_title == "BAD_ACCESS_POLICY_TITLE":
+            return_value = {"response": "ERROR_RESPONSE"}
+        else:
+            return_value = {"access_policy_name": "MOCK_ACCESS_POLICY_NAME"}
+        with patch.object(su, "get_access_policy_name", return_value=return_value):
+            result = asu.get_terraform_env("MOCK_TOKEN", request_args, debug=debug)
     assert result == expected
 
 
