@@ -69,12 +69,7 @@ def get_access_policy_name(token, access_policy_title, project_id, error_code=20
         return {
             "response": flask.Response(
                 status=error_code,
-                response=json.dumps(
-                    {
-                        "status": "BLOCKED",
-                        "reason": "UNKNOWN_STATUS"
-                    }
-                ),
+                response=json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_STATUS"}),
             )
         }
 
