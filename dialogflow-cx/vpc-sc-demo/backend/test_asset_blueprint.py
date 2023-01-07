@@ -78,6 +78,37 @@ def test_asset_status_bad_token(app, endpoint, how):
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
+@pytest.mark.parametrize(
+    "app,endpoint",
+    [
+        (blueprint, "/update_target"),
+        (blueprint, "/asset_status"),
+    ],
+    indirect=["app"],
+)
+@patch.object(
+    get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
+)
+@patch.object(asu, "get_terraform_env", return_value={"response": "MOCK_RESPONSE"})
+def test_asset_status_bad_terraform_env(
+    mock_get_terraform_env,
+    mock_get_token,
+    app,
+    endpoint,
+):
+    """Test /asset_status, bad response from get_terraform_env."""
+    method = "post" if endpoint == "/update_target" else "get"
+    return_value = get_result(
+        app,
+        endpoint,
+        method=method,
+        json_data={},
+    )
+    assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
+    mock_get_token.assert_called_once()
+    mock_get_terraform_env.assert_called_once()
+
+
 @pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_asset_status_init_exit(app):
     """Test /asset_status, init had nonzero return value."""

@@ -87,7 +87,7 @@ variable "service_perimeter" {
   default     = "df_webhook"
 }
 
-variable "access_policy_title" {
+variable "access_policy_name" {
   description = "Access Policy"
   default = "null"
   type        = string
@@ -339,6 +339,6 @@ module "service_perimeter" {
   project_id = var.project_id
   service_perimeter = var.service_perimeter
   accesscontextmanager_api = google_project_service.accesscontextmanager
-  access_policy_title = var.access_policy_title
+  access_policy_name = var.access_policy_name
   cloudbilling_api = google_project_service.cloudbilling
 }
