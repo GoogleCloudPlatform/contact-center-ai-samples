@@ -300,10 +300,12 @@ function DataModel() {
   const renderedPageNumber = {current: null, set: null};
   const terraformLocked = {current: null, set: null};
   const validProjectId = {current: null, set: null};
+  const validAccessPolicy = {current: null, set: null};
   const invertAssetCollectionSwitches = {current: null, set: null};
   const showServicesPanel = {current: null, set: null};
   const sessionExpiredModalOpen = {current: null, set: null};
   const loginRedirect = {current: null, set: null};
+  const refetchAssetStatus = {current: null, set: null};
 
   const allStates = {};
   allStates['dialogflowRestrictedState'] = getState();
@@ -322,12 +324,14 @@ function DataModel() {
   [renderedPageNumber.current, renderedPageNumber.set] = useState(null);
   [terraformLocked.current, terraformLocked.set] = useState(false);
   [validProjectId.current, validProjectId.set] = useState(false);
+  [validAccessPolicy.current, validAccessPolicy.set] = useState(true);
   [invertAssetCollectionSwitches.current, invertAssetCollectionSwitches.set] =
     useState(false);
   [showServicesPanel.current, showServicesPanel.set] = useState(true);
   [sessionExpiredModalOpen.current, sessionExpiredModalOpen.set] =
     useState(false);
   [loginRedirect.current, loginRedirect.set] = useState(false);
+  [refetchAssetStatus.current, refetchAssetStatus.set] = useState(true);
 
   const dataModel = {
     pageMapper: pageMapper,
@@ -339,10 +343,12 @@ function DataModel() {
     assetStatus: AssetStatus(),
     terraformLocked: terraformLocked,
     validProjectId: validProjectId,
+    validAccessPolicy: validAccessPolicy,
     invertAssetCollectionSwitches: invertAssetCollectionSwitches,
     showServicesPanel: showServicesPanel,
     sessionExpiredModalOpen: sessionExpiredModalOpen,
     loginRedirect: loginRedirect,
+    refetchAssetStatus: refetchAssetStatus,
     activePage: {current: null, set: null},
     queryParams: {},
   };

@@ -35,7 +35,7 @@ ACCESS_POLICY_RESOURCE = (
 
 
 @asset.route("/asset_status", methods=["GET"])
-def asset_status():  # pylint: disable=too-many-locals
+def asset_status():  # pylint: disable=too-many-locals,too-many-return-statements
     """Get status of terraform-tracked assets."""
     token_dict = get_token.get_token(flask.request, token_type="access_token")
     if "response" in token_dict:
@@ -48,6 +48,8 @@ def asset_status():  # pylint: disable=too-many-locals
         flask.request.args,
         debug=asu.get_debug(flask.request),
     )
+    if "response" in env:
+        return env["response"]
     ctx = context.Context()
     module = "/deploy/terraform/main.tf"
     prefix = f'terraform/{flask.request.args["project_id"]}'
@@ -99,7 +101,7 @@ def asset_status():  # pylint: disable=too-many-locals
 
 
 @asset.route("/update_target", methods=["POST"])
-def update_target():
+def update_target():  # pylint: disable=too-many-return-statements
     """Use terraform to update a target."""
     token_dict = get_token.get_token(flask.request, token_type="access_token")
     if "response" in token_dict:
@@ -112,6 +114,8 @@ def update_target():
         flask.request.args,
         debug=asu.get_debug(flask.request),
     )
+    if "response" in env:
+        return env["response"]
     targets = content.get("targets")
     destroy = content["destroy"]
 
