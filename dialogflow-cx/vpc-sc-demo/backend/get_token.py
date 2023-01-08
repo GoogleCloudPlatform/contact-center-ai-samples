@@ -106,7 +106,7 @@ def get_token_from_auth_server(session_id, auth_service_hostname=AUTH_SERVICE_HO
         )
         return {
             "response": flask.Response(
-                status=500,
+                status=200,
                 response=json.dumps(
                     {"status": "BLOCKED", "reason": "REJECTED_REQUEST"}
                 ),
@@ -165,7 +165,7 @@ def get_token(
             }
         return {
             "response": flask.Response(
-                status=500,
+                status=200,
                 response=json.dumps({"status": "BLOCKED", "reason": "UNKNOWN"}),
             )
         }
@@ -174,7 +174,7 @@ def get_token(
         logger.info("  oauth error: email not verified")
         return {
             "response": flask.Response(
-                status=500,
+                status=200,
                 response=json.dumps({"status": "BLOCKED", "reason": "BAD_EMAIL"}),
             )
         }
@@ -194,7 +194,7 @@ def get_token(
         logger.info(response)
         response = {
             "response": flask.Response(
-                status=500,
+                status=200,
                 response=json.dumps({"status": "BLOCKED", "reason": response.lstrip()}),
             )
         }

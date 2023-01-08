@@ -63,7 +63,7 @@ jobs:
           egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
 
       - name: Checkout Code
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
           fetch-depth: 0
       - name: Install missing python packages
@@ -77,6 +77,8 @@ jobs:
           pip install -r dialogflow-cx/requirements-test.txt
           pip install -r dialogflow-cx/vpc-sc-auth-server/server/requirements.txt
           pip install -r dialogflow-cx/vpc-sc-auth-server/server/requirements-test.txt
+          pip install -r dialogflow-cx/vpc-sc-demo/backend/requirements.txt
+          pip install -r dialogflow-cx/vpc-sc-demo/backend/requirements-test.txt
           mv .venv /home/runner/work/_temp/_github_workflow
       - name: Lint Code Base
         uses: github/super-linter/slim@bb2d833b08b6c288608686672b93a8a4589cdc49 # v4.9.7
@@ -103,4 +105,5 @@ jobs:
           TERRAFORM_TERRASCAN_CONFIG_FILE: terrascan.toml
           PYTHONPATH: "/github/workspace:/github/workflow/.venv/lib/python3.10/site-packages"
           YAML_ERROR_ON_WARNING: true
+          CSS_FILE_NAME: .stylelintrc.json
 ...

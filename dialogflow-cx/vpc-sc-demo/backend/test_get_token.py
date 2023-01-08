@@ -26,17 +26,10 @@ from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 from google.oauth2 import id_token
 from mock import mock_open, patch
-from werkzeug.test import EnvironBuilder
-
-
-@pytest.fixture
-def lru_fixture():
-    """Fixture function for testing LruCache."""
-    return lambda x: x
 
 
 @pytest.mark.hermetic
-def test_lru_cache_bump_out(lru_fixture):  # pylint: disable=redefined-outer-name
+def test_lru_cache_bump_out(lru_fixture):
     """Test LruCache bumps LRU value out when over capacity."""
     max_size, test_size, = (
         5,
@@ -57,7 +50,7 @@ def test_lru_cache_bump_out(lru_fixture):  # pylint: disable=redefined-outer-nam
 
 
 @pytest.mark.hermetic
-def test_lru_cache_reuse(lru_fixture):  # pylint: disable=redefined-outer-name
+def test_lru_cache_reuse(lru_fixture):
     """Test LruCache does cache lookup instead of retrieval."""
     mock_val = 10
     cache = get_token.LruCache(lru_fixture, max_size=1)
@@ -73,7 +66,7 @@ def test_get_token_from_auth_server_unknown_integration():
     mock_session_id = "UNKNOWN_SESSION_ID"
 
     result = get_token.get_token_from_auth_server(mock_session_id)
-    assert_response(result, 500, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
 
 
 @pytest.mark.hermetic
@@ -86,7 +79,7 @@ def test_get_token_from_auth_server_unknown_hermetic_401():
 
     with patch.object(requests, "get", return_value=return_value):
         result = get_token.get_token_from_auth_server(mock_session_id)
-    assert_response(result, 500, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
 
 
 @pytest.mark.hermetic
@@ -149,36 +142,29 @@ def test_get_token_from_auth_server_unknown_hermetic_200():
 
 
 @pytest.mark.hermetic
-def test_get_token_no_session_id():
+def test_get_token_no_session_id(mock_request):
     """Test get_token."""
-
-    builder = EnvironBuilder()
-    request = builder.get_request()
-    result = get_token.get_token(request)
+    result = get_token.get_token(mock_request)
     assert_response(result, 200, {"status": "BLOCKED", "reason": "BAD_SESSION_ID"})
 
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize("precache", [False, True])
-def test_get_token_cached(precache):
+def test_get_token_cached(mock_request, precache):
     """Test get_token when response is cached."""
-
     mock_session_id = "MOCK_SESSION_ID"
     mock_cache_response = {"response": {"MOCK_TOKEN_KEY": "MOCK_TOKEN_VAL"}}
 
     cache = get_token.LruCache(lambda _: mock_cache_response)
     if precache:
         cache.cache[mock_session_id] = mock_cache_response
-
-    builder = EnvironBuilder()
-    request = builder.get_request()
-    request.cookies = {"session_id": mock_session_id}
-    result = get_token.get_token(request, cache=cache)
+    mock_request.cookies = {"session_id": mock_session_id}
+    result = get_token.get_token(mock_request, cache=cache)
     assert result == mock_cache_response
 
 
 @pytest.mark.hermetic
-def test_get_token_failure_unknown():
+def test_get_token_failure_unknown(mock_request):
     """Test get_token with an unknown auth server error"""
     mock_session_id = "MOCK_SESSION_ID"
     mock_cache_response = {"auth_data": {"id_token": "MOCK_ID_TOKEN"}}
@@ -189,21 +175,19 @@ def test_get_token_failure_unknown():
         del request
         raise ValueError("Unknown error")
 
-    builder = EnvironBuilder()
-    request = builder.get_request()
-    request.cookies = {"session_id": mock_session_id}
+    mock_request.cookies = {"session_id": mock_session_id}
     with patch.object(
         id_token,
         "verify_oauth2_token",
         new=mock_verify_oauth2_token_raise_unknown_error,
     ):
-        result = get_token.get_token(request, cache=cache)
-    result = get_token.get_token(request, cache=cache)
-    assert_response(result, 500, {"status": "BLOCKED", "reason": "UNKNOWN"})
+        result = get_token.get_token(mock_request, cache=cache)
+    result = get_token.get_token(mock_request, cache=cache)
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "UNKNOWN"})
 
 
 @pytest.mark.hermetic
-def test_get_token_failure_expired():
+def test_get_token_failure_expired(mock_request):
     """Test get_token with an expired token."""
     mock_session_id = "MOCK_SESSION_ID"
     mock_cache_response = {"auth_data": {"id_token": "MOCK_ID_TOKEN"}}
@@ -214,20 +198,18 @@ def test_get_token_failure_expired():
         del request
         raise ValueError("Token expired")
 
-    builder = EnvironBuilder()
-    request = builder.get_request()
-    request.cookies = {"session_id": mock_session_id}
+    mock_request.cookies = {"session_id": mock_session_id}
     with patch.object(
         id_token,
         "verify_oauth2_token",
         new=mock_verify_oauth2_token_raise_value_error,
     ):
-        result = get_token.get_token(request, cache=cache)
+        result = get_token.get_token(mock_request, cache=cache)
     assert_response(result, 200, {"status": "BLOCKED", "reason": "TOKEN_EXPIRED"})
 
 
 @pytest.mark.hermetic
-def test_get_token_failure_bad_email():
+def test_get_token_failure_bad_email(mock_request):
     """Test get_token, with a bad email address."""
     mock_session_id = "MOCK_SESSION_ID"
     mock_cache_response = {"auth_data": {"id_token": "MOCK_ID_TOKEN"}}
@@ -238,16 +220,14 @@ def test_get_token_failure_bad_email():
         del request
         return {"email_verified": False}
 
-    builder = EnvironBuilder()
-    request = builder.get_request()
-    request.cookies = {"session_id": mock_session_id}
+    mock_request.cookies = {"session_id": mock_session_id}
     with patch.object(
         id_token,
         "verify_oauth2_token",
         new=mock_verify_oauth2_token_raise_value_error,
     ):
-        result = get_token.get_token(request, cache=cache)
-    assert_response(result, 500, {"status": "BLOCKED", "reason": "BAD_EMAIL"})
+        result = get_token.get_token(mock_request, cache=cache)
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "BAD_EMAIL"})
 
 
 @pytest.mark.hermetic
@@ -260,7 +240,7 @@ def test_get_token_failure_bad_email():
         ("UNKNOWN", None),
     ],
 )
-def test_get_token_failure_success(token_type, expected):
+def test_get_token_failure_success(token_type, expected, mock_request):
     """Test get token for all token_types including an unknown type."""
     mock_session_id = "MOCK_SESSION_ID"
     mock_cache_response = {
@@ -277,15 +257,13 @@ def test_get_token_failure_success(token_type, expected):
         del request
         return {"email_verified": True}
 
-    builder = EnvironBuilder()
-    request = builder.get_request()
-    request.cookies = {"session_id": mock_session_id}
+    mock_request.cookies = {"session_id": mock_session_id}
     with patch.object(
         id_token,
         "verify_oauth2_token",
         new=mock_verify_oauth2_token,
     ):
-        result = get_token.get_token(request, cache=cache, token_type=token_type)
+        result = get_token.get_token(mock_request, cache=cache, token_type=token_type)
 
     if token_type != "UNKNOWN":
         assert len(result) == 1
@@ -293,7 +271,7 @@ def test_get_token_failure_success(token_type, expected):
     else:
         assert_response(
             result,
-            500,
+            200,
             {
                 "status": "BLOCKED",
                 "reason": (

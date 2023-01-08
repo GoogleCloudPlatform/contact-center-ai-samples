@@ -26,14 +26,14 @@ RUN apk add --no-cache \
 ARG PROD
 ENV PROD=${PROD:-true}
 
-RUN wget -nv https://releases.hashicorp.com/terraform/1.2.9/terraform_1.2.9_linux_amd64.zip
+RUN curl -LJO https://releases.hashicorp.com/terraform/1.2.9/terraform_1.2.9_linux_amd64.zip
 RUN unzip terraform_1.2.9_linux_amd64.zip
 RUN mv terraform /usr/bin/terraform
 
 # Frontend
-WORKDIR /backend/frontend
+COPY frontend/ /frontend
+WORKDIR /frontend
 
-COPY frontend/ /backend/frontend/
 RUN npm install react-scripts@5.0.1 && npm run build
 
 # Backend
@@ -54,6 +54,12 @@ COPY components/reverse_proxy_server/proxy-server-src /components/proxy-server-s
 
 RUN mkdir -p /deploy/.terraform.d/plugin-cache
 
+# Suggested by hadolint DL4006:
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Install gcloud cli:
+RUN curl -sSL https://sdk.cloud.google.com | bash
+RUN echo 'source /root/google-cloud-sdk/path.bash.inc' | tee /root/.bashrc > /dev/null
 
 EXPOSE 8080
 CMD ["gunicorn", "--bind=0.0.0.0:8080", "--workers=1", "--threads=8", "--log-level=info", "app:app"]

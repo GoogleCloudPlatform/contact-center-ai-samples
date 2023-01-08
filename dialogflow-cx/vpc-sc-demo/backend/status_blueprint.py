@@ -18,7 +18,6 @@ import json
 import logging
 
 import flask
-import get_token
 import requests
 import status_utilities as su
 
@@ -26,65 +25,22 @@ status = flask.Blueprint("status", __name__)
 logger = logging.getLogger(__name__)
 
 
-def get_token_and_project(request):
-    """Helper method to retrieve a token or project, or return early."""
-    response = {}
-    token_dict = get_token.get_token(request, token_type="access_token")
-    if "response" in token_dict:
-        return token_dict
-    response["token"] = token_dict["access_token"]
-
-    response["project_id"] = flask.request.args.get("project_id", None)
-    if not response["project_id"]:
-        return {
-            "response": flask.Response(
-                status=200,
-                response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
-            )
-        }
-    return response
-
-
-def get_restricted_service_status(request, service_key):
-    """Get status of restricted service:"""
-    data = get_token_and_project(request)
-    if "response" in data:
-        return data["response"]
-    project_id, token = data["project_id"], data["token"]
-    access_policy_title = request.args.get("access_policy_title", None)
-
-    response = su.get_access_policy_name(token, access_policy_title, project_id)
-    if "response" in response:
-        return response["response"]
-    access_policy_name = response["access_policy_name"]
-    status_dict = su.get_restricted_services_status(
-        token, project_id, access_policy_name
-    )
-    if "response" in status_dict:
-        return status_dict["response"]
-
-    return flask.Response(
-        status=200,
-        response=json.dumps({"status": status_dict[service_key]}),
-    )
-
-
 @status.route("/restricted_services_status_cloudfunctions", methods=["GET"])
 def restricted_services_status_cloudfunctions():
     """Get boolean status of wether cloudfunctions is restricted."""
-    return get_restricted_service_status(flask.request, "cloudfunctions_restricted")
+    return su.get_restricted_service_status(flask.request, "cloudfunctions_restricted")
 
 
 @status.route("/restricted_services_status_dialogflow", methods=["GET"])
 def restricted_services_status_dialogflow():
     """Get boolean status of wether dialogflow is restricted."""
-    return get_restricted_service_status(flask.request, "dialogflow_restricted")
+    return su.get_restricted_service_status(flask.request, "dialogflow_restricted")
 
 
 @status.route("/webhook_ingress_internal_only_status", methods=["GET"])
 def webhook_ingress_internal_only_status():
     """Get boolean status of internally restricted webhook ingress."""
-    data = get_token_and_project(flask.request)
+    data = su.get_token_and_project(flask.request)
     if "response" in data:
         return data["response"]
     project_id, token = data["project_id"], data["token"]
@@ -121,7 +77,7 @@ def webhook_ingress_internal_only_status():
 @status.route("/webhook_access_allow_unauthenticated_status", methods=["GET"])
 def webhook_access_allow_unauthenticated_status():  # pylint: disable=too-many-branches,too-many-return-statements
     """Get boolean status of allow unauthenticated webhook access."""
-    data = get_token_and_project(flask.request)
+    data = su.get_token_and_project(flask.request)
     if "response" in data:
         return data["response"]
     project_id, token = data["project_id"], data["token"]
@@ -199,7 +155,7 @@ def webhook_access_allow_unauthenticated_status():  # pylint: disable=too-many-b
 @status.route("/service_directory_webhook_fulfillment_status", methods=["GET"])
 def service_directory_webhook_fulfillment_status():
     """Get boolean status of service directory usage in webhook."""
-    data = get_token_and_project(flask.request)
+    data = su.get_token_and_project(flask.request)
     if "response" in data:
         return data["response"]
     project_id, token = data["project_id"], data["token"]

@@ -18,6 +18,7 @@ import json
 import logging
 
 import flask
+import get_token
 import requests
 
 logger = logging.getLogger(__name__)
@@ -43,12 +44,12 @@ def get_project_number(token, project_id):
     }
 
 
-def get_access_policy_name(token, access_policy_title, project_id):
+def get_access_policy_name(token, access_policy_title, project_id, error_code=200):
     """Get access policy name using cloudresourcemanager API."""
     if not access_policy_title:
         return {
             "response": flask.Response(
-                status=200,
+                status=error_code,
                 response=json.dumps(
                     {"status": "BLOCKED", "reason": "NO_ACCESS_POLICY"}
                 ),
@@ -67,15 +68,8 @@ def get_access_policy_name(token, access_policy_title, project_id):
     if response.status_code != 200:
         return {
             "response": flask.Response(
-                status=500,
-                response=json.dumps(
-                    {
-                        "status": "BLOCKED",
-                        "reason": json.loads(response.text)["error"].get(
-                            "status", "UNKNOWN_STATUS"
-                        ),
-                    }
-                ),
+                status=error_code,
+                response=json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_STATUS"}),
             )
         }
 
@@ -86,7 +80,7 @@ def get_access_policy_name(token, access_policy_title, project_id):
     if not organization_id:
         return {
             "response": flask.Response(
-                status=200,
+                status=error_code,
                 response=json.dumps({"status": "BLOCKED", "reason": "NO_ORGANIZATION"}),
             )
         }
@@ -115,7 +109,7 @@ def get_access_policy_name(token, access_policy_title, project_id):
 
     return {
         "response": flask.Response(
-            status=200,
+            status=error_code,
             response=json.dumps({"status": "BLOCKED", "reason": "POLICY_NOT_FOUND"}),
         )
     }
@@ -328,6 +322,13 @@ def get_agents(token, project_id, region):  # pylint: disable=too-many-branches
     headers = {}
     headers["x-goog-user-project"] = project_id
     headers["Authorization"] = f"Bearer {token}"
+    if region not in ["us-central1"]:
+        return {
+            "response": flask.Response(
+                status=200,
+                response=json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"}),
+            )
+        }
     result = requests.get(
         (
             f"https://{region}-dialogflow.googleapis.com/v3/"
@@ -391,7 +392,9 @@ def get_agents(token, project_id, region):  # pylint: disable=too-many-branches
     elif result.status_code != 200:
         logger.info("  dialogflow API rejected request: %s", result.text)
         response = {
-            "response": flask.Response(status=result.status_code, response=result.text)
+            "response": flask.Response(
+                status=result.status_code, response=json.dumps({"error": result.text})
+            )
         }
     else:
         result_dict = result.json()
@@ -438,7 +441,50 @@ def get_webhooks(token, agent_name, project_id, region):
                     return {"response": response}
     if result.status_code != 200:
         logger.info("  dialogflow API rejected request: %s", result.text)
-        response = flask.Response(status=result.status_code, response=result.text)
+        response = flask.Response(
+            status=result.status_code, response=json.dumps({"error": result.text})
+        )
         return {"response": response}
     agents = result.json()
     return {"data": {data["displayName"]: data for data in agents["webhooks"]}}
+
+
+def get_token_and_project(request):
+    """Helper method to retrieve a token or project, or return early."""
+    response = {}
+    token_dict = get_token.get_token(request, token_type="access_token")
+    if "response" in token_dict:
+        return token_dict
+    response["token"] = token_dict["access_token"]
+
+    response["project_id"] = request.args.get("project_id", None)
+    if not response["project_id"]:
+        return {
+            "response": flask.Response(
+                status=200,
+                response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
+            )
+        }
+    return response
+
+
+def get_restricted_service_status(request, service_key):
+    """Get status of restricted service:"""
+    data = get_token_and_project(request)
+    if "response" in data:
+        return data["response"]
+    project_id, token = data["project_id"], data["token"]
+    access_policy_title = request.args.get("access_policy_title", None)
+
+    response = get_access_policy_name(token, access_policy_title, project_id)
+    if "response" in response:
+        return response["response"]
+    access_policy_name = response["access_policy_name"]
+    status_dict = get_restricted_services_status(token, project_id, access_policy_name)
+    if "response" in status_dict:
+        return status_dict["response"]
+
+    return flask.Response(
+        status=200,
+        response=json.dumps({"status": status_dict[service_key]}),
+    )

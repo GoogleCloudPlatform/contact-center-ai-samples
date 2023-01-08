@@ -18,7 +18,8 @@ import json
 import logging
 import tempfile
 
-import asset_utilities as au
+import analytics_utilities as au
+import asset_utilities as asu
 import flask
 import get_token
 from invoke import context
@@ -34,29 +35,39 @@ ACCESS_POLICY_RESOURCE = (
 
 
 @asset.route("/asset_status", methods=["GET"])
-def asset_status():  # pylint: disable=too-many-locals
+def asset_status():  # pylint: disable=too-many-locals,too-many-return-statements,too-many-branches
     """Get status of terraform-tracked assets."""
     token_dict = get_token.get_token(flask.request, token_type="access_token")
     if "response" in token_dict:
         return token_dict["response"]
-    debug = flask.request.args.get("debug") == "true"
+    if not flask.request.args.get("project_id"):
+        return flask.Response(
+            status=200,
+            response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
+        )
     target = flask.request.args.get("target", None)
     update = flask.request.args.get("update", True)
     access_token = token_dict["access_token"]
-    env = au.get_terraform_env(access_token, flask.request.args, debug=debug)
+    env = asu.get_terraform_env(
+        access_token,
+        flask.request.args,
+        debug=asu.get_debug(flask.request),
+    )
+    if "response" in env:
+        return env["response"]
     ctx = context.Context()
     module = "/deploy/terraform/main.tf"
     prefix = f'terraform/{flask.request.args["project_id"]}'
     with tempfile.TemporaryDirectory() as workdir:
 
-        result = au.tf_init(ctx, module, workdir, env, prefix)
+        result = asu.tf_init(ctx, module, workdir, env, prefix)
 
         if result:
             return result
 
         resource_id_dict = {}
         if update:
-            result = au.tf_plan(ctx, module, workdir, env, target=target)
+            result = asu.tf_plan(ctx, module, workdir, env, target=target)
             if result is not None:
                 if "response" in result:
                     return result["response"]
@@ -66,19 +77,19 @@ def asset_status():  # pylint: disable=too-many-locals
 
         if ACCESS_POLICY_RESOURCE in resource_id_dict:
             access_policy_id = resource_id_dict[ACCESS_POLICY_RESOURCE]
-            response = au.get_access_policy_title(access_token, access_policy_id)
+            response = asu.get_access_policy_title(access_token, access_policy_id)
             if "response" in response:
                 return response["response"]
             access_policy_title = response["access_policy_title"]
         else:
             access_policy_title = None
 
-        result = au.tf_state_list(ctx, module, workdir, env)
+        result = asu.tf_state_list(ctx, module, workdir, env)
         if "response" in result:
             return result["response"]
         resources = result["resources"]
 
-        return flask.Response(
+        response = flask.Response(
             status=200,
             response=json.dumps(
                 {
@@ -89,51 +100,69 @@ def asset_status():  # pylint: disable=too-many-locals
                 }
             ),
         )
+        return au.register_action(
+            flask.request, response, au.ACTIONS.UPDATE_STATUS, {"service": "ingress"}
+        )
 
 
 @asset.route("/update_target", methods=["POST"])
-def update_target():
+def update_target():  # pylint: disable=too-many-return-statements
     """Use terraform to update a target."""
     token_dict = get_token.get_token(flask.request, token_type="access_token")
     if "response" in token_dict:
         return token_dict["response"]
+    if not flask.request.args.get("project_id"):
+        return flask.Response(
+            status=200,
+            response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
+        )
     content = flask.request.get_json(silent=True)
     access_token = token_dict["access_token"]
 
-    debug = flask.request.args.get("debug") == "true"
-    env = au.get_terraform_env(access_token, flask.request.args, debug=debug)
+    env = asu.get_terraform_env(
+        access_token,
+        flask.request.args,
+        debug=asu.get_debug(flask.request),
+    )
+    if "response" in env:
+        return env["response"]
     targets = content.get("targets")
     destroy = content["destroy"]
 
     if targets == ["all"]:
-        targets = None
+        update_targets = None
+    else:
+        update_targets = targets
 
     ctx = context.Context()
-    module = "/app/deploy/terraform/main.tf"
+    module = "/deploy/terraform/main.tf"
     prefix = f'terraform/{flask.request.args["project_id"]}'
     with tempfile.TemporaryDirectory() as workdir:
 
-        result = au.tf_init(ctx, module, workdir, env, prefix)
+        result = asu.tf_init(ctx, module, workdir, env, prefix)
         if result:
             return result
 
-        if targets:
-            for target in targets:
-                result = au.tf_plan(ctx, module, workdir, env, target=target)
+        if update_targets:
+            for target in update_targets:
+                result = asu.tf_plan(ctx, module, workdir, env, target=target)
                 if result and "response" in result:
                     return result["response"]
-                result = au.tf_apply(ctx, module, workdir, env, destroy, target=target)
+                result = asu.tf_apply(ctx, module, workdir, env, destroy, target=target)
         else:
-            result = au.tf_plan(ctx, module, workdir, env)
-            result = au.tf_apply(ctx, module, workdir, env, destroy)
+            result = asu.tf_plan(ctx, module, workdir, env)
+            result = asu.tf_apply(ctx, module, workdir, env, destroy)
         if result:
             return result
 
-        result = au.tf_state_list(ctx, module, workdir, env)
+        result = asu.tf_state_list(ctx, module, workdir, env)
         if "response" in result:
             return result["response"]
-        resources = result["resources"]
 
-        return flask.Response(
-            status=200, response=json.dumps({"status": "OK", "resources": resources})
+        response = flask.Response(
+            status=200,
+            response=json.dumps({"status": "OK", "resources": result["resources"]}),
+        )
+        return au.register_action(
+            flask.request, response, au.ACTIONS.UPDATE_STATUS, {"service": "ingress"}
         )

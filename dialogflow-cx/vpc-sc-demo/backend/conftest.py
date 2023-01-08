@@ -17,15 +17,20 @@
 import json
 from urllib.parse import urlparse
 
+import flask
+import pytest
+from werkzeug.test import EnvironBuilder
+
 MOCK_DOMAIN = "MOCK_DOMAIN."
 
 
 class MockReturnObject:  # pylint: disable=too-few-public-methods
     """Class to mock out json interface of requests.Response."""
 
-    def __init__(self, status_code, data):
+    def __init__(self, status_code, data=None, text=None):
         self.status_code = status_code
-        self.data = data
+        self.data = {} if data is None else data
+        self._text = text
 
     def json(self):
         """Mock json interface."""
@@ -33,8 +38,10 @@ class MockReturnObject:  # pylint: disable=too-few-public-methods
 
     @property
     def text(self):
-        """Mock text attribute interface."""
-        return json.dumps(self.data)
+        """Mock text interface; fall back to json as string."""
+        if self._text is None:
+            return json.dumps(self.data)
+        return self._text
 
 
 def assert_response(result, status_code, expected):
@@ -59,3 +66,54 @@ def assert_response_ep(
     if response is not None:
         for curr_response in return_value.response:
             assert curr_response.decode() == response
+
+
+@pytest.fixture
+def lru_fixture():
+    """Fixture function for testing LruCache."""
+    return lambda x: x
+
+
+@pytest.fixture(scope="function")
+def app(request):
+    """Fixture for tests on session blueprint."""
+    curr_app = flask.Flask(__name__)
+    curr_app.register_blueprint(request.param)
+    curr_app.config["TESTING"] = True
+    return curr_app
+
+
+@pytest.fixture
+def mock_request():
+    """Mock request for testing functions that take a request as an arg."""
+    builder = EnvironBuilder()
+    return builder.get_request()
+
+
+@pytest.fixture
+def mock_response():
+    """Mock request for testing functions that take a request as an arg."""
+    return flask.Response()
+
+
+def generate_mock_register_action():
+    """Factory function to provide a MockRegisterAction fixture."""
+
+    class MockRegisterAction:
+        """Mock Register action function with call counter."""
+
+        def __init__(self):
+            self.called_counter = 0
+
+        def __call__(self, request, response, action, data=None):
+            self.called_counter += 1
+            del request
+            del action
+            del data
+            return response
+
+        def assert_called_once(self):
+            """Method to ensure that the mock fixture is envoked once."""
+            assert self.called_counter == 1
+
+    return MockRegisterAction()

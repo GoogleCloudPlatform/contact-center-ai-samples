@@ -17,20 +17,17 @@
 import json
 from urllib.parse import urlparse
 
-import flask
 import get_token
 import pytest
 import requests
 import status_utilities as su
-from conftest import MockReturnObject
+from conftest import MOCK_DOMAIN, MockReturnObject
 from mock import patch
 from status_blueprint import status as blueprint
 
-_MOCK_DOMAIN = "MOCK_DOMAIN."
-
 
 def assert_response(
-    return_value, status_code, endpoint, response=None, netloc=_MOCK_DOMAIN
+    return_value, status_code, endpoint, response=None, netloc=MOCK_DOMAIN
 ):
     """Assert function for testing responses"""
     parsed_url = urlparse(return_value.request.url)
@@ -44,58 +41,47 @@ def assert_response(
             assert curr_response.decode() == response
 
 
-@pytest.fixture
-def app():
-    """Fixture for tests on session blueprint."""
-    curr_app = flask.Flask(__name__)
-    curr_app.register_blueprint(blueprint)
-    curr_app.config["TESTING"] = True
-    return curr_app
-
-
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "endpoint",
+    "app, endpoint",
     [
-        "/webhook_ingress_internal_only_status",
-        "/webhook_access_allow_unauthenticated_status",
-        "/restricted_services_status_cloudfunctions",
-        "/restricted_services_status_dialogflow",
-        "/service_directory_webhook_fulfillment_status",
+        (blueprint, "/webhook_ingress_internal_only_status"),
+        (blueprint, "/webhook_access_allow_unauthenticated_status"),
+        (blueprint, "/restricted_services_status_cloudfunctions"),
+        (blueprint, "/restricted_services_status_dialogflow"),
+        (blueprint, "/service_directory_webhook_fulfillment_status"),
     ],
+    indirect=["app"],
 )
-def test_restricted_services_status_bad_token(
-    app, endpoint
-):  # pylint: disable=redefined-outer-name
+def test_restricted_services_status_bad_token(app, endpoint):
     """Test restricted services status, bad token."""
     with patch.object(
         get_token, "get_token", return_value={"response": "MOCK_RESPONSE"}
     ):
         with app.test_client() as curr_client:
-            return_value = curr_client.get(endpoint, base_url=f"https://{_MOCK_DOMAIN}")
+            return_value = curr_client.get(endpoint, base_url=f"https://{MOCK_DOMAIN}")
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
 
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "endpoint",
+    "app, endpoint",
     [
-        "/webhook_ingress_internal_only_status",
-        "/webhook_access_allow_unauthenticated_status",
-        "/restricted_services_status_cloudfunctions",
-        "/restricted_services_status_dialogflow",
-        "/service_directory_webhook_fulfillment_status",
+        (blueprint, "/webhook_ingress_internal_only_status"),
+        (blueprint, "/webhook_access_allow_unauthenticated_status"),
+        (blueprint, "/restricted_services_status_cloudfunctions"),
+        (blueprint, "/restricted_services_status_dialogflow"),
+        (blueprint, "/service_directory_webhook_fulfillment_status"),
     ],
+    indirect=["app"],
 )
-def test_restricted_services_status_no_project(
-    app, endpoint
-):  # pylint: disable=redefined-outer-name
+def test_restricted_services_status_no_project(app, endpoint):
     """Test restricted services status, no project."""
     with patch.object(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
     ):
         with app.test_client() as curr_client:
-            return_value = curr_client.get(endpoint, base_url=f"https://{_MOCK_DOMAIN}")
+            return_value = curr_client.get(endpoint, base_url=f"https://{MOCK_DOMAIN}")
     assert_response(
         return_value,
         200,
@@ -105,7 +91,7 @@ def test_restricted_services_status_no_project(
 
 
 def get_result(
-    curr_app,
+    app,
     endpoint,
     mock_project_id="MOCK_PROJECT_ID",
     mock_region=None,
@@ -119,25 +105,24 @@ def get_result(
         query_string["region"] = mock_region
     if mock_webhook_name:
         query_string["webhook_name"] = mock_webhook_name
-    with curr_app.test_client() as curr_client:
+    with app.test_client() as curr_client:
         return curr_client.get(
             endpoint,
-            base_url=f"https://{_MOCK_DOMAIN}",
+            base_url=f"https://{MOCK_DOMAIN}",
             query_string=query_string,
         )
 
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "endpoint",
+    "app, endpoint",
     [
-        "/restricted_services_status_cloudfunctions",
-        "/restricted_services_status_dialogflow",
+        (blueprint, "/restricted_services_status_cloudfunctions"),
+        (blueprint, "/restricted_services_status_dialogflow"),
     ],
+    indirect=["app"],
 )
-def test_restricted_services_status_no_policy(
-    app, endpoint
-):  # pylint: disable=redefined-outer-name
+def test_restricted_services_status_no_policy(app, endpoint):
     """Test restricted services status, no policy."""
     with patch.object(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
@@ -151,15 +136,14 @@ def test_restricted_services_status_no_policy(
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "endpoint",
+    "app, endpoint",
     [
-        "/restricted_services_status_cloudfunctions",
-        "/restricted_services_status_dialogflow",
+        (blueprint, "/restricted_services_status_cloudfunctions"),
+        (blueprint, "/restricted_services_status_dialogflow"),
     ],
+    indirect=["app"],
 )
-def test_restricted_services_status_restricted(
-    app, endpoint
-):  # pylint: disable=redefined-outer-name
+def test_restricted_services_status_restricted(app, endpoint):
     """Test restricted services status, restricted."""
     with patch.object(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
@@ -180,15 +164,18 @@ def test_restricted_services_status_restricted(
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "endpoint,status_key",
+    "app, endpoint,status_key",
     [
-        ("/restricted_services_status_cloudfunctions", "cloudfunctions_restricted"),
-        ("/restricted_services_status_dialogflow", "dialogflow_restricted"),
+        (
+            blueprint,
+            "/restricted_services_status_cloudfunctions",
+            "cloudfunctions_restricted",
+        ),
+        (blueprint, "/restricted_services_status_dialogflow", "dialogflow_restricted"),
     ],
+    indirect=["app"],
 )
-def test_restricted_services_status_cloudfunctions_success(
-    app, endpoint, status_key
-):  # pylint: disable=redefined-outer-name
+def test_restricted_services_status_cloudfunctions_success(app, endpoint, status_key):
     """Test restricted services status, success."""
     with patch.object(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
@@ -209,13 +196,14 @@ def test_restricted_services_status_cloudfunctions_success(
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "endpoint",
+    "app,endpoint",
     [
-        "/webhook_ingress_internal_only_status",
-        "/webhook_access_allow_unauthenticated_status",
+        (blueprint, "/webhook_ingress_internal_only_status"),
+        (blueprint, "/webhook_access_allow_unauthenticated_status"),
     ],
+    indirect=["app"],
 )
-def test_webhook_no_function(app, endpoint):  # pylint: disable=redefined-outer-name
+def test_webhook_no_function(app, endpoint):
     """Test webhook, function does not exist"""
     with patch.object(
         get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
@@ -230,9 +218,10 @@ def test_webhook_no_function(app, endpoint):  # pylint: disable=redefined-outer-
 
 
 @pytest.mark.hermetic
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
 def test_webhook_ingress_internal_only_status_api_error(
     app,
-):  # pylint: disable=redefined-outer-name
+):
     """Test /webhook_ingress_internal_only_status, api error"""
     endpoint = "/webhook_ingress_internal_only_status"
     with patch.object(
@@ -248,16 +237,15 @@ def test_webhook_ingress_internal_only_status_api_error(
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "ingress_settings,status",
+    "app,ingress_settings,status",
     [
-        ("ALLOW_INTERNAL_ONLY", True),
-        ("ALLOW_ALL", False),
-        ("ALLOW_INTERNAL_AND_GCLB", True),
+        (blueprint, "ALLOW_INTERNAL_ONLY", True),
+        (blueprint, "ALLOW_ALL", False),
+        (blueprint, "ALLOW_INTERNAL_AND_GCLB", True),
     ],
+    indirect=["app"],
 )
-def test_webhook_ingress_internal_only_status_success(
-    app, ingress_settings, status
-):  # pylint: disable=redefined-outer-name
+def test_webhook_ingress_internal_only_status_success(app, ingress_settings, status):
     """Test /webhook_ingress_internal_only_status, success."""
     endpoint = "/webhook_ingress_internal_only_status"
     with patch.object(
@@ -279,9 +267,10 @@ def test_webhook_ingress_internal_only_status_success(
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "status,return_value,expected,expected_status",
+    "app,status,return_value,expected,expected_status",
     [
         (
+            blueprint,
             403,
             {
                 "error": {
@@ -293,6 +282,7 @@ def test_webhook_ingress_internal_only_status_success(
             200,
         ),
         (
+            blueprint,
             403,
             {
                 "error": {
@@ -304,6 +294,7 @@ def test_webhook_ingress_internal_only_status_success(
             200,
         ),
         (
+            blueprint,
             403,
             {
                 "error": {
@@ -322,6 +313,7 @@ def test_webhook_ingress_internal_only_status_success(
             500,
         ),
         (
+            blueprint,
             403,
             {
                 "error": {
@@ -333,11 +325,12 @@ def test_webhook_ingress_internal_only_status_success(
             {"status": "BLOCKED", "reason": "VPC_SERVICE_CONTROLS"},
             200,
         ),
-        (500, {}, None, 500),
+        (blueprint, 500, {}, None, 500),
     ],
+    indirect=["app"],
 )
 def test_webhook_access_allow_unauthenticated_status_api_error(
-    app,  # pylint: disable=redefined-outer-name
+    app,
     status,
     return_value,
     expected,
@@ -365,12 +358,13 @@ def test_webhook_access_allow_unauthenticated_status_api_error(
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "policy_dict,status",
+    "app,policy_dict,status",
     [
-        ({}, True),
-        ({"bindings": []}, True),
-        ({"bindings": [{"members": []}]}, True),
+        (blueprint, {}, True),
+        (blueprint, {"bindings": []}, True),
+        (blueprint, {"bindings": [{"members": []}]}, True),
         (
+            blueprint,
             {
                 "bindings": [
                     {"members": ["allUsers"], "role": "roles/cloudfunctions.invoker"}
@@ -378,11 +372,16 @@ def test_webhook_access_allow_unauthenticated_status_api_error(
             },
             False,
         ),
-        ({"bindings": [{"members": ["allUsers"], "role": "MOCK_ROLE"}]}, True),
+        (
+            blueprint,
+            {"bindings": [{"members": ["allUsers"], "role": "MOCK_ROLE"}]},
+            True,
+        ),
     ],
+    indirect=["app"],
 )
 def test_webhook_access_allow_unauthenticated_status_success(
-    app,  # pylint: disable=redefined-outer-name
+    app,
     policy_dict,
     status,
 ):
@@ -408,10 +407,11 @@ def test_webhook_access_allow_unauthenticated_status_success(
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "return_value,expected,region",
+    "app,return_value,expected,region",
     [
-        ({"response": "MOCK_RESPONSE"}, "MOCK_RESPONSE", "us-central1"),
+        (blueprint, {"response": "MOCK_RESPONSE"}, "MOCK_RESPONSE", "us-central1"),
         (
+            blueprint,
             {"data": []},
             json.dumps(
                 {
@@ -422,15 +422,17 @@ def test_webhook_access_allow_unauthenticated_status_success(
             "us-central1",
         ),
         (
+            blueprint,
             {"data": []},
             json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"}),
             "BAD_REGION",
         ),
     ],
+    indirect=["app"],
 )
 def test_service_directory_webhook_fulfillment_status_no_agent(
     app, return_value, expected, region
-):  # pylint: disable=redefined-outer-name
+):
     """Test /service_directory_webhook_fulfillment_status, no agent"""
     endpoint = "/service_directory_webhook_fulfillment_status"
     with patch.object(
@@ -448,15 +450,18 @@ def test_service_directory_webhook_fulfillment_status_no_agent(
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "region,expected",
+    "app,region,expected",
     [
-        ("us-central1", "MOCK_RESPONSE"),
-        ("MOCK_REGION", json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"})),
+        (blueprint, "us-central1", "MOCK_RESPONSE"),
+        (
+            blueprint,
+            "MOCK_REGION",
+            json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_REGION"}),
+        ),
     ],
+    indirect=["app"],
 )
-def test_service_directory_webhook_fulfillment_status_no_webhook(
-    app, region, expected
-):  # pylint: disable=redefined-outer-name
+def test_service_directory_webhook_fulfillment_status_no_webhook(app, region, expected):
     """Test /service_directory_webhook_fulfillment_status, no webhook"""
     endpoint = "/service_directory_webhook_fulfillment_status"
     with patch.object(
@@ -481,11 +486,12 @@ def test_service_directory_webhook_fulfillment_status_no_webhook(
 
 @pytest.mark.hermetic
 @pytest.mark.parametrize(
-    "webhook_dict,expected,region",
+    "app,webhook_dict,expected,region",
     [
-        ({}, {"status": False}, "us-central1"),
-        ({"serviceDirectory": "MOCK_DATA"}, {"status": True}, "us-central1"),
+        (blueprint, {}, {"status": False}, "us-central1"),
+        (blueprint, {"serviceDirectory": "MOCK_DATA"}, {"status": True}, "us-central1"),
         (
+            blueprint,
             {"serviceDirectory": "MOCK_DATA"},
             {
                 "status": "BLOCKED",
@@ -494,6 +500,7 @@ def test_service_directory_webhook_fulfillment_status_no_webhook(
             "MOCK_REGION",
         ),
     ],
+    indirect=["app"],
 )
 def test_service_directory_webhook_fulfillment_status_success(
     app, webhook_dict, expected, region

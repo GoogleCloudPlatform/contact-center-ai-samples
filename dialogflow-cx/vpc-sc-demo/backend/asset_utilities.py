@@ -17,18 +17,17 @@
 
 import json
 import logging
+import os
 
 import flask
 import google.auth.transport.requests
 import requests
+import status_utilities as su
 from flask import Response
 from google.oauth2 import service_account
 from invoke import task
 
 logger = logging.getLogger(__name__)
-
-
-TF_PLAN_STORAGE_BUCKET = "vpc-sc-demo-nicholascain15-tf"
 
 
 RESOURCE_GROUP = {
@@ -43,7 +42,7 @@ RESOURCE_GROUP = {
     },
     "module.services": {
         "module.services.google_project_service.appengine",
-        "module.services.google_project_service.artifactregistry",
+        "google_project_service.artifactregistry",
         "module.services.google_project_service.run",
         "module.services.google_project_service.vpcaccess",
         "google_project_service.accesscontextmanager",
@@ -87,6 +86,14 @@ RESOURCE_GROUP = {
 }
 
 
+def get_credentials():
+    """Helper function to get service account credentials."""
+    return service_account.Credentials.from_service_account_file(
+        "/backend/demo-server-key.json",
+        scopes=["https://www.googleapis.com/auth/cloud-platform"],
+    )
+
+
 def get_access_policy_title(token, access_policy_id):
     """Get access_policy_title using the accesscontextmanager API."""
     headers = {}
@@ -109,10 +116,18 @@ def get_terraform_env(access_token, request_args, debug=False):
     env["TF_VAR_project_id"] = request_args["project_id"]
     env["TF_VAR_bucket"] = request_args["bucket"]
     env["TF_VAR_region"] = request_args["region"]
-    if "access_policy_title" in request_args:
-        env["TF_VAR_access_policy_title"] = request_args["access_policy_title"]
+    if request_args.get("access_policy_title", None):
+        response = su.get_access_policy_name(
+            access_token,
+            request_args["access_policy_title"],
+            request_args["project_id"],
+            error_code=500,
+        )
+        if "response" in response:
+            return response
+        env["TF_VAR_access_policy_name"] = response["access_policy_name"]
     else:
-        env["TF_VAR_access_policy_title"] = "null"
+        env["TF_VAR_access_policy_name"] = "null"
     if debug:
         env["TF_LOG"] = "DEBUG"
     return env
@@ -124,10 +139,7 @@ def tf_init(context, module, workdir, env, prefix):
     user_access_token = env.pop("GOOGLE_OAUTH_ACCESS_TOKEN")
     debug = "TF_LOG" in env
 
-    credentials = service_account.Credentials.from_service_account_file(
-        "/backend/demo-server-key.json",
-        scopes=["https://www.googleapis.com/auth/cloud-platform"],
-    )
+    credentials = get_credentials()
     request = google.auth.transport.requests.Request()
     credentials.refresh(request)
     env["GOOGLE_OAUTH_ACCESS_TOKEN"] = credentials.token
@@ -137,7 +149,7 @@ def tf_init(context, module, workdir, env, prefix):
             f"terraform -chdir={workdir} init "
             "-upgrade -reconfigure "
             f'-backend-config="access_token={env["GOOGLE_OAUTH_ACCESS_TOKEN"]}" '
-            f'-backend-config="bucket={TF_PLAN_STORAGE_BUCKET}" '
+            f'-backend-config="bucket={os.environ["TF_PLAN_STORAGE_BUCKET"]}" '
             f'-backend-config="prefix={prefix}"'
         ),
         warn=True,
@@ -319,3 +331,10 @@ def tf_state_list(context, module, workdir, env):
             status_dict["resources"].append(group_name)
     logging.debug(status_dict["resources"])
     return status_dict
+
+
+def get_debug(request):
+    """Get boolean to engage debug mode for terraform"""
+    if (request.args.get("debug") == "true") or (logging.DEBUG >= logging.root.level):
+        return True
+    return False
