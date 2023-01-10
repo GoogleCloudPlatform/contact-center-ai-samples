@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect} from 'react';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import {QueryClient, QueryClientProvider, useQuery} from 'react-query';
@@ -636,9 +636,7 @@ function ToggleAsset(props) {
       }
     } else {
       for (const key in props.dataModel.assetStatus) {
-        props.dataModel.assetStatus[key].set(
-          data.resources.includes(key)
-        );
+        props.dataModel.assetStatus[key].set(data.resources.includes(key));
       }
     }
   }
@@ -808,9 +806,7 @@ function PollAssetStatus(props) {
     props.dataModel.projectIdColor.set('primary');
     if (data.status !== 'BLOCKED') {
       for (const key in props.dataModel.assetStatus) {
-        props.dataModel.assetStatus[key].set(
-          data.resources.includes(key)
-        );
+        props.dataModel.assetStatus[key].set(data.resources.includes(key));
       }
     }
   }

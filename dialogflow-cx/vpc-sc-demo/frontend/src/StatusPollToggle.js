@@ -213,7 +213,7 @@ function PollStatus(props) {
   if (props.dataModel.terraformLocked.current) {
     return (
       <Typography variant="body2" align="right" style={{color: 'red'}}>
-        {`Blocked: TERRAFORM_UPDATING`}
+        {'Blocked: TERRAFORM_UPDATING'}
       </Typography>
     );
   } else if (props.state.isUpdating.current) {
