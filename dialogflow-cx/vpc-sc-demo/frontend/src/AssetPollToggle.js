@@ -565,7 +565,7 @@ function ToggleAsset(props) {
         'google_project_service.cloudbilling',
         'google_project_service.iam',
       ];
-    } else if (props.target === 'module.service_directory' && destroy) {
+    } else if (props.target === 'module.service_directory') {
       target = [
         props.target,
         'module.service_perimeter.google_access_context_manager_service_perimeter.service_perimeter[0]',
