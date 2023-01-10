@@ -446,6 +446,15 @@ def get_webhooks(token, agent_name, project_id, region):
         )
         return {"response": response}
     agents = result.json()
+    if "webhooks" not in agents:
+        return {
+            "response": flask.Response(
+                status=200,
+                response=json.dumps(
+                    {"status": "BLOCKED", "reason": "WEBHOOK_NOT_FOUND"}
+                ),
+            )
+        }
     return {"data": {data["displayName"]: data for data in agents["webhooks"]}}
 
 
