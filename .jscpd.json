@@ -1,12 +1,15 @@
 {
   "threshold": 10,
-  "reporters": [
-    "consoleFull"
-  ],
+  "reporters": ["html", "markdown"],
   "ignore": [
-    "**/__snapshots__/**",
-    "**/*-test.js",
-    "**/workflows/inactive/dialogflow-cx-python.yaml"
-  ],
-  "absolute": true
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/.rbenv/**",
+    "**/.venv/**",
+    "**/*cache*/**",
+    "**/.github/**",
+    "**/.idea/**",
+    "**/report/**",
+    "**/*.svg"
+  ]
 }

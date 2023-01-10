@@ -209,3 +209,5 @@ dialogflow-cx/vpc-sc-demo/deploy/tmp
 dialogflow-cx/vpc-sc-demo/deploy/.terraform
 dialogflow-cx/vpc-sc-demo/deploy/.terraform.d
 dialogflow-cx/vpc-sc-demo/deploy/.terraform.lock.hcl
+
+megalinter-reports/
