@@ -67,8 +67,10 @@ gcloud config set project "${PROJECT_ID?}"
 
 # Revision in Cloud Run tagged with current repo hash
 REVISION_SUFFIX="$(git rev-parse --short HEAD)"
+SERVICE_NAME="authentication-service"
 gcloud builds submit server --tag="${IMAGE_URI?}" --gcs-log-dir=gs://"${PROJECT_ID?}"
-gcloud run deploy --allow-unauthenticated "authentication-service" \
+gcloud run deploy "${SERVICE_NAME?}" \
+  --allow-unauthenticated \
   --image "${IMAGE_URI?}" \
   --platform managed \
   --region "${REGION?}" \
@@ -77,5 +79,5 @@ gcloud run deploy --allow-unauthenticated "authentication-service" \
   --set-env-vars=CLIENT_ID="${CLIENT_ID?}",SESSION_BUCKET="${SESSION_BUCKET?}",IP_ADDRESS="${DOMAIN?}",PROD=true \
   --tag="${SERVICE_TAG?}" \
   --revision-suffix="${REVISION_SUFFIX?}"
-gcloud run services update-traffic authentication-service \
-  --update-tags="${REVISION_SUFFIX?}=authentication-service-${REVISION_SUFFIX?}"
+gcloud run services update-traffic ${SERVICE_NAME?} \
+  --update-tags="r-${REVISION_SUFFIX?}=${SERVICE_NAME?}-${REVISION_SUFFIX?}"
