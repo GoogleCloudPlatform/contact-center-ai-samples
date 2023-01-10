@@ -99,7 +99,7 @@ def get_token_from_auth_server(session_id, auth_service_hostname=AUTH_SERVICE_HO
 
     req = requests.get(auth_service_auth_endpoint, params=params, timeout=10)
     if req.status_code == 401:
-        logger.info(
+        logger.error(
             "  auth-service %s rejected request: %s",
             auth_service_auth_endpoint,
             req.text,
