@@ -57,17 +57,23 @@ do
   esac
 done
 
-SERVICE_NAME="vpc-sc-live-demo"
+gcloud --quiet auth login "${PRINCIPAL?}" --no-launch-browser
+gcloud config set project "${PROJECT_ID?}"
+
 IMAGE="gcr.io/${PROJECT_ID?}/${SERVICE_NAME?}"
 TAG='latest'
-
 sudo docker build -t "${IMAGE?}":"${TAG?}" .
 sudo docker push "${IMAGE?}":"${TAG?}"
-gcloud run deploy "${SERVICE_NAME?}"\
+REVISION_SUFFIX="$(git rev-parse --short HEAD)"
+SERVICE_NAME="vpc-sc-live-demo"
+gcloud run deploy "${SERVICE_NAME?}" \
+  --allow-unauthenticated \
   --project="${PROJECT_ID?}"\
   --platform=managed\
   --region=us-central1\
   --image="${IMAGE?}":"${TAG?}"\
-  --allow-unauthenticated \
   --update-env-vars=ANALYTICS_DATABASE="${ANALYTICS_DATABASE?}",TF_PLAN_STORAGE_BUCKET="${TF_PLAN_STORAGE_BUCKET?}" \
-  --tag="${SERVICE_TAG?}"
+  --tag="${SERVICE_TAG?}" \
+  --revision-suffix="${REVISION_SUFFIX?}"
+gcloud run services update-traffic authentication-service \
+  --update-tags="${REVISION_SUFFIX?}=${SERVICE_NAME?}-${REVISION_SUFFIX?}"
