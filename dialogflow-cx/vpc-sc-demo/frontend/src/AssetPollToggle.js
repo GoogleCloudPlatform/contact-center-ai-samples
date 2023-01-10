@@ -27,7 +27,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import Divider from '@mui/material/Divider';
-import {backendEnabled, getBucket, handleTokenExpired} from './Utilities.js';
+import {getBucket, handleTokenExpired} from './Utilities.js';
 
 const PANEL_WIDTH = 150;
 
@@ -343,6 +343,24 @@ function AccessPolicyErrorDialog(props) {
   );
 }
 
+function ProjectIdErrorDialog(props) {
+  return (
+    <Dialog open={props.open} onClose={() => {}}>
+      <DialogTitle>{'Unknown Project Id:'}</DialogTitle>
+      <DialogContent>
+        <DialogContentText style={{whiteSpace: 'pre'}}>
+          Unknown Project ID: {props.unknownProjectId}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={props.onClickCancel} variant="contained">
+          OK
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 function ErrorDialog(props) {
   let resourceName;
   let responseType = null;
@@ -350,9 +368,17 @@ function ErrorDialog(props) {
   if (
     props.error !== null &&
     Object.hasOwn(props.error.response.data, 'status') &&
-    props.error.response.data.status === 'BLOCKED'
+    props.error.response.data.status === 'BLOCKED' &&
+    props.error.response.data.reason === 'POLICY_NOT_FOUND'
   ) {
     responseType = 'ACCESS_POLICY_ERROR';
+  } else if (
+    props.error !== null &&
+    Object.hasOwn(props.error.response.data, 'status') &&
+    props.error.response.data.status === 'BLOCKED' &&
+    props.error.response.data.reason === 'UNKNOWN_PROJECT_ID'
+  ) {
+    responseType = 'UNKNOWN_PROJECT_ID_ERROR';
   } else if (
     props.error !== null &&
     props.error.response.data.errors[0]['diagnostic']['summary'] ===
@@ -424,6 +450,11 @@ function ErrorDialog(props) {
     () => {
       if (responseType === 'ACCESS_POLICY_ERROR') {
         props.dataModel.validAccessPolicy.set(false);
+        props.dataModel.accessPolicyTitleColor.set('error');
+      }
+      if (responseType === 'UNKNOWN_PROJECT_ID_ERROR') {
+        props.dataModel.validProjectId.set(null);
+        props.dataModel.projectIdColor.set('error');
       }
     },
     /* eslint-disable react-hooks/exhaustive-deps */
@@ -479,6 +510,14 @@ function ErrorDialog(props) {
         badAccessPolicyTitle={
           props.dataModel.projectData.accessPolicyTitle.current
         }
+      />
+    );
+  } else if (responseType === 'UNKNOWN_PROJECT_ID_ERROR') {
+    return (
+      <ProjectIdErrorDialog
+        open={props.open}
+        onClickCancel={props.onClickCancel}
+        unknownProjectId={props.dataModel.projectData.project_id.current}
       />
     );
   } else if (responseType === null) {
@@ -585,11 +624,18 @@ function ToggleAsset(props) {
       .then(res => res.data);
   }
 
+  function onSuccess() {
+    props.dataModel.validAccessPolicy.set(true);
+    props.dataModel.validProjectId.set(true);
+    props.dataModel.projectIdColor.set('primary');
+  }
+
   const update = useQuery('/update_target', queryFunction, {
     enabled: false,
     onSettled: onSettled,
     retry: 0,
     onError: onError,
+    onSuccess: onSuccess,
   });
 
   function onImportSuccess() {
@@ -766,6 +812,12 @@ function PollAssetStatus(props) {
     setErrorBoxOpen(true);
   }
 
+  function onSuccess() {
+    props.dataModel.validAccessPolicy.set(true);
+    props.dataModel.validProjectId.set(true);
+    props.dataModel.projectIdColor.set('primary');
+  }
+
   const assetStatus = useQuery(
     ['/asset_status', props.dataModel.projectData.project_id.current],
     queryFunction,
@@ -773,8 +825,12 @@ function PollAssetStatus(props) {
       refetchInterval: props.dataModel.terraformLocked.current ? false : 600000,
       onSettled: onSettled,
       retry: false,
-      enabled: backendEnabled(props.dataModel),
+      enabled: false,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
       onError: onError,
+      onSuccess: onSuccess,
     }
   );
 

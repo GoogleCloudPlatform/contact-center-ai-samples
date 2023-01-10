@@ -14,25 +14,6 @@
 
 const LOGIN_COOKIE_NAME = 'user_logged_in';
 
-function backendEnabled(dataModel) {
-  if (dataModel.projectData.project_id.current === '') {
-    return false;
-  }
-
-  if (typeof dataModel.validProjectId.current !== 'boolean') {
-    return false;
-  }
-
-  if (
-    dataModel.loggedIn.current === true &&
-    dataModel.validProjectId.current === true
-  ) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -46,7 +27,6 @@ function deleteCookie(name) {
 }
 
 function handleTokenExpired(dataModel) {
-  console.log('handleTokenExpired');
   dataModel.projectData.principal.set(null);
   dataModel.sessionExpiredModalOpen.set(true);
   deleteCookie(LOGIN_COOKIE_NAME);
@@ -56,10 +36,4 @@ function getBucket(dataModel) {
   return `${dataModel.projectData.project_id.current}-vpcsc-demo`;
 }
 
-export {
-  backendEnabled,
-  handleTokenExpired,
-  getCookie,
-  LOGIN_COOKIE_NAME,
-  getBucket,
-};
+export {handleTokenExpired, getCookie, LOGIN_COOKIE_NAME, getBucket};

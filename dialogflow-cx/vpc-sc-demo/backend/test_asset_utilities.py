@@ -386,3 +386,26 @@ def test_get_debug(request_debug, logging_level, mock_request):
     mock_request.args = {"debug": request_debug}
     expected = request_debug == "true" or logging_level <= logging.DEBUG
     assert asu.get_debug(mock_request) == expected
+
+
+@patch.object(requests, "get", return_value=MockReturnObject(0))
+def test_validate_project_id_failure(mock_requests_get):
+    """Test validate_project_id failure."""
+    result = asu.validate_project_id("MOCK_PROJECT_ID", "MOCK_ACCESS_TOKEN")
+    mock_requests_get.assert_called_once()
+    assert_response(
+        {"response": result},
+        500,
+        {
+            "status": "BLOCKED",
+            "reason": "UNKNOWN_PROJECT_ID",
+        },
+    )
+
+
+@patch.object(requests, "get", return_value=MockReturnObject(200))
+def test_validate_project_id_success(mock_requests_get):
+    """Test validate_project_id success."""
+    response = asu.validate_project_id("MOCK_PROJECT_ID", "MOCK_ACCESS_TOKEN")
+    mock_requests_get.assert_called_once()
+    assert response is None
