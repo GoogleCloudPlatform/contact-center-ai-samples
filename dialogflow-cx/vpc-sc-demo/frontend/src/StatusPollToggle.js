@@ -210,7 +210,13 @@ function PollStatus(props) {
     }
   });
 
-  if (props.state.isUpdating.current) {
+  if (props.dataModel.terraformLocked.current) {
+    return (
+      <Typography variant="body2" align="right" style={{color: 'red'}}>
+        {'Blocked: TERRAFORM_UPDATING'}
+      </Typography>
+    );
+  } else if (props.state.isUpdating.current) {
     let remainingTimeBlocker = 0;
     if (props.blocked_by) {
       remainingTimeBlocker = Math.max(
