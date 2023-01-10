@@ -79,5 +79,5 @@ gcloud run deploy "${SERVICE_NAME?}" \
   --set-env-vars=CLIENT_ID="${CLIENT_ID?}",SESSION_BUCKET="${SESSION_BUCKET?}",IP_ADDRESS="${DOMAIN?}",PROD=true \
   --tag="${SERVICE_TAG?}" \
   --revision-suffix="${REVISION_SUFFIX?}"
-gcloud run services update-traffic authentication-service \
-  --update-tags="${REVISION_SUFFIX?}=${SERVICE_NAME?}-${REVISION_SUFFIX?}"
+gcloud run services update-traffic ${SERVICE_NAME?} \
+  --update-tags="r-${REVISION_SUFFIX?}=${SERVICE_NAME?}-${REVISION_SUFFIX?}"

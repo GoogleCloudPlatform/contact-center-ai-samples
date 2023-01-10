@@ -60,12 +60,12 @@ done
 gcloud --quiet auth login "${PRINCIPAL?}" --no-launch-browser
 gcloud config set project "${PROJECT_ID?}"
 
+SERVICE_NAME="vpc-sc-live-demo"
 IMAGE="gcr.io/${PROJECT_ID?}/${SERVICE_NAME?}"
 TAG='latest'
 sudo docker build -t "${IMAGE?}":"${TAG?}" .
 sudo docker push "${IMAGE?}":"${TAG?}"
 REVISION_SUFFIX="$(git rev-parse --short HEAD)"
-SERVICE_NAME="vpc-sc-live-demo"
 gcloud run deploy "${SERVICE_NAME?}" \
   --allow-unauthenticated \
   --project="${PROJECT_ID?}"\
@@ -75,5 +75,5 @@ gcloud run deploy "${SERVICE_NAME?}" \
   --update-env-vars=ANALYTICS_DATABASE="${ANALYTICS_DATABASE?}",TF_PLAN_STORAGE_BUCKET="${TF_PLAN_STORAGE_BUCKET?}" \
   --tag="${SERVICE_TAG?}" \
   --revision-suffix="${REVISION_SUFFIX?}"
-gcloud run services update-traffic authentication-service \
-  --update-tags="${REVISION_SUFFIX?}=${SERVICE_NAME?}-${REVISION_SUFFIX?}"
+gcloud run services update-traffic "${SERVICE_NAME?}" \
+  --update-tags="r-${REVISION_SUFFIX?}=${SERVICE_NAME?}-${REVISION_SUFFIX?}"
