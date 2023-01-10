@@ -126,9 +126,12 @@ def get_token_from_auth_server(session_id, auth_service_hostname=AUTH_SERVICE_HO
         decrypt = PKCS1_OAEP.new(key=RSA.import_key(private_pem))
         decrypted_message = decrypt.decrypt(key_bytes_stream)
         aes_cipher = AESCipher(key=decrypted_message)
-        auth_data = json.loads(aes_cipher.decrypt(session_data_bytes_stream).decode())
-        return {"auth_data": auth_data}
-    except Exception as exc:
+        return {
+            "auth_data": json.loads(
+                aes_cipher.decrypt(session_data_bytes_stream).decode()
+            )
+        }
+    except ValueError as exc:
         logger.error('Decryption Error: %s', exc)
         return {
             "response": flask.Response(

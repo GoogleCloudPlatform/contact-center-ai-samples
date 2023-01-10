@@ -27,7 +27,6 @@ from invoke import context
 asset = flask.Blueprint("asset", __name__)
 logger = logging.getLogger(__name__)
 
-
 ACCESS_POLICY_RESOURCE = (
     "module.service_perimeter."
     "google_access_context_manager_access_policy.access_policy[0]"
@@ -45,11 +44,16 @@ def asset_status():  # pylint: disable=too-many-locals,too-many-return-statement
             status=200,
             response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
         )
+    response = asu.validate_project_id(
+        flask.request.args["project_id"], token_dict["access_token"]
+    )
+    if response:
+        return response
+
     target = flask.request.args.get("target", None)
     update = flask.request.args.get("update", True)
-    access_token = token_dict["access_token"]
     env = asu.get_terraform_env(
-        access_token,
+        token_dict["access_token"],
         flask.request.args,
         debug=asu.get_debug(flask.request),
     )
@@ -77,7 +81,9 @@ def asset_status():  # pylint: disable=too-many-locals,too-many-return-statement
 
         if ACCESS_POLICY_RESOURCE in resource_id_dict:
             access_policy_id = resource_id_dict[ACCESS_POLICY_RESOURCE]
-            response = asu.get_access_policy_title(access_token, access_policy_id)
+            response = asu.get_access_policy_title(
+                token_dict["access_token"], access_policy_id
+            )
             if "response" in response:
                 return response["response"]
             access_policy_title = response["access_policy_title"]
@@ -106,7 +112,7 @@ def asset_status():  # pylint: disable=too-many-locals,too-many-return-statement
 
 
 @asset.route("/update_target", methods=["POST"])
-def update_target():  # pylint: disable=too-many-return-statements
+def update_target():  # pylint: disable=too-many-return-statements,too-many-branches
     """Use terraform to update a target."""
     token_dict = get_token.get_token(flask.request, token_type="access_token")
     if "response" in token_dict:
@@ -116,6 +122,11 @@ def update_target():  # pylint: disable=too-many-return-statements
             status=200,
             response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
         )
+    response = asu.validate_project_id(
+        flask.request.args["project_id"], token_dict["access_token"]
+    )
+    if response:
+        return response
     content = flask.request.get_json(silent=True)
     access_token = token_dict["access_token"]
 

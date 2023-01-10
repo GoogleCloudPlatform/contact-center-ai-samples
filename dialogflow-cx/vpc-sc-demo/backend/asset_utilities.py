@@ -338,3 +338,19 @@ def get_debug(request):
     if (request.args.get("debug") == "true") or (logging.DEBUG >= logging.root.level):
         return True
     return False
+
+
+def validate_project_id(project_id, access_token):
+    """Confirm if the current project_id is valid for current user."""
+    headers = {}
+    headers["Authorization"] = f"Bearer {access_token}"
+    response = requests.get(
+        f"https://cloudresourcemanager.googleapis.com/v1/projects/{project_id}",
+        headers=headers,
+        timeout=10,
+    )
+    if response.status_code != 200:
+        return flask.Response(
+            status=500,
+            response=json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_PROJECT_ID"}),
+        )
