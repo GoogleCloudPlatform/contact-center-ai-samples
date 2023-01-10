@@ -88,6 +88,7 @@ def test_get_token_from_auth_server_decryption_error(
     mock_zipfile,
 ):
     """Test get_token_from_auth_server, decryption error occurs."""
+
     class MockDecryptClass:  # pylint: disable=too-few-public-methods
         """Mock out class PKCS1_OAEP"""
 

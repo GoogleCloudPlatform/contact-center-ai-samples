@@ -132,7 +132,7 @@ def get_token_from_auth_server(session_id, auth_service_hostname=AUTH_SERVICE_HO
             )
         }
     except ValueError as exc:
-        logger.error('Decryption Error: %s', exc)
+        logger.error("Decryption Error: %s", exc)
         return {
             "response": flask.Response(
                 status=200,
