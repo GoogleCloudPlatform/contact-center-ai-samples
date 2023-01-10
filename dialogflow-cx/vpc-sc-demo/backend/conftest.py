@@ -16,13 +16,13 @@
 
 import io
 import json
+import zipfile
 from urllib.parse import urlparse
 
 import flask
 import pytest
 import requests
 from werkzeug.test import EnvironBuilder
-import zipfile
 
 MOCK_DOMAIN = "MOCK_DOMAIN."
 

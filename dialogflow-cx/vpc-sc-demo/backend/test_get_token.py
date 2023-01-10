@@ -82,6 +82,7 @@ def test_get_token_from_auth_server_unknown_hermetic_401():
 
 @pytest.mark.hermetic
 @patch.object(RSA, "import_key", return_value="MOCK_KEY")
+@patch("builtins.open", mock_open(read_data="MOCK_DATE"))
 def test_get_token_from_auth_server_decryption_error(
     mock_import_key,
     mock_zipfile,
