@@ -14,11 +14,14 @@
 
 """conftest module for pytest containing test classes for reuse."""
 
+import io
 import json
+import zipfile
 from urllib.parse import urlparse
 
 import flask
 import pytest
+import requests
 from werkzeug.test import EnvironBuilder
 
 MOCK_DOMAIN = "MOCK_DOMAIN."
@@ -117,3 +120,16 @@ def generate_mock_register_action():
             assert self.called_counter == 1
 
     return MockRegisterAction()
+
+
+@pytest.fixture
+def mock_zipfile():
+    """Create a mock zipfile"""
+    return_value = requests.Response()
+    return_value.status_code = 200
+    return_value.raw = io.BytesIO()
+    with zipfile.ZipFile(return_value.raw, "w") as zip_file:
+        zip_file.writestr("key", "MOCK_KEY")
+        zip_file.writestr("session_data", "MOCK_SESSION_DATA")
+    return_value.raw.seek(0)
+    return return_value
