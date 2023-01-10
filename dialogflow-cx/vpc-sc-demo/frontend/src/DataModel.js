@@ -306,6 +306,8 @@ function DataModel() {
   const sessionExpiredModalOpen = {current: null, set: null};
   const loginRedirect = {current: null, set: null};
   const refetchAssetStatus = {current: null, set: null};
+  const projectIdColor = {current: null, set: null};
+  const accessPolicyTitleColor = {current: null, set: null};
 
   const allStates = {};
   allStates['dialogflowRestrictedState'] = getState();
@@ -331,7 +333,10 @@ function DataModel() {
   [sessionExpiredModalOpen.current, sessionExpiredModalOpen.set] =
     useState(false);
   [loginRedirect.current, loginRedirect.set] = useState(false);
-  [refetchAssetStatus.current, refetchAssetStatus.set] = useState(true);
+  [refetchAssetStatus.current, refetchAssetStatus.set] = useState(false);
+  [projectIdColor.current, projectIdColor.set] = useState('primary');
+  [accessPolicyTitleColor.current, accessPolicyTitleColor.set] =
+    useState('primary');
 
   const dataModel = {
     pageMapper: pageMapper,
@@ -349,6 +354,8 @@ function DataModel() {
     sessionExpiredModalOpen: sessionExpiredModalOpen,
     loginRedirect: loginRedirect,
     refetchAssetStatus: refetchAssetStatus,
+    projectIdColor: projectIdColor,
+    accessPolicyTitleColor: accessPolicyTitleColor,
     activePage: {current: null, set: null},
     queryParams: {},
   };

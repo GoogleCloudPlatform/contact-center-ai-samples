@@ -13,83 +13,28 @@
 // limitations under the License.
 
 import React, {useEffect} from 'react';
-import {QueryClient, QueryClientProvider, useQuery} from 'react-query';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import {QueryPrincipal} from './QueryPrincipal';
-import axios from 'axios';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import {InvertMenuSwitchesCheckbox} from './InvertMenuSwitchesCheckbox.js';
 import {ShowServicesPanelCheckbox} from './ShowServicesPanelCheckbox.js';
 import {QueryToggleAsset} from './AssetPollToggle.js';
 import Paper from '@mui/material/Paper';
-import {handleTokenExpired} from './Utilities.js';
 
-function ProjectIdInputField(props) {
-  function queryFunction() {
-    return axios
-      .get('/validate_project_id', {
-        params: {
-          project_id: props.dataModel.projectData.project_id.current,
-        },
-      })
-      .then(res => res.data);
-  }
-
-  const {data} = useQuery(
-    ['/validate_project_id', props.dataModel.projectData.project_id.current],
-    queryFunction,
-    {
-      enabled: props.dataModel.loggedIn.current === true,
-      retry: false,
-    }
-  );
+function SettingsField(props) {
+  const projectDataField = props.projectDataField;
+  const colorField = props.colorField;
 
   function onChange(e) {
-    props.dataModel.projectData.project_id.set(e.target.value);
-  }
-
-  useEffect(() => {
-    if (data) {
-      if (
-        (data.status === 'BLOCKED') &
-        (data.reason === 'TOKEN_EXPIRED') &
-        props.dataModel.loggedIn.current &
-        !props.dataModel.sessionExpiredModalOpen.current
-      ) {
-        handleTokenExpired(props.dataModel);
-      } else {
-        props.dataModel.validProjectId.set(data.status);
-      }
-    }
-  });
-
-  const textFieldColor = props.dataModel.validProjectId.current
-    ? 'primary'
-    : 'error';
-  return (
-    <TextField
-      sx={props.sx ? props.sx : {mx: 2, width: 350}}
-      label={props.label}
-      variant="outlined"
-      value={props.dataModel.projectData.project_id.current}
-      onChange={onChange}
-      placeholder={props.label}
-      InputProps={{spellCheck: 'false'}}
-      color={textFieldColor}
-    />
-  );
-}
-
-function AccessPolicyField(props) {
-  function onChange(e) {
-    props.dataModel.projectData.accessPolicyTitle.set(e.target.value);
+    props.dataModel.projectData[projectDataField].set(e.target.value);
+    props.dataModel[colorField].set('primary');
   }
   const shrink = !(
-    props.dataModel.projectData.accessPolicyTitle.current === null ||
-    props.dataModel.projectData.accessPolicyTitle.current === '' ||
-    typeof props.dataModel.projectData.accessPolicyTitle.current === 'undefined'
+    props.dataModel.projectData[projectDataField].current === null ||
+    props.dataModel.projectData[projectDataField].current === '' ||
+    typeof props.dataModel.projectData[projectDataField].current === 'undefined'
   );
 
   function keyPress(e) {
@@ -98,33 +43,28 @@ function AccessPolicyField(props) {
     }
   }
 
-  const textFieldColor = props.dataModel.validAccessPolicy.current
-    ? 'primary'
-    : 'error';
-
   return (
     <TextField
       sx={props.sx ? props.sx : {mx: 2, width: 350}}
       label={props.label}
       variant="outlined"
       value={
-        props.dataModel.projectData.accessPolicyTitle.current === null ||
-        typeof props.dataModel.projectData.accessPolicyTitle.current ===
+        props.dataModel.projectData[projectDataField].current === null ||
+        typeof props.dataModel.projectData[projectDataField].current ===
           'undefined'
           ? ''
-          : props.dataModel.projectData.accessPolicyTitle.current
+          : props.dataModel.projectData[projectDataField].current
       }
       onChange={onChange}
       onKeyDown={keyPress}
       placeholder={''}
       InputProps={{spellCheck: 'false'}}
       disabled={props.dataModel.terraformLocked.current}
-      // color="primary"
-      color={textFieldColor}
+      color={props.dataModel[colorField].current}
       InputLabelProps={{
         shrink: shrink,
       }}
-      focused={textFieldColor === 'error' ? true : false}
+      focused={props.dataModel[colorField].current === 'error' ? true : false}
     />
   );
 }
@@ -145,7 +85,14 @@ function RegionField(props) {
 }
 
 function SettingsPanel(props) {
-  const queryClient = new QueryClient();
+  useEffect(
+    () => {
+      props.dataModel.refetchAssetStatus.set(true);
+    },
+    /* eslint-disable react-hooks/exhaustive-deps */
+    []
+    /* eslint-enable react-hooks/exhaustive-deps */
+  );
   return (
     <div>
       <Grid container rowSpacing={2} direction="column" sx={{py: 2}}>
@@ -153,20 +100,22 @@ function SettingsPanel(props) {
           <QueryPrincipal dataModel={props.dataModel} />
         </Grid>
         <Grid item justifyContent="flex-start" alignItems="center">
-          <QueryClientProvider client={queryClient}>
-            <ProjectIdInputField
-              label="Project ID"
-              dataModel={props.dataModel}
-            />
-          </QueryClientProvider>
+          <SettingsField
+            label="Project ID"
+            dataModel={props.dataModel}
+            projectDataField={'project_id'}
+            colorField={'projectIdColor'}
+          />
         </Grid>
         <Grid item justifyContent="flex-start" alignItems="center">
           <RegionField label="Region" dataModel={props.dataModel} />
         </Grid>
         <Grid item justifyContent="flex-start" alignItems="center">
-          <AccessPolicyField
+          <SettingsField
             label="Access Policy Title"
             dataModel={props.dataModel}
+            projectDataField={'accessPolicyTitle'}
+            colorField={'accessPolicyTitleColor'}
           />
         </Grid>
       </Grid>
