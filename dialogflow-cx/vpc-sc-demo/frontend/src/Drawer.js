@@ -42,6 +42,7 @@ import {SessionExpiredModal} from './SessionExpiredModal.js';
 import {getCookie, LOGIN_COOKIE_NAME} from './Utilities.js';
 import {useQueryState} from './UseQueryState.js';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import PolicyIcon from '@mui/icons-material/Policy';
 
 const drawerWidth = 240;
 const TITLE =
@@ -276,6 +277,20 @@ function MiniDrawer(props) {
       activePage={props.dataModel.activePage.current}
     />
   );
+  const PrivacyButton = (
+    <DrawerButton
+      open={open}
+      text={'Privacy Policy'}
+      icon={PolicyIcon}
+      dataModel={props.dataModel}
+      targetPage="privacyPolicy"
+      onClick={() => {
+        props.dataModel.activePage.set('privacyPolicy');
+        resetStateOnPageChange(props.dataModel);
+      }}
+      activePage={props.dataModel.activePage.current}
+    />
+  );
 
   return (
     <div>
@@ -322,6 +337,7 @@ function MiniDrawer(props) {
           <List>
             {TutorialButton}
             {LiveDemoButton}
+            {PrivacyButton}
           </List>
         </Drawer>
         <Box component="main" sx={{flexGrow: 1, p: 3}}>
