@@ -33,7 +33,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Home from '@mui/icons-material/Home';
 import School from '@mui/icons-material/School';
-import Login from '@mui/icons-material/Login';
 import Logout from '@mui/icons-material/Logout';
 import {useEffect} from 'react';
 import Tooltip from '@mui/material/Tooltip';
@@ -210,20 +209,6 @@ function MiniDrawer(props) {
   }
   props.dataModel.queryParams = queryParams;
   const queryStr = new URLSearchParams(props.dataModel.queryParams).toString();
-  const loginButton = (
-    <DrawerButton
-      open={open}
-      text={'Login'}
-      icon={Login}
-      href={`http://${window.location.host}/session?${queryStr}`}
-      dataModel={props.dataModel}
-      targetPage={null}
-      activePage={props.dataModel.activePage.current}
-      onClick={() => {
-        props.dataModel.loginRedirect.set(true);
-      }}
-    />
-  );
   const logoutButton = (
     <DrawerButton
       open={open}
@@ -330,7 +315,6 @@ function MiniDrawer(props) {
           <Divider />
           <List>
             {HomeButton}
-            {loginButton}
             {props.dataModel.loggedIn.current ? logoutButton : <></>}
           </List>
           <Divider />
