@@ -35,7 +35,15 @@ function PrivacyPolicyPage(props) {
       Access Token
     </Link>
   );
-
+  const AccessTokenScope = (
+    <Link
+      target="_blank"
+      href="https://www.googleapis.com/auth/cloud-platform"
+      variant="body1"
+    >
+      cloud-platform
+    </Link>
+  );
   const launchPadLink = (
     <Link
       style={{cursor: 'pointer'}}
@@ -87,17 +95,16 @@ function PrivacyPolicyPage(props) {
       </Typography>
       <Typography paragraph sx={{mx: 2}}>
         If you authenticate your identity using OAuth with your Google identity
-        (i.e. &quot;Log in&quot;), you will authorize an {AccessToken} to be
-        issued and temporarily stored with a dedicated authentication server
-        (auth.dialogflow-demo.app). This non-renewable token is deleted after 60
-        minutes, and is used to deploy and remove several pre-defined cloud
-        resources.
+        (i.e. &quot;Log in&quot;), you will authorize an {AccessToken} with{' '}
+        {AccessTokenScope} scope to be temporarily stored. This non-renewable
+        token is deleted after 60 minutes, and is used to deploy and remove
+        several pre-defined cloud resources.
       </Typography>
       <Typography paragraph sx={{mx: 2}}>
-        If the token expires while you are still exploring, it will be
-        immediately deleted and you will be prompted to reauthorize the service.
-        Although your access token is temporarily stored, it is stored in an
-        RSA-encrypted format, so that only you can use your token on the{' '}
+        If the token expires while you are still exploring (or you log out), it
+        will be immediately deleted and you will be prompted to reauthorize the
+        service. Although your access token is temporarily stored, it is stored
+        in an RSA-encrypted format, so that only you can use your token on the{' '}
         {launchPadLink}.
       </Typography>
       <Typography variant="h5" sx={{mx: 2, my: 1}} id="privacyPolicyStorage">
