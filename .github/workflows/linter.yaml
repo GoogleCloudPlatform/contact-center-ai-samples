@@ -81,7 +81,7 @@ jobs:
           pip install -r dialogflow-cx/vpc-sc-demo/backend/requirements-test.txt
           mv .venv /home/runner/work/_temp/_github_workflow
       - name: Lint Code Base
-        uses: github/super-linter/slim@bb2d833b08b6c288608686672b93a8a4589cdc49 # v4.9.7
+        uses: github/super-linter/slim@454ba4482ce2cd0c505bc592e83c06e1e37ade61 # v4.10.1
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
