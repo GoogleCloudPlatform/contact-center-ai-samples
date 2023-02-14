@@ -15,7 +15,7 @@
 # shellcheck disable=SC1000-SC9999
 
 Flask==2.0.2
-werkzeug==2.0.3
+werkzeug==2.2.3
 types-Flask==1.1.6
 Flask-Logging==0.1.3
 gunicorn==20.1.0
