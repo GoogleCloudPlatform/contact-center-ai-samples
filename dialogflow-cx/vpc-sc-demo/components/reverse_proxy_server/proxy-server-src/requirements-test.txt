@@ -14,5 +14,5 @@
 
 pytest==7.2.0
 Flask==2.0.2
-werkzeug==2.0.3
+werkzeug==2.2.3
 types-Flask==1.1.6
