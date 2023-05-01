@@ -14,7 +14,7 @@
 # limitations under the License.
 # shellcheck disable=SC1000-SC9999
 
-Flask==2.0.2
+Flask==2.3.2
 werkzeug==2.0.3
 types-Flask==1.1.6
 Flask-Logging==0.1.3
