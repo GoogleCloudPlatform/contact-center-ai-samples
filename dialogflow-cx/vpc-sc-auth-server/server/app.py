@@ -148,7 +148,7 @@ def auth():
     return send_file(
         zip_file_stream,
         as_attachment=True,
-        attachment_filename="encrypted_session.zip", # pylint: disable=unexpected-keyword-arg
+        attachment_filename="encrypted_session.zip",  # pylint: disable=unexpected-keyword-arg
     )
 
 
