@@ -20,17 +20,17 @@ variable "project_id" {
 variable "access_token" {
   description = "Access Token"
   type        = string
-  sensitive = true
+  sensitive   = true
 }
 
 terraform {
   required_providers {
     google = "~> 4.45.0"
-    time = "~> 0.9.1"
+    time   = "~> 0.9.1"
   }
   backend "gcs" {
-    bucket  = null
-    prefix  = null
+    bucket = null
+    prefix = null
   }
 }
 
@@ -60,16 +60,16 @@ variable "agent_display_name" {
 }
 
 resource "google_project_service" "serviceusage" {
-  service = "serviceusage.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "serviceusage.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
 }
 
 resource "google_project_service" "dialogflow" {
-  service = "dialogflow.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "dialogflow.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -84,11 +84,11 @@ resource "time_sleep" "wait_for_apis" {
 }
 
 resource "google_dialogflow_cx_agent" "full_agent" {
-  display_name = var.agent_display_name
-  location = var.region
-  default_language_code = "en"
-  time_zone = "America/Chicago"
-  project = var.project_id
+  display_name            = var.agent_display_name
+  location                = var.region
+  default_language_code   = "en"
+  time_zone               = "America/Chicago"
+  project                 = var.project_id
   enable_spell_correction = true
 
   provisioner "local-exec" {

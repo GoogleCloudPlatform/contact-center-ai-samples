@@ -63,7 +63,6 @@ def asset_status():  # pylint: disable=too-many-locals,too-many-return-statement
     module = "/deploy/terraform/main.tf"
     prefix = f'terraform/{flask.request.args["project_id"]}'
     with tempfile.TemporaryDirectory() as workdir:
-
         result = asu.tf_init(ctx, module, workdir, env, prefix)
 
         if result:
@@ -149,7 +148,6 @@ def update_target():  # pylint: disable=too-many-return-statements,too-many-bran
     module = "/deploy/terraform/main.tf"
     prefix = f'terraform/{flask.request.args["project_id"]}'
     with tempfile.TemporaryDirectory() as workdir:
-
         result = asu.tf_init(ctx, module, workdir, env, prefix)
         if result:
             return result
