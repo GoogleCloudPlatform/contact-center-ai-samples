@@ -22,6 +22,9 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Login from '@mui/icons-material/Login';
 import Logout from '@mui/icons-material/Logout';
+import GoogleLoginImage from './btn_google_signin_light_normal_web@2x.png';
+import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
 
 function GetPrincipal(props) {
   const {data} = useQuery(props.endpoint, () =>
@@ -57,7 +60,26 @@ function GetPrincipal(props) {
 
   const shrink = !(principal.current === null || principal.current === '');
 
-  return (
+  const loginImage = (
+    <Button
+      disableElevation
+      sx={{px: 0, py: 0}}
+      variant="string"
+      href={href.current}
+      onClick={() => {
+        props.dataModel.loginRedirect.set(true);
+      }}
+    >
+      <Paper
+        component="img"
+        variant="string"
+        src={GoogleLoginImage}
+        sx={{width: 370, pl: 1.5}}
+      />
+    </Button>
+  );
+
+  const textField = (
     <div>
       <TextField
         sx={{mx: 2, width: 350, color: 'red'}}
@@ -97,6 +119,12 @@ function GetPrincipal(props) {
       />
     </div>
   );
+
+  if (loginEnabled.current) {
+    return loginImage;
+  } else {
+    return textField;
+  }
 }
 
 function QueryPrincipal(props) {

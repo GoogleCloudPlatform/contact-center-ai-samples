@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect} from 'react';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import {QueryClient, QueryClientProvider, useQuery} from 'react-query';
@@ -529,7 +529,6 @@ function ToggleAsset(props) {
   const asset = props.dataModel.assetStatus[props.target];
   const [errorBoxOpen, setErrorBoxOpen] = React.useState(false);
   const [resourceName, setResourceName] = React.useState(null);
-  const completed = useRef(false);
 
   const handleErrorBoxCancel = () => {
     setErrorBoxOpen(false);
@@ -537,7 +536,6 @@ function ToggleAsset(props) {
 
   function onSettled() {
     props.dataModel.terraformLocked.set(false);
-    completed.current = true;
     props.dataModel.invertAssetCollectionSwitches.set(false);
   }
 
@@ -565,7 +563,7 @@ function ToggleAsset(props) {
         'google_project_service.cloudbilling',
         'google_project_service.iam',
       ];
-    } else if (props.target === 'module.service_directory' && destroy) {
+    } else if (props.target === 'module.service_directory') {
       target = [
         props.target,
         'module.service_perimeter.google_access_context_manager_service_perimeter.service_perimeter[0]',
@@ -624,10 +622,23 @@ function ToggleAsset(props) {
       .then(res => res.data);
   }
 
-  function onSuccess() {
+  function onSuccess(data) {
     props.dataModel.validAccessPolicy.set(true);
     props.dataModel.validProjectId.set(true);
     props.dataModel.projectIdColor.set('primary');
+    if (data.status === 'BLOCKED') {
+      if (
+        (data.reason === 'TOKEN_EXPIRED') &
+        props.dataModel.loggedIn.current &
+        !props.dataModel.sessionExpiredModalOpen.current
+      ) {
+        handleTokenExpired(props.dataModel);
+      }
+    } else {
+      for (const key in props.dataModel.assetStatus) {
+        props.dataModel.assetStatus[key].set(data.resources.includes(key));
+      }
+    }
   }
 
   const update = useQuery('/update_target', queryFunction, {
@@ -653,27 +664,6 @@ function ToggleAsset(props) {
     setErrorBoxOpen(false);
     tfImport.refetch();
   };
-
-  useEffect(() => {
-    if (update.data && completed.current) {
-      if (update.data.status === 'BLOCKED') {
-        if (
-          (update.data.reason === 'TOKEN_EXPIRED') &
-          props.dataModel.loggedIn.current &
-          !props.dataModel.sessionExpiredModalOpen.current
-        ) {
-          handleTokenExpired(props.dataModel);
-        }
-      } else {
-        completed.current = false;
-        for (const key in props.dataModel.assetStatus) {
-          props.dataModel.assetStatus[key].set(
-            update.data.resources.includes(key)
-          );
-        }
-      }
-    }
-  });
 
   function onChange() {
     update.refetch();
@@ -783,12 +773,10 @@ function ToggleAsset(props) {
 }
 
 function PollAssetStatus(props) {
-  const completed = useRef(false);
   const [errorBoxOpen, setErrorBoxOpen] = React.useState(false);
 
   function onSettled() {
     props.dataModel.terraformLocked.set(false);
-    completed.current = true;
   }
 
   function queryFunction() {
@@ -812,10 +800,15 @@ function PollAssetStatus(props) {
     setErrorBoxOpen(true);
   }
 
-  function onSuccess() {
+  function onSuccess(data) {
     props.dataModel.validAccessPolicy.set(true);
     props.dataModel.validProjectId.set(true);
     props.dataModel.projectIdColor.set('primary');
+    if (data.status !== 'BLOCKED') {
+      for (const key in props.dataModel.assetStatus) {
+        props.dataModel.assetStatus[key].set(data.resources.includes(key));
+      }
+    }
   }
 
   const assetStatus = useQuery(
@@ -833,19 +826,6 @@ function PollAssetStatus(props) {
       onSuccess: onSuccess,
     }
   );
-
-  useEffect(() => {
-    if (assetStatus.data && completed.current) {
-      if (assetStatus.data.status !== 'BLOCKED') {
-        completed.current = false;
-        for (const key in props.dataModel.assetStatus) {
-          props.dataModel.assetStatus[key].set(
-            assetStatus.data.resources.includes(key)
-          );
-        }
-      }
-    }
-  });
 
   useEffect(() => {
     if (props.dataModel.refetchAssetStatus.current === true) {
