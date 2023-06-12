@@ -159,7 +159,6 @@ def test_get_access_policy_name():
                     },
                 ),
             ):
-
                 result = su.get_access_policy_name(
                     "MOCK_TOKEN", "MOCK_PROJECT_TITLE", "MOCK_PROJECT_ID"
                 )

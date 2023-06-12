@@ -43,11 +43,11 @@ variable "cloudbilling_api" {
 }
 
 data "google_project" "project" {
-  project_id     = var.project_id
+  project_id = var.project_id
 }
 
 resource "google_access_context_manager_service_perimeter" "service_perimeter" {
-  count = var.access_policy_name=="null" ? 0 : 1
+  count  = var.access_policy_name == "null" ? 0 : 1
   parent = var.access_policy_name
   name   = "${var.access_policy_name}/servicePerimeters/${var.service_perimeter}"
   title  = var.service_perimeter
