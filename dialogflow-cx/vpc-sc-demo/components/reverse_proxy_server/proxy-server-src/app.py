@@ -36,6 +36,7 @@ authorized_emails = [os.environ["BOT_USER"]]
 @app.before_request
 def check_user_authentication():  # pylint: disable=R1710
     """Validates that caller is in the allowslist authorized_emails."""
+    # pylint: disable=logging-fstring-interpolation
     app.logger.info("[0] Begin check_user_authentication")
 
     verified_email = None
@@ -104,6 +105,7 @@ def root() -> Response:
 
 def shutdown_handler(signal_int, frame) -> None:
     """Safely exit program"""
+    # pylint: disable=logging-fstring-interpolation
     del frame
     app.logger.info(f"Caught Signal {signal.strsignal(signal_int)}")
     raise SystemExit(0)

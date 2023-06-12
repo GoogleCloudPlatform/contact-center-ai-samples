@@ -22,8 +22,8 @@ terraform {
     google = "~> 4.45.0"
   }
   backend "gcs" {
-    bucket  = null
-    prefix  = null
+    bucket = null
+    prefix = null
   }
 }
 
@@ -34,9 +34,9 @@ variable "region" {
 }
 
 provider "google" {
-  project     = var.project_id
-  billing_project     = var.project_id
-  region      = var.region
+  project               = var.project_id
+  billing_project       = var.project_id
+  region                = var.region
   user_project_override = true
 }
 
@@ -59,16 +59,16 @@ variable "reverse_proxy_server_ip" {
 }
 
 resource "google_project_service" "serviceusage" {
-  service = "serviceusage.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "serviceusage.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
 }
 
 resource "google_project_service" "compute" {
-  service = "compute.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "compute.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -76,8 +76,8 @@ resource "google_project_service" "compute" {
 }
 
 resource "google_compute_network" "vpc_network" {
-  name = var.vpc_network
-  project = var.project_id
+  name                    = var.vpc_network
+  project                 = var.project_id
   auto_create_subnetworks = false
   depends_on = [
     google_project_service.compute,
@@ -85,24 +85,24 @@ resource "google_compute_network" "vpc_network" {
 }
 
 resource "google_compute_subnetwork" "reverse_proxy_subnetwork" {
-  name          = var.vpc_subnetwork
-  ip_cidr_range = "10.10.20.0/28"
-  project       = var.project_id
-  region        = var.region
-  network       = google_compute_network.vpc_network.name
+  name                     = var.vpc_subnetwork
+  ip_cidr_range            = "10.10.20.0/28"
+  project                  = var.project_id
+  region                   = var.region
+  network                  = google_compute_network.vpc_network.name
   private_ip_google_access = true
 }
 
 resource "google_compute_router" "nat_router" {
-  name                          = "nat-router"
-  network                       = google_compute_network.vpc_network.name
-  region = var.region
+  name    = "nat-router"
+  network = google_compute_network.vpc_network.name
+  region  = var.region
 }
 
 resource "google_compute_router_nat" "nat_manual" {
-  name   = "nat-config"
-  router = google_compute_router.nat_router.name
-  region = google_compute_router.nat_router.region
+  name                               = "nat-config"
+  router                             = google_compute_router.nat_router.name
+  region                             = google_compute_router.nat_router.region
   nat_ip_allocate_option             = "AUTO_ONLY"
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
   log_config {
@@ -112,16 +112,16 @@ resource "google_compute_router_nat" "nat_manual" {
 }
 
 resource "google_compute_firewall" "allow_dialogflow" {
-  name    = "allow-dialogflow"
-  network = google_compute_network.vpc_network.name
+  name      = "allow-dialogflow"
+  network   = google_compute_network.vpc_network.name
   direction = "INGRESS"
-  priority = 1000
+  priority  = 1000
   allow {
     protocol = "tcp"
     ports    = ["443"]
   }
   source_ranges = ["35.199.192.0/19"]
-  target_tags = ["webhook-reverse-proxy-vm"]
+  target_tags   = ["webhook-reverse-proxy-vm"]
 }
 
 resource "google_compute_firewall" "allow" {
