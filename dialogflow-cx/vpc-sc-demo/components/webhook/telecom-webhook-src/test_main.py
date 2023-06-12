@@ -73,7 +73,7 @@ def test_detect_customeranomaly_other(app):
         assert res["sessionInfo"]["parameters"]["anomaly_detect"] == "false"
         assert res["sessionInfo"]["parameters"]["total_bill"] == 1054.34
         assert res["sessionInfo"]["parameters"]["first_month"] == str(
-            today.replace(day=1, month=(today.month - 1))
+            today.replace(day=1, month=today.month-1)
         )
 
 
