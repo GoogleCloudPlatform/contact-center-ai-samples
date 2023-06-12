@@ -14,10 +14,10 @@
 
 terraform {
   required_providers {
-    google = "~> 4.37.0"
+    google      = "~> 4.37.0"
     google-beta = "~> 4.68.0"
-    time = "~> 0.9.1"
-    archive = "~> 2.2.0"
+    time        = "~> 0.9.1"
+    archive     = "~> 2.2.0"
   }
 }
 
@@ -29,7 +29,7 @@ variable "project_id" {
 variable "access_token" {
   description = "Access Token"
   type        = string
-  sensitive = true
+  sensitive   = true
 }
 
 variable "webhook_name" {
@@ -111,8 +111,8 @@ variable "bucket_name" {
 }
 
 resource "google_compute_network" "vpc_network" {
-  name = var.vpc_network
-  project = var.project_id
+  name                    = var.vpc_network
+  project                 = var.project_id
   auto_create_subnetworks = false
   depends_on = [
     var.proxy_permission_storage,
@@ -123,15 +123,15 @@ resource "google_compute_network" "vpc_network" {
 }
 
 resource "google_compute_router" "nat_router" {
-  name                          = "nat-router"
-  network                       = google_compute_network.vpc_network.name
-  region = var.region
+  name    = "nat-router"
+  network = google_compute_network.vpc_network.name
+  region  = var.region
 }
 
 resource "google_compute_router_nat" "nat_manual" {
-  name   = "nat-config"
-  router = google_compute_router.nat_router.name
-  region = google_compute_router.nat_router.region
+  name                               = "nat-config"
+  router                             = google_compute_router.nat_router.name
+  region                             = google_compute_router.nat_router.region
   nat_ip_allocate_option             = "AUTO_ONLY"
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
   log_config {
@@ -141,16 +141,16 @@ resource "google_compute_router_nat" "nat_manual" {
 }
 
 resource "google_compute_firewall" "allow_dialogflow" {
-  name    = "allow-dialogflow"
-  network = google_compute_network.vpc_network.name
+  name      = "allow-dialogflow"
+  network   = google_compute_network.vpc_network.name
   direction = "INGRESS"
-  priority = 1000
+  priority  = 1000
   allow {
     protocol = "tcp"
     ports    = ["443"]
   }
   source_ranges = ["35.199.192.0/19"]
-  target_tags = ["webhook-reverse-proxy-vm"]
+  target_tags   = ["webhook-reverse-proxy-vm"]
 }
 
 resource "google_compute_firewall" "allow" {
@@ -167,11 +167,11 @@ resource "google_compute_firewall" "allow" {
 }
 
 resource "google_compute_subnetwork" "reverse_proxy_subnetwork" {
-  name          = var.vpc_subnetwork
-  ip_cidr_range = "10.10.20.0/28"
-  project       = var.project_id
-  region        = var.region
-  network       = google_compute_network.vpc_network.name
+  name                     = var.vpc_subnetwork
+  ip_cidr_range            = "10.10.20.0/28"
+  project                  = var.project_id
+  region                   = var.region
+  network                  = google_compute_network.vpc_network.name
   private_ip_google_access = true
 }
 
@@ -229,13 +229,13 @@ resource "google_cloudbuild_trigger" "reverse_proxy_server" {
         object = google_storage_bucket_object.proxy_server_source.name
       }
     }
-    
+
     logs_bucket = "gs://${var.bucket_name}"
 
     step {
-      name = "gcr.io/cloud-builders/docker"
+      name    = "gcr.io/cloud-builders/docker"
       timeout = "120s"
-      args = ["build", "--network", "cloudbuild", "--no-cache", "-t", "${var.region}-docker.pkg.dev/${var.project_id}/webhook-registry/webhook-server-image:latest", "."]
+      args    = ["build", "--network", "cloudbuild", "--no-cache", "-t", "${var.region}-docker.pkg.dev/${var.project_id}/webhook-registry/webhook-server-image:latest", "."]
     }
     artifacts {
       images = ["${var.region}-docker.pkg.dev/${var.project_id}/webhook-registry/webhook-server-image:latest"]
@@ -264,8 +264,8 @@ resource "time_sleep" "wait_for_build" {
 
 resource "google_project_service_identity" "dfsa" {
   provider = google-beta
-  project = var.project_id
-  service = "dialogflow.googleapis.com"
+  project  = var.project_id
+  service  = "dialogflow.googleapis.com"
   depends_on = [
     var.iam_api,
     var.dialogflow_api,
@@ -274,14 +274,14 @@ resource "google_project_service_identity" "dfsa" {
 
 resource "google_project_iam_member" "dfsa_sd_viewer" {
   project = var.project_id
-  role               = "roles/servicedirectory.viewer"
-  member = "serviceAccount:${google_project_service_identity.dfsa.email}"
+  role    = "roles/servicedirectory.viewer"
+  member  = "serviceAccount:${google_project_service_identity.dfsa.email}"
 }
 
 resource "google_project_iam_member" "dfsa_sd_pscAuthorizedService" {
   project = var.project_id
-  role               = "roles/servicedirectory.pscAuthorizedService"
-  member = "serviceAccount:${google_project_service_identity.dfsa.email}"
+  role    = "roles/servicedirectory.pscAuthorizedService"
+  member  = "serviceAccount:${google_project_service_identity.dfsa.email}"
 }
 
 resource "google_service_account" "rpcsa_service_account" {
@@ -294,28 +294,28 @@ resource "google_service_account" "rpcsa_service_account" {
 
 resource "google_project_iam_member" "rpcsa_artifactregistry" {
   project = var.project_id
-  role               = "roles/artifactregistry.reader"
-  member = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
+  role    = "roles/artifactregistry.reader"
+  member  = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
 }
 
 resource "google_project_iam_member" "rpcsa_cfinvoker" {
   project = var.project_id
-  role               = "roles/cloudfunctions.invoker"
-  member = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
+  role    = "roles/cloudfunctions.invoker"
+  member  = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
 }
 
 resource "google_project_iam_member" "rpcsa_storage_admin" {
   project = var.project_id
   role    = "roles/storage.admin"
-  member = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
+  member  = "serviceAccount:${google_service_account.rpcsa_service_account.email}"
 }
 
 resource "google_compute_instance" "reverse_proxy_server" {
   name         = "webhook-server"
-  project      =  var.project_id
+  project      = var.project_id
   zone         = "${var.region}-a"
   machine_type = "n1-standard-1"
-  tags = ["webhook-reverse-proxy-vm"]
+  tags         = ["webhook-reverse-proxy-vm"]
   service_account {
     scopes = [
       "compute-ro",
@@ -324,29 +324,29 @@ resource "google_compute_instance" "reverse_proxy_server" {
       "storage-rw",
       "trace",
     ]
-    email  = google_service_account.rpcsa_service_account.email
+    email = google_service_account.rpcsa_service_account.email
   }
 
   boot_disk {
     auto_delete = true
     device_name = "instance-1"
-    mode = "READ_WRITE"
+    mode        = "READ_WRITE"
     initialize_params {
       image = "projects/debian-cloud/global/images/debian-10-buster-v20220719"
-      size = 10
+      size  = 10
     }
   }
 
   network_interface {
-    network = google_compute_network.vpc_network.name
+    network    = google_compute_network.vpc_network.name
     subnetwork = google_compute_subnetwork.reverse_proxy_subnetwork.name
     network_ip = google_compute_address.reverse_proxy_address.address
   }
 
   metadata = {
-    bucket = var.bucket_name
-    image = "${var.region}-docker.pkg.dev/${var.project_id}/webhook-registry/webhook-server-image:latest"
-    bot_user = google_project_service_identity.dfsa.email
+    bucket              = var.bucket_name
+    image               = "${var.region}-docker.pkg.dev/${var.project_id}/webhook-registry/webhook-server-image:latest"
+    bot_user            = google_project_service_identity.dfsa.email
     webhook_trigger_uri = "https://${var.region}-${var.project_id}.cloudfunctions.net/${var.webhook_name}"
   }
 
