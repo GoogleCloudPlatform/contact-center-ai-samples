@@ -34,7 +34,7 @@ RUN mv terraform /usr/bin/terraform
 COPY frontend/ /frontend
 WORKDIR /frontend
 
-RUN npm install && npm run build
+RUN npm install react-scripts@5.0.1 && npm run build
 
 # Backend
 WORKDIR /backend
