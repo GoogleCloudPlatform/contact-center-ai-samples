@@ -26,6 +26,7 @@ const TIMER_SCALE = 10;
 function ToggleStatus(props) {
   const changeRequested = useRef(false);
   const updatePageNumber = useRef(false);
+  const disabled = useRef(false);
 
   const {isFetching, refetch} = useQuery(
     props.endpoint,
@@ -96,21 +97,19 @@ function ToggleStatus(props) {
     refetch();
   }
 
-  let disabled;
-  if (typeof props.state.isUpdating.current !== 'boolean') {
-    disabled = false;
-  } else {
+  useEffect(() => {
     if (
       props.state.isUpdating.current ||
       props.state.blocked.current ||
       props.dataModel.projectData.project_id.current === null ||
-      !props.dataModel.loggedIn.current
+      !props.dataModel.loggedIn.current ||
+      props.dataModel.terraformLocked.current
     ) {
-      disabled = true;
+      disabled.current = true;
     } else {
-      disabled = false;
+      disabled.current = false;
     }
-  }
+  });
 
   return (
     <>
@@ -122,9 +121,7 @@ function ToggleStatus(props) {
               ? props.state.status.current
               : false
           }
-          // disabled={disabled}
-          style={{visibility: disabled ? 'hidden' : 'visible'}}
-          // color="secondary"
+          style={{visibility: disabled.current ? 'hidden' : 'visible'}}
         />
       }
     </>
@@ -176,10 +173,10 @@ function PollStatus(props) {
     props.state.isUpdating.current ||
     props.dataModel.projectData.project_id.current === '' ||
     props.dataModel.projectData.project_id.current === null ||
-    props.dataModel.projectData.project_id.current === null ||
     typeof props.dataModel.validProjectId.current !== 'boolean' ||
     props.dataModel.validProjectId.current === false ||
-    props.dataModel.loggedIn.current === false
+    props.dataModel.loggedIn.current === false ||
+    props.dataModel.terraformLocked.current
       ? false
       : true;
   const {data} = useQuery(props.endpoint, queryFunction, {
@@ -213,7 +210,13 @@ function PollStatus(props) {
     }
   });
 
-  if (props.state.isUpdating.current) {
+  if (props.dataModel.terraformLocked.current) {
+    return (
+      <Typography variant="body2" align="right" style={{color: 'red'}}>
+        {'Blocked: TERRAFORM_UPDATING'}
+      </Typography>
+    );
+  } else if (props.state.isUpdating.current) {
     let remainingTimeBlocker = 0;
     if (props.blocked_by) {
       remainingTimeBlocker = Math.max(
