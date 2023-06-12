@@ -41,6 +41,6 @@ jobs:
       - name: Install jsonline-tree
         run: npm install jsonlint-tree -g
       - name: Extract agent file
-        run: unzip divebooker-agent.zip
+        run: unzip divebooker-agent.zip -d divebooker-agent
       - name: Run JSON linter
         run: jsonlint-tree divebooker-agent
