@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-google-cloud-dialogflow-cx==1.13.5
-google-auth==2.14.1
-grpcio==1.51.1  # Potentially related: https://github.com/grpc/grpc/issues/29044
-mock==4.0.3
+google-cloud-dialogflow-cx==1.21.0
+google-auth==2.16.0
+grpcio==1.55.0  # Potentially related: https://github.com/grpc/grpc/issues/29044
+mock==5.0.1

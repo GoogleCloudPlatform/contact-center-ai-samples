@@ -36,12 +36,12 @@ def test_session_create():
     with patch.object(
         google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
     ):
-        from google.cloud import storage  # pylint: disable=import-outside-toplevel
+        import google.cloud.storage as storage  # pylint: disable=import-outside-toplevel,consider-using-from-import
 
         with patch.object(storage.blob, "Blob", return_value=mock_blob):
             import session  # pylint: disable=import-outside-toplevel
 
-            private_key = RSA.generate(1024)
+            private_key = RSA.generate(2048)
             public_key = private_key.publickey()
             public_pem = public_key.export_key().decode()
             session_id = "123456"
@@ -57,7 +57,7 @@ def get_session_data(download_as_bytes_mock):
     with patch.object(
         google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
     ):
-        from google.cloud import storage  # pylint: disable=import-outside-toplevel
+        import google.cloud.storage as storage  # pylint: disable=import-outside-toplevel,consider-using-from-import
 
         with patch.object(storage.blob, "Blob", return_value=mock_blob):
             import session  # pylint: disable=import-outside-toplevel
