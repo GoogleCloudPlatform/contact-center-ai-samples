@@ -15,6 +15,7 @@
 
 """Blueprint for serving session and logout frontend."""
 
+import datetime
 import json
 import logging
 import uuid
@@ -56,6 +57,7 @@ def session_route():
         secure=True,
         httponly=True,
         domain=su.user_service_domain(flask.request),
+        expires=datetime.datetime.now() + datetime.timedelta(hours=1),
     )
     response.set_cookie(
         "user_logged_in",
@@ -63,6 +65,7 @@ def session_route():
         secure=True,
         httponly=False,
         domain=su.user_service_domain(flask.request),
+        expires=datetime.datetime.now() + datetime.timedelta(hours=1),
     )
     return response
 

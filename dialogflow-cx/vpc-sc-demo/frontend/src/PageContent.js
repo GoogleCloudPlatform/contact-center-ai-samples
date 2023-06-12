@@ -26,6 +26,7 @@ import {LiveDemoPrerequisites} from './LiveDemoPrerequisites.js';
 import {TutorialPageIntroduction} from './TutorialPageIntroduction.js';
 import {TutorialPageTabs} from './TutorialPageTabs.js';
 import {HomePage} from './HomePage.js';
+import {PrivacyPolicyPage} from './PrivacyPolicy.js';
 
 function StateButtonGridAndImage(props) {
   return (
@@ -107,6 +108,8 @@ function PageContent(props) {
     return <TutorialPage dataModel={props.dataModel} />;
   } else if (targetPage === 'liveDemo') {
     return <LiveDemoPage dataModel={props.dataModel} />;
+  } else if (targetPage === 'privacyPolicy') {
+    return <PrivacyPolicyPage dataModel={props.dataModel} />;
   } else if (typeof targetPage === 'undefined') {
     return <HomePage dataModel={props.dataModel} />;
   }
