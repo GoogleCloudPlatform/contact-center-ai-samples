@@ -190,7 +190,6 @@ def test_get_terraform_env(  # pylint: disable=redefined-outer-name
 def test_tf_init(debug, exited, request_args):  # pylint: disable=redefined-outer-name
     """Test tf_init."""
     with patch.object(service_account, "Credentials", return_value="MOCK_CREDENTIALS"):
-
         context = MockContext()
         context.set_result(
             MockPromise(MockResult(exited, "MOCK_STDOUT", "MOCK_STDERR"))

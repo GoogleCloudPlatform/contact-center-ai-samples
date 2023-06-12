@@ -15,7 +15,7 @@
 terraform {
   required_providers {
     archive = "~> 2.2.0"
-    google = "4.45.0"
+    google  = "4.45.0"
   }
 }
 
@@ -36,7 +36,7 @@ variable "webhook_function_entrypoint" {
 
 locals {
   archive_path = abspath("./tmp/function.zip")
-  region = "us-central1"
+  region       = "us-central1"
 }
 
 data "archive_file" "source" {
@@ -46,25 +46,25 @@ data "archive_file" "source" {
 }
 
 resource "google_storage_bucket_object" "archive" {
-  name   = "index.zip"
-  bucket = "ccai-samples-df-tf"
-  source = data.archive_file.source.output_path
+  name       = "index.zip"
+  bucket     = "ccai-samples-df-tf"
+  source     = data.archive_file.source.output_path
   depends_on = [data.archive_file.source]
 }
 
 resource "google_cloudfunctions_function" "function" {
-  project = var.project_id
-  name        = var.webhook_function_name
-  description = "Basic webhook"
-  runtime     = "python39"
+  project               = var.project_id
+  name                  = var.webhook_function_name
+  description           = "Basic webhook"
+  runtime               = "python39"
   available_memory_mb   = 128
   source_archive_bucket = "ccai-samples-df-tf"
   source_archive_object = google_storage_bucket_object.archive.name
   trigger_http          = true
   timeout               = 60
   entry_point           = var.webhook_function_entrypoint
-  region = local.region
-  depends_on = [google_storage_bucket_object.archive]
+  region                = local.region
+  depends_on            = [google_storage_bucket_object.archive]
 }
 
 # IAM entry for a single user to invoke the function
@@ -72,6 +72,6 @@ resource "google_cloudfunctions_function_iam_member" "invoker" {
   project        = google_cloudfunctions_function.function.project
   region         = google_cloudfunctions_function.function.region
   cloud_function = google_cloudfunctions_function.function.name
-  role   = "roles/cloudfunctions.invoker"
-  member = "serviceAccount:cloud-function-envoker@${google_cloudfunctions_function.function.project}.iam.gserviceaccount.com"
+  role           = "roles/cloudfunctions.invoker"
+  member         = "serviceAccount:cloud-function-envoker@${google_cloudfunctions_function.function.project}.iam.gserviceaccount.com"
 }

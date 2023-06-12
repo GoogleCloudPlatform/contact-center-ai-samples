@@ -14,8 +14,8 @@
 
 terraform {
   required_providers {
-    google = "~> 4.37.0"
-    time = "~> 0.9.1"
+    google  = "~> 4.37.0"
+    time    = "~> 0.9.1"
     archive = "~> 2.2.0"
   }
 }
@@ -33,7 +33,7 @@ variable "region" {
 variable "access_token" {
   description = "Access Token"
   type        = string
-  sensitive = true
+  sensitive   = true
 }
 
 variable "webhook_src" {
@@ -116,18 +116,18 @@ resource "time_sleep" "wait_for_apis" {
 }
 
 resource "google_cloudfunctions_function" "webhook" {
-  project = var.project_id
-  name        = var.webhook_name
-  description = "VPC-SC Demo Webhook"
-  runtime     = var.webhook_runtime
+  project               = var.project_id
+  name                  = var.webhook_name
+  description           = "VPC-SC Demo Webhook"
+  runtime               = var.webhook_runtime
   available_memory_mb   = 128
   source_archive_bucket = var.bucket_name
   source_archive_object = google_storage_bucket_object.webhook.name
   trigger_http          = true
   timeout               = 60
   entry_point           = var.webhook_entrypoint
-  region = var.region
-  ingress_settings = var.webhook_ingress_setting
+  region                = var.region
+  ingress_settings      = var.webhook_ingress_setting
   depends_on = [
     time_sleep.wait_for_apis,
     var.bucket,
@@ -135,11 +135,11 @@ resource "google_cloudfunctions_function" "webhook" {
 }
 
 resource "google_dialogflow_cx_agent" "full_agent" {
-  display_name = var.agent_display_name
-  location = var.region
-  default_language_code = "en"
-  time_zone = "America/Chicago"
-  project = var.project_id
+  display_name            = var.agent_display_name
+  location                = var.region
+  default_language_code   = "en"
+  time_zone               = "America/Chicago"
+  project                 = var.project_id
   enable_spell_correction = true
 
   provisioner "local-exec" {

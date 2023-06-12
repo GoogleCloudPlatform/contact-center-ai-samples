@@ -14,7 +14,7 @@
 
 terraform {
   required_providers {
-    google = "~> 4.37.0"
+    google      = "~> 4.37.0"
     google-beta = "~> 4.68.0"
   }
 }
@@ -64,14 +64,14 @@ variable "service_directory_service_api" {
 }
 
 data "google_project" "project" {
-  project_id     = var.project_id
+  project_id = var.project_id
 }
 
 resource "google_service_directory_namespace" "reverse_proxy" {
   provider     = google-beta
   namespace_id = var.service_directory_namespace
   location     = var.region
-  project = var.project_id
+  project      = var.project_id
   depends_on = [
     var.service_directory_service_api
   ]
