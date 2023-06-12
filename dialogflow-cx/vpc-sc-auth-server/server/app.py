@@ -129,6 +129,7 @@ def login_get():
 @app.route("/auth", methods=["GET"])
 def auth():
     """Rout for getting authentication information, when session_id is valid."""
+    # pylint: disable=unexpected-keyword-arg
     session_id = request.args.get("session_id")
 
     session_data = session.read(session_id)
@@ -145,7 +146,7 @@ def auth():
                 os.path.basename(curr_stream_name), curr_stream.getvalue()
             )
     zip_file_stream.seek(0)
-    # pylint: disable=unexpected-keyword-arg
+
     return send_file(
         zip_file_stream,
         as_attachment=True,
