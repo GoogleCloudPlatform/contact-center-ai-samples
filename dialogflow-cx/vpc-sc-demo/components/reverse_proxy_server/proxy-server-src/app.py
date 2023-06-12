@@ -75,9 +75,7 @@ def check_user_authentication():  # pylint: disable=R1710
         return abort(403)
 
     verified_email = info["email"]
-    app.logger.info(
-        f"[0]   User: {verified_email}"
-    )
+    app.logger.info(f"[0]   User: {verified_email}")
     if verified_email not in authorized_emails:
         return abort(403)
 
@@ -109,9 +107,7 @@ def shutdown_handler(signal_int, frame) -> None:
     """Safely exit program"""
     # pylint: disable=logging-fstring-interpolation
     del frame
-    app.logger.info(
-        f"Caught Signal {signal.strsignal(signal_int)}"
-    )
+    app.logger.info(f"Caught Signal {signal.strsignal(signal_int)}")
     raise SystemExit(0)
 
 
