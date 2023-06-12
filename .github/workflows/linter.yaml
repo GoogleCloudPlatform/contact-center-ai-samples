@@ -58,12 +58,12 @@ jobs:
       # Checkout the code base #
       ##########################
       - name: Harden Runner
-        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # v2.0.0
+        uses: step-security/harden-runner@128a63446a954579617e875aaab7d2978154e969 # v2.0.0
         with:
           egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
 
       - name: Checkout Code
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.3.0
         with:
           fetch-depth: 0
       - name: Install missing python packages
@@ -77,9 +77,11 @@ jobs:
           pip install -r dialogflow-cx/requirements-test.txt
           pip install -r dialogflow-cx/vpc-sc-auth-server/server/requirements.txt
           pip install -r dialogflow-cx/vpc-sc-auth-server/server/requirements-test.txt
+          pip install -r dialogflow-cx/vpc-sc-demo/backend/requirements.txt
+          pip install -r dialogflow-cx/vpc-sc-demo/backend/requirements-test.txt
           mv .venv /home/runner/work/_temp/_github_workflow
       - name: Lint Code Base
-        uses: github/super-linter/slim@bb2d833b08b6c288608686672b93a8a4589cdc49 # v4.9.7
+        uses: github/super-linter/slim@45fc0d88288beee4701c62761281edfee85655d7 # v5.0.0
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -100,6 +102,8 @@ jobs:
           MARKDOWN_CONFIG_FILE: .markdowmlint.jsonc
           NATURAL_LANGUAGE_CONFIG_FILE: .textlintrc
           YAML_CONFIG_FILE: .yaml-lint.yml
+          TERRAFORM_TERRASCAN_CONFIG_FILE: terrascan.toml
           PYTHONPATH: "/github/workspace:/github/workflow/.venv/lib/python3.10/site-packages"
           YAML_ERROR_ON_WARNING: true
+          CSS_FILE_NAME: .stylelintrc.json
 ...
