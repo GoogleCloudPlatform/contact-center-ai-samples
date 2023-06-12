@@ -181,7 +181,7 @@ def test_get_redirect_url(prod, expected):
 def get_aut_endpoint_response(curr_client, mock_blob, mock_session_id):
     """Return response from a mocked /auth endpoint."""
     with patch.dict(os.environ, {"SESSION_BUCKET": "MOCK_SESSION_BUCKET"}):
-        from google.cloud import storage  # pylint: disable=import-outside-toplevel
+        import google.cloud.storage as storage  # pylint: disable=import-outside-toplevel,consider-using-from-import
 
         with patch.object(storage.blob, "Blob", return_value=mock_blob):
             return curr_client.get(
@@ -221,12 +221,12 @@ def test_auth(client):  # pylint: disable=redefined-outer-name
 
 def test_auth_bad_session(client):  # pylint: disable=redefined-outer-name
     """Test /auth route, with a session_id that doesnt exist."""
-    mock_error_message = "MOCK_ERROR_MESSAGE"
     mock_session_id = "MOCK_SESSION_ID"
     mock_blob = Mock()
+    import session  # pylint: disable=import-outside-toplevel
 
     def download_as_bytes_mock():
-        raise google.api_core.exceptions.NotFound(mock_error_message)
+        raise google.api_core.exceptions.NotFound(session.NOT_FOUND_ERROR_MESSAGE)
 
     mock_blob.download_as_bytes = download_as_bytes_mock
 
@@ -239,4 +239,4 @@ def test_auth_bad_session(client):  # pylint: disable=redefined-outer-name
     assert return_value.headers["Content-Type"] == "text/html; charset=utf-8"
     assert return_value.status_code == 401
     for curr_response in return_value.response:
-        assert curr_response == f"404 {mock_error_message}".encode()
+        assert curr_response == f"{session.NOT_FOUND_ERROR_MESSAGE}".encode()

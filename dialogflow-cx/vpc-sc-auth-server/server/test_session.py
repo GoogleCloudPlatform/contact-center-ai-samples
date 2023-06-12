@@ -36,12 +36,12 @@ def test_session_create():
     with patch.object(
         google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
     ):
-        from google.cloud import storage  # pylint: disable=import-outside-toplevel
+        import google.cloud.storage as storage  # pylint: disable=import-outside-toplevel,consider-using-from-import
 
         with patch.object(storage.blob, "Blob", return_value=mock_blob):
             import session  # pylint: disable=import-outside-toplevel
 
-            private_key = RSA.generate(1024)
+            private_key = RSA.generate(2048)
             public_key = private_key.publickey()
             public_pem = public_key.export_key().decode()
             session_id = "123456"
@@ -57,7 +57,7 @@ def get_session_data(download_as_bytes_mock):
     with patch.object(
         google.auth, "default", return_value=("MOCK_CREDENTIALS", "MOCK_PROJECT")
     ):
-        from google.cloud import storage  # pylint: disable=import-outside-toplevel
+        import google.cloud.storage as storage  # pylint: disable=import-outside-toplevel,consider-using-from-import
 
         with patch.object(storage.blob, "Blob", return_value=mock_blob):
             import session  # pylint: disable=import-outside-toplevel
@@ -82,8 +82,10 @@ def test_session_read():
 def test_session_read_xfail():
     """Test session.py:read, expected to fail because of blob not found."""
 
+    import session  # pylint: disable=import-outside-toplevel
+
     def download_as_bytes_mock():
-        raise google.api_core.exceptions.NotFound("MOCK_ERROR_MESSAGE")
+        raise google.api_core.exceptions.NotFound(session.NOT_FOUND_ERROR_MESSAGE)
 
     session_data = get_session_data(download_as_bytes_mock)
     assert len(session_data) == 1

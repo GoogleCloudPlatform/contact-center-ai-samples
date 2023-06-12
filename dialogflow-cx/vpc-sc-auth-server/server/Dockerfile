@@ -24,13 +24,14 @@ COPY ./requirements.txt /app/requirements.txt
 WORKDIR /app
 
 # Install the dependencies and packages in the requirements file
-RUN pip install --no-cache-dir --upgrade pip==22.3.1
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip==22.3.1 && pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 5000
 
 # Copy every content from the local file to the image
 COPY app.py /app/app.py
 COPY ./session.py /app/session.py
+COPY ./utilities.py /app/utilities.py
+COPY ./aes_cipher.py /app/aes_cipher.py
 
-CMD ["exec", "gunicorn", "--bind=0.0.0.0:5000", "--workers=1", "--threads=8", "--log-level=info", "app:app"]
+CMD ["gunicorn", "--bind=0.0.0.0:5000", "--workers=1", "--threads=8", "--log-level=info", "app:app"]

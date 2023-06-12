@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 """
     Stored session management.
     Based on https://github.com/GoogleCloudPlatform/emblem/blob/main/website/middleware/session.py
@@ -58,6 +57,8 @@ from flask import Response
 
 log = logging.getLogger("session")
 credentials, project = google.auth.default()
+
+NOT_FOUND_ERROR_MESSAGE = "Exception: google.api_core.exceptions.NotFound"
 
 
 class NoBucketError(Exception):
@@ -132,5 +133,5 @@ def read(session_id):
             "key": io.BytesIO(key_bytes),
             "session_data": io.BytesIO(session_data_bytes),
         }
-    except google.api_core.exceptions.NotFound as exc:
-        return {"error": Response(status=401, response=str(exc))}
+    except google.api_core.exceptions.NotFound:
+        return {"error": Response(status=401, response=NOT_FOUND_ERROR_MESSAGE)}

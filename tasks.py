@@ -37,6 +37,7 @@ _LINTER_PATTERN = (
     f'-e YAML_ERROR_ON_WARNING={_LINTER_ENV["YAML_ERROR_ON_WARNING"]} '
     f"-v $(pwd):/tmp/lint {_SUPER_LINTER_VERSION}"
 )
+_TERRASCAN_CONFIG = "TERRAFORM_TERRASCAN_CONFIG_FILE"
 _LINTER_CONFIG = {
     "terraform": {
         "validate": "VALIDATE_TERRAFORM_TFLINT=true",
@@ -90,6 +91,14 @@ _LINTER_CONFIG = {
         "validate": "VALIDATE_YAML=true",
         "config": f'YAML_CONFIG_FILE={_LINTER_ENV["YAML_CONFIG_FILE"]}',
     },
+    "terrascan": {
+        "validate": "VALIDATE_TERRAFORM_TERRASCAN=true",
+        "config": f"TERRAFORM_TERRASCAN_CONFIG_FILE={_LINTER_ENV[_TERRASCAN_CONFIG]}",
+    },
+    "stylelint": {
+        "validate": "VALIDATE_CSS=true",
+        "config": f'CSS_FILE_NAME={_LINTER_ENV["CSS_FILE_NAME"]}',
+    },
 }
 
 
@@ -103,21 +112,22 @@ def print_result(linter, result, hide):
             print(f'linter "{linter}": OK')
 
 
-def run_autofix(ctx):
+@task
+def autofix(ctx):
     """Run black and isort before linting."""
-    ctx.run("isort .", warn=False, hide=False)
-    ctx.run("black .", warn=False, hide=False)
+    ctx.run("isort --skip=noxfile.py --skip=venv .", warn=False, hide=False)
+    ctx.run("black --exclude=venv .", warn=False, hide=False)
 
 
 @task
-def lint(ctx, linter="all", warn=False, hide=False, autofix=True):
+def lint(ctx, linter="all", warn=False, hide=False, run_autofix=True):
     """Run a linter(s) using pyinvoke."""
     if linter == "all":
-        if autofix:
-            run_autofix(ctx)
+        if run_autofix:
+            autofix(ctx)
         any_failure = False
         for curr_linter in _LINTER_CONFIG:
-            result = lint(ctx, curr_linter, warn=True, hide=True, autofix=False)
+            result = lint(ctx, curr_linter, warn=True, hide=True, run_autofix=False)
             print_result(curr_linter, result, hide)
             if result.exited:
                 any_failure = result.exited
@@ -125,8 +135,8 @@ def lint(ctx, linter="all", warn=False, hide=False, autofix=True):
             sys.exit(result.exited)
         return result
 
-    if autofix:
-        run_autofix(ctx)
+    if run_autofix:
+        autofix(ctx)
     result = ctx.run(
         _LINTER_PATTERN.format(
             validate=_LINTER_CONFIG[linter]["validate"],

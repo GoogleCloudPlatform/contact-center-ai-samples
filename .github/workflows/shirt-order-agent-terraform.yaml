@@ -1,5 +1,5 @@
 ---
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,41 +13,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: VPC-SC Demo Workflow
+name: Dialogflow Shirt Order Agent Terraform Plan
 on:
   push:
     branches:
       - main
-      - 'dialogflow-cx/vpc-sc-demo/**'
+    paths:
+      - 'dialogflow-cx/shirt-order-agent/**'
   pull_request:
     branches:
       - main
-      - 'dialogflow-cx/vpc-sc-demo/**'
+    paths:
+      - 'dialogflow-cx/shirt-order-agent/**'
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
 
 jobs:
   pytest:
-    name: VPC-SC Demo Webhook Pytest
+    name: Dialogflow Shirt Order Agent Terraform Test
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dialogflow-cx/vpc-sc-demo/components/webhook/telecom-webhook-src
-    strategy:
-      matrix:
-        python: ["3.9"]
+        working-directory: dialogflow-cx/shirt-order-agent
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # v2.0.0
+        uses: step-security/harden-runner@128a63446a954579617e875aaab7d2978154e969 # v2.0.0
         with:
           egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
 
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
-      - name: Install Requirements
-        run: |-
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r requirements-test.txt
-      - name: Run Webhook Tests
-        run: pytest
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+      - name: Run Tests
+        run: |
+          ./run_tests.sh
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v3
 ...
