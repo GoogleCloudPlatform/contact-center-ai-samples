@@ -60,7 +60,6 @@ class PageDelegator(ClientDelegator):
                 page=page,
             )
         except google.api_core.exceptions.AlreadyExists:
-
             request = cx.ListPagesRequest(parent=self.parent)
             for curr_page in self.client.list_pages(request=request):
                 if curr_page.display_name == self.display_name:

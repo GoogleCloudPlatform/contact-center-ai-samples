@@ -20,7 +20,7 @@ variable "project_id" {
 variable "access_token" {
   description = "Access Token"
   type        = string
-  sensitive = true
+  sensitive   = true
 }
 
 variable "region" {
@@ -72,13 +72,13 @@ variable "service_directory_endpoint" {
 variable "webhook_src" {
   description = "webhook_src"
   type        = string
-  default = "/components/telecom-webhook-src"
+  default     = "/components/telecom-webhook-src"
 }
 
 variable "proxy_server_src" {
   description = "proxy_server_src"
   type        = string
-  default = "/components/proxy-server-src"
+  default     = "/components/proxy-server-src"
 }
 
 variable "service_perimeter" {
@@ -89,7 +89,7 @@ variable "service_perimeter" {
 
 variable "access_policy_name" {
   description = "Access Policy"
-  default = "null"
+  default     = "null"
   type        = string
 }
 
@@ -100,9 +100,9 @@ variable "webhook_name" {
 }
 
 provider "google" {
-  project     = var.project_id
-  billing_project     = var.project_id
-  region      = var.region
+  project               = var.project_id
+  billing_project       = var.project_id
+  region                = var.region
   user_project_override = true
 }
 
@@ -110,25 +110,25 @@ terraform {
   required_providers {
     google = "~> 4.37.0"
   }
-#START_BACKEND
+  #START_BACKEND
   backend "gcs" {
-    bucket  = null
-    prefix  = null
+    bucket = null
+    prefix = null
   }
-#END_BACKEND
+  #END_BACKEND
 }
 
 resource "google_project_service" "serviceusage" {
-  service = "serviceusage.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "serviceusage.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
 }
 
 resource "google_project_service" "servicedirectory" {
-  service = "servicedirectory.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "servicedirectory.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -136,9 +136,9 @@ resource "google_project_service" "servicedirectory" {
 }
 
 resource "google_project_service" "compute" {
-  service = "compute.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "compute.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -146,7 +146,7 @@ resource "google_project_service" "compute" {
 }
 
 data "google_project" "project" {
-  project_id     = var.project_id
+  project_id = var.project_id
 }
 
 resource "google_project_iam_member" "storage_admin" {
@@ -177,9 +177,9 @@ resource "google_project_iam_member" "webhook_invoker" {
 }
 
 resource "google_project_service" "dialogflow" {
-  service = "dialogflow.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "dialogflow.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -187,9 +187,9 @@ resource "google_project_service" "dialogflow" {
 }
 
 resource "google_project_service" "cloudfunctions" {
-  service = "cloudfunctions.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "cloudfunctions.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -197,9 +197,9 @@ resource "google_project_service" "cloudfunctions" {
 }
 
 resource "google_project_service" "cloudbuild" {
-  service = "cloudbuild.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "cloudbuild.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -207,9 +207,9 @@ resource "google_project_service" "cloudbuild" {
 }
 
 resource "google_project_service" "accesscontextmanager" {
-  service = "accesscontextmanager.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "accesscontextmanager.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -217,9 +217,9 @@ resource "google_project_service" "accesscontextmanager" {
 }
 
 resource "google_project_service" "cloudbilling" {
-  service = "cloudbilling.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "cloudbilling.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -227,9 +227,9 @@ resource "google_project_service" "cloudbilling" {
 }
 
 resource "google_project_service" "iam" {
-  service = "iam.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "iam.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -237,9 +237,9 @@ resource "google_project_service" "iam" {
 }
 
 resource "google_project_service" "artifactregistry" {
-  service = "artifactregistry.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "artifactregistry.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -249,9 +249,9 @@ resource "google_project_service" "artifactregistry" {
 
 
 resource "google_project_service" "pubsub" {
-  service = "pubsub.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "pubsub.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -259,16 +259,16 @@ resource "google_project_service" "pubsub" {
 }
 
 resource "google_storage_bucket" "bucket" {
-  name     = var.bucket
-  location = "US"
-  project = var.project_id
-  force_destroy = true
+  name                        = var.bucket
+  location                    = "US"
+  project                     = var.project_id
+  force_destroy               = true
   uniform_bucket_level_access = true
 }
 
 module "services" {
-  source = "/deploy/terraform/services"
-  project_id = var.project_id
+  source           = "/deploy/terraform/services"
+  project_id       = var.project_id
   serviceusage_api = google_project_service.serviceusage
   depends_on = [
     google_project_service.servicedirectory,
@@ -286,59 +286,59 @@ module "services" {
 }
 
 module "vpc_network" {
-  source = "/deploy/terraform/vpc-network"
-  project_id = var.project_id
-  region = var.region
-  vpc_network = var.vpc_network
-  vpc_subnetwork = var.vpc_subnetwork
-  reverse_proxy_server_ip = var.reverse_proxy_server_ip
-  proxy_permission_storage = google_project_iam_member.storage_admin
+  source                    = "/deploy/terraform/vpc-network"
+  project_id                = var.project_id
+  region                    = var.region
+  vpc_network               = var.vpc_network
+  vpc_subnetwork            = var.vpc_subnetwork
+  reverse_proxy_server_ip   = var.reverse_proxy_server_ip
+  proxy_permission_storage  = google_project_iam_member.storage_admin
   proxy_permission_registry = google_project_iam_member.registry_reader
-  proxy_permission_invoke = google_project_iam_member.webhook_invoker
-  iam_api = google_project_service.iam
-  dialogflow_api = google_project_service.dialogflow
-  artifactregistry_api = google_project_service.artifactregistry
-  pubsub_api = google_project_service.pubsub
-  cloudbuild_api = google_project_service.cloudbuild
-  compute_api = google_project_service.compute
-  proxy_server_src = var.proxy_server_src
-  access_token = var.access_token
-  bucket = google_storage_bucket.bucket
-  bucket_name = google_storage_bucket.bucket.name
-  webhook_name = var.webhook_name
+  proxy_permission_invoke   = google_project_iam_member.webhook_invoker
+  iam_api                   = google_project_service.iam
+  dialogflow_api            = google_project_service.dialogflow
+  artifactregistry_api      = google_project_service.artifactregistry
+  pubsub_api                = google_project_service.pubsub
+  cloudbuild_api            = google_project_service.cloudbuild
+  compute_api               = google_project_service.compute
+  proxy_server_src          = var.proxy_server_src
+  access_token              = var.access_token
+  bucket                    = google_storage_bucket.bucket
+  bucket_name               = google_storage_bucket.bucket.name
+  webhook_name              = var.webhook_name
 }
 
 module "service_directory" {
-  source = "/deploy/terraform/service-directory"
-  project_id = var.project_id
-  region = var.region
-  vpc_network = var.vpc_network
-  reverse_proxy_server_ip = var.reverse_proxy_server_ip
-  service_directory_endpoint = var.service_directory_endpoint
-  service_directory_service = var.service_directory_service
-  service_directory_namespace = var.service_directory_namespace
+  source                        = "/deploy/terraform/service-directory"
+  project_id                    = var.project_id
+  region                        = var.region
+  vpc_network                   = var.vpc_network
+  reverse_proxy_server_ip       = var.reverse_proxy_server_ip
+  service_directory_endpoint    = var.service_directory_endpoint
+  service_directory_service     = var.service_directory_service
+  service_directory_namespace   = var.service_directory_namespace
   service_directory_service_api = google_project_service.servicedirectory
 }
 
 module "webhook_agent" {
-  source = "/deploy/terraform/webhook-agent"
-  project_id = var.project_id
-  region = var.region
-  access_token = var.access_token
-  webhook_src = var.webhook_src
-  webhook_name = var.webhook_name
-  bucket = google_storage_bucket.bucket
-  bucket_name = google_storage_bucket.bucket.name
-  dialogflow_api = google_project_service.dialogflow
+  source             = "/deploy/terraform/webhook-agent"
+  project_id         = var.project_id
+  region             = var.region
+  access_token       = var.access_token
+  webhook_src        = var.webhook_src
+  webhook_name       = var.webhook_name
+  bucket             = google_storage_bucket.bucket
+  bucket_name        = google_storage_bucket.bucket.name
+  dialogflow_api     = google_project_service.dialogflow
   cloudfunctions_api = google_project_service.cloudfunctions
-  cloudbuild_api = google_project_service.cloudbuild
+  cloudbuild_api     = google_project_service.cloudbuild
 }
 
 module "service_perimeter" {
-  source = "/deploy/terraform/service-perimeter"
-  project_id = var.project_id
-  service_perimeter = var.service_perimeter
+  source                   = "/deploy/terraform/service-perimeter"
+  project_id               = var.project_id
+  service_perimeter        = var.service_perimeter
   accesscontextmanager_api = google_project_service.accesscontextmanager
-  access_policy_name = var.access_policy_name
-  cloudbilling_api = google_project_service.cloudbilling
+  access_policy_name       = var.access_policy_name
+  cloudbilling_api         = google_project_service.cloudbilling
 }
