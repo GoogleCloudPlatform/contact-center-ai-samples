@@ -14,9 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Divebooker Agent - Increase intent coverage and handle errors gracefully with generative response
+# Divebooker Agent - Increase intent coverage and handle errors gracefully with
+generative response
 
-In this codelab you'll build, deploy and configure a simple virtual agent in Dialogflow CX to assist traveling scuba divers with group bookings and private charters. The virtual agent will use Generative AI and Google's latest generative large language models (LLMs) to generate virtual agent responses. 
+In this codelab you'll build, deploy and configure a simple virtual agent in
+Dialogflow CX to assist traveling scuba divers with group bookings and private
+charters. The virtual agent will use Generative AI and Google's latest
+generative large language models (LLMs) to generate virtual agent responses.
 
 ![Dialogflow CX Generative Response](images/generative-response.png)
 
