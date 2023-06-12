@@ -24,13 +24,13 @@ variable "bucket" {
 
 terraform {
   required_providers {
-    google = "~> 4.45.0"
+    google  = "~> 4.45.0"
     archive = "~> 2.2.0"
-    time = "~> 0.9.1"
+    time    = "~> 0.9.1"
   }
   backend "gcs" {
-    bucket  = null
-    prefix  = null
+    bucket = null
+    prefix = null
   }
 }
 
@@ -43,7 +43,7 @@ variable "region" {
 variable "webhook_src" {
   description = "webhook_src"
   type        = string
-  default = "./telecom-webhook-src"
+  default     = "./telecom-webhook-src"
 }
 
 variable "webhook_name" {
@@ -77,16 +77,16 @@ variable "webhook_ingress_setting" {
 }
 
 resource "google_project_service" "serviceusage" {
-  service = "serviceusage.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "serviceusage.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
 }
 
 resource "google_project_service" "cloudfunctions" {
-  service = "cloudfunctions.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "cloudfunctions.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -94,9 +94,9 @@ resource "google_project_service" "cloudfunctions" {
 }
 
 resource "google_project_service" "cloudbuild" {
-  service = "cloudbuild.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "cloudbuild.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -124,18 +124,18 @@ resource "time_sleep" "wait_for_apis" {
 }
 
 resource "google_cloudfunctions_function" "webhook" {
-  project = var.project_id
-  name        = var.webhook_name
-  description = "VPC-SC Demo Webhook"
-  runtime     = var.webhook_runtime
+  project               = var.project_id
+  name                  = var.webhook_name
+  description           = "VPC-SC Demo Webhook"
+  runtime               = var.webhook_runtime
   available_memory_mb   = 128
   source_archive_bucket = var.bucket
   source_archive_object = google_storage_bucket_object.webhook.name
   trigger_http          = true
   timeout               = 60
   entry_point           = var.webhook_entrypoint
-  region = var.region
-  ingress_settings = var.webhook_ingress_setting
+  region                = var.region
+  ingress_settings      = var.webhook_ingress_setting
   depends_on = [
     time_sleep.wait_for_apis
   ]
