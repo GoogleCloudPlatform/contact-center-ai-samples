@@ -19,12 +19,12 @@ variable "project_id" {
 
 terraform {
   required_providers {
-    google = "~> 4.37.0"
+    google      = "~> 4.37.0"
     google-beta = "~> 4.68.0"
   }
   backend "gcs" {
-    bucket  = null
-    prefix  = null
+    bucket = null
+    prefix = null
   }
 }
 
@@ -35,16 +35,16 @@ variable "region" {
 }
 
 resource "google_project_service" "serviceusage" {
-  service = "serviceusage.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "serviceusage.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
 }
 
 resource "google_project_service" "servicedirectory" {
-  service = "servicedirectory.googleapis.com"
-  project            = var.project_id
-  disable_on_destroy = false
+  service                    = "servicedirectory.googleapis.com"
+  project                    = var.project_id
+  disable_on_destroy         = false
   disable_dependent_services = true
   depends_on = [
     google_project_service.serviceusage
@@ -82,14 +82,14 @@ variable "reverse_proxy_server_ip" {
 }
 
 data "google_project" "project" {
-  project_id     = var.project_id
+  project_id = var.project_id
 }
 
 resource "google_service_directory_namespace" "reverse_proxy" {
   provider     = google-beta
   namespace_id = var.service_directory_namespace
   location     = var.region
-  project = var.project_id
+  project      = var.project_id
   depends_on = [
     google_project_service.servicedirectory
   ]

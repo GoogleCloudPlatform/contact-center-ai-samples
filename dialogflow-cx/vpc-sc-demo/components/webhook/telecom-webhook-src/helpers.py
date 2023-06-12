@@ -42,7 +42,7 @@ def get_date_details(bill_state):
     first_day_str = str(first_day)
 
     last_month_name = month_names[today.month - 2]
-    last_month_first_day_str = str(today.replace(day=1, month=(today.month - 1)))
+    last_month_first_day_str = str(today.replace(day=1, month=today.month - 1))
     second_last_month_name = month_names[today.month - 3]
     if bill_state == "current":
         return [first_month_name, first_day_str, last_month_name]
