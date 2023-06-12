@@ -33,7 +33,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Home from '@mui/icons-material/Home';
 import School from '@mui/icons-material/School';
-import Login from '@mui/icons-material/Login';
 import Logout from '@mui/icons-material/Logout';
 import {useEffect} from 'react';
 import Tooltip from '@mui/material/Tooltip';
@@ -42,6 +41,7 @@ import {SessionExpiredModal} from './SessionExpiredModal.js';
 import {getCookie, LOGIN_COOKIE_NAME} from './Utilities.js';
 import {useQueryState} from './UseQueryState.js';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import PolicyIcon from '@mui/icons-material/Policy';
 
 const drawerWidth = 240;
 const TITLE =
@@ -209,20 +209,6 @@ function MiniDrawer(props) {
   }
   props.dataModel.queryParams = queryParams;
   const queryStr = new URLSearchParams(props.dataModel.queryParams).toString();
-  const loginButton = (
-    <DrawerButton
-      open={open}
-      text={'Login'}
-      icon={Login}
-      href={`http://${window.location.host}/session?${queryStr}`}
-      dataModel={props.dataModel}
-      targetPage={null}
-      activePage={props.dataModel.activePage.current}
-      onClick={() => {
-        props.dataModel.loginRedirect.set(true);
-      }}
-    />
-  );
   const logoutButton = (
     <DrawerButton
       open={open}
@@ -276,6 +262,20 @@ function MiniDrawer(props) {
       activePage={props.dataModel.activePage.current}
     />
   );
+  const PrivacyButton = (
+    <DrawerButton
+      open={open}
+      text={'Privacy Policy'}
+      icon={PolicyIcon}
+      dataModel={props.dataModel}
+      targetPage="privacyPolicy"
+      onClick={() => {
+        props.dataModel.activePage.set('privacyPolicy');
+        resetStateOnPageChange(props.dataModel);
+      }}
+      activePage={props.dataModel.activePage.current}
+    />
+  );
 
   return (
     <div>
@@ -315,13 +315,13 @@ function MiniDrawer(props) {
           <Divider />
           <List>
             {HomeButton}
-            {loginButton}
             {props.dataModel.loggedIn.current ? logoutButton : <></>}
           </List>
           <Divider />
           <List>
             {TutorialButton}
             {LiveDemoButton}
+            {PrivacyButton}
           </List>
         </Drawer>
         <Box component="main" sx={{flexGrow: 1, p: 3}}>
