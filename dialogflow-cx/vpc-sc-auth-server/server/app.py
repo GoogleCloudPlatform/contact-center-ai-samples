@@ -145,10 +145,11 @@ def auth():
                 os.path.basename(curr_stream_name), curr_stream.getvalue()
             )
     zip_file_stream.seek(0)
+    # pylint: disable=unexpected-keyword-arg
     return send_file(
         zip_file_stream,
         as_attachment=True,
-        attachment_filename="encrypted_session.zip", # pylint: disable=unexpected-keyword-arg
+        attachment_filename="encrypted_session.zip",
     )
 
 
