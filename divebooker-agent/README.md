@@ -15,7 +15,7 @@ limitations under the License.
 -->
 
 # Divebooker Agent - Increase intent coverage and handle errors gracefully with
-generative response
+  generative response
 
 In this codelab you'll build, deploy and configure a simple virtual agent in
 Dialogflow CX to assist traveling scuba divers with group bookings and private
