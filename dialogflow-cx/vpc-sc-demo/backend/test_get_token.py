@@ -29,9 +29,9 @@ from mock import mock_open, patch
 @pytest.mark.hermetic
 def test_lru_cache_bump_out(lru_fixture):
     """Test LruCache bumps LRU value out when over capacity."""
-    max_size, test_size, = (
+    (max_size, test_size) = (
         5,
-        15,
+        15,  # fmt: skip
     )
     for curr_val in range(test_size):
         assert lru_fixture(curr_val) == curr_val

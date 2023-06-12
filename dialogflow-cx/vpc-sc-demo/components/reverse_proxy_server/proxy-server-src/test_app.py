@@ -68,7 +68,6 @@ def client(request):
             "WEBHOOK_TRIGGER_URI": "http://MOCK_WEBHOOK_TRIGGER_URI",
         },
     ):
-
         with patch.object(
             id_token,
             request.param.get("verify_token_method", _DEFAULT_VERIFY_TOKEN_METHOD),
@@ -79,7 +78,6 @@ def client(request):
                 request.param.get("text", "MOCK_TEXT"),
             )
             with patch.object(requests, "post", return_value=return_value):
-
                 import app  # pylint: disable=import-outside-toplevel
 
                 app.app.config["TESTING"] = True
