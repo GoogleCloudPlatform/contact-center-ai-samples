@@ -44,12 +44,12 @@ def get_project_number(token, project_id):
     }
 
 
-def get_access_policy_name(token, access_policy_title, project_id):
+def get_access_policy_name(token, access_policy_title, project_id, error_code=200):
     """Get access policy name using cloudresourcemanager API."""
     if not access_policy_title:
         return {
             "response": flask.Response(
-                status=200,
+                status=error_code,
                 response=json.dumps(
                     {"status": "BLOCKED", "reason": "NO_ACCESS_POLICY"}
                 ),
@@ -68,15 +68,8 @@ def get_access_policy_name(token, access_policy_title, project_id):
     if response.status_code != 200:
         return {
             "response": flask.Response(
-                status=500,
-                response=json.dumps(
-                    {
-                        "status": "BLOCKED",
-                        "reason": json.loads(response.text)["error"].get(
-                            "status", "UNKNOWN_STATUS"
-                        ),
-                    }
-                ),
+                status=error_code,
+                response=json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_STATUS"}),
             )
         }
 
@@ -87,7 +80,7 @@ def get_access_policy_name(token, access_policy_title, project_id):
     if not organization_id:
         return {
             "response": flask.Response(
-                status=200,
+                status=error_code,
                 response=json.dumps({"status": "BLOCKED", "reason": "NO_ORGANIZATION"}),
             )
         }
@@ -116,7 +109,7 @@ def get_access_policy_name(token, access_policy_title, project_id):
 
     return {
         "response": flask.Response(
-            status=200,
+            status=error_code,
             response=json.dumps({"status": "BLOCKED", "reason": "POLICY_NOT_FOUND"}),
         )
     }
@@ -453,6 +446,15 @@ def get_webhooks(token, agent_name, project_id, region):
         )
         return {"response": response}
     agents = result.json()
+    if "webhooks" not in agents:
+        return {
+            "response": flask.Response(
+                status=200,
+                response=json.dumps(
+                    {"status": "BLOCKED", "reason": "WEBHOOK_NOT_FOUND"}
+                ),
+            )
+        }
     return {"data": {data["displayName"]: data for data in agents["webhooks"]}}
 
 

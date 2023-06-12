@@ -18,6 +18,7 @@ import base64
 import json
 import logging
 
+import analytics_utilities as au
 import flask
 import requests
 import status_utilities as su
@@ -111,7 +112,10 @@ def update_webhook_access():  # pylint: disable=too-many-branches
         return flask.Response(
             status=response.status_code, response=json.dumps({"error": response.text})
         )
-    return flask.Response(status=200)
+    response = flask.Response(status=200)
+    return au.register_action(
+        flask.request, response, au.ACTIONS.UPDATE_STATUS, {"service": "ingress"}
+    )
 
 
 @update.route("/update_webhook_ingress", methods=["POST"])
@@ -163,56 +167,29 @@ def update_webhook_ingress():
         return flask.Response(
             status=response.status_code, response=json.dumps({"error": response.text})
         )
-    return flask.Response(status=200)
+    response = flask.Response(status=200)
+    return au.register_action(
+        flask.request, response, au.ACTIONS.UPDATE_STATUS, {"service": "ingress"}
+    )
 
 
 @update.route("/update_security_perimeter_cloudfunctions", methods=["POST"])
 def update_security_perimeter_cloudfunctions():
     """Update security perimeter, cloudfunctions."""
-    data = su.get_token_and_project(flask.request)
-    if "response" in data:
-        return data["response"]
-    project_id, token = data["project_id"], data["token"]
-
-    access_policy_title = flask.request.args["access_policy_title"]
-    response = su.get_access_policy_name(token, access_policy_title, project_id)
-    if "response" in response:
-        return response["response"]
-    access_policy_name = response["access_policy_name"]
-
-    content = flask.request.get_json(silent=True)
-    restrict_access = content["status"]
-    return uu.update_security_perimeter(
-        token,
-        "cloudfunctions.googleapis.com",
-        restrict_access,
-        project_id,
-        access_policy_name,
+    response = uu.update_security_perimeter(
+        flask.request, "cloudfunctions.googleapis.com"
+    )
+    return au.register_action(
+        flask.request, response, au.ACTIONS.UPDATE_STATUS, {"service": "ingress"}
     )
 
 
 @update.route("/update_security_perimeter_dialogflow", methods=["POST"])
 def update_security_perimeter_dialogflow():
     """Update security perimeter, dialogflow."""
-    data = su.get_token_and_project(flask.request)
-    if "response" in data:
-        return data["response"]
-    project_id, token = data["project_id"], data["token"]
-
-    access_policy_title = flask.request.args["access_policy_title"]
-    response = su.get_access_policy_name(token, access_policy_title, project_id)
-    if "response" in response:
-        return response["response"]
-    access_policy_name = response["access_policy_name"]
-
-    content = flask.request.get_json(silent=True)
-    restrict_access = content["status"]
-    return uu.update_security_perimeter(
-        token,
-        "dialogflow.googleapis.com",
-        restrict_access,
-        project_id,
-        access_policy_name,
+    response = uu.update_security_perimeter(flask.request, "dialogflow.googleapis.com")
+    return au.register_action(
+        flask.request, response, au.ACTIONS.UPDATE_STATUS, {"service": "ingress"}
     )
 
 
@@ -298,4 +275,7 @@ def update_service_directory_webhook_fulfillment():  # pylint: disable=too-many-
         return flask.Response(
             status=response.status_code, response=json.dumps({"error": response.text})
         )
-    return flask.Response(status=200)
+    response = flask.Response(status=200)
+    return au.register_action(
+        flask.request, response, au.ACTIONS.UPDATE_STATUS, {"service": "ingress"}
+    )

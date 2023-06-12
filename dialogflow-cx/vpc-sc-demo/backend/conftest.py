@@ -14,11 +14,14 @@
 
 """conftest module for pytest containing test classes for reuse."""
 
+import io
 import json
+import zipfile
 from urllib.parse import urlparse
 
 import flask
 import pytest
+import requests
 from werkzeug.test import EnvironBuilder
 
 MOCK_DOMAIN = "MOCK_DOMAIN."
@@ -88,3 +91,45 @@ def mock_request():
     """Mock request for testing functions that take a request as an arg."""
     builder = EnvironBuilder()
     return builder.get_request()
+
+
+@pytest.fixture
+def mock_response():
+    """Mock request for testing functions that take a request as an arg."""
+    return flask.Response()
+
+
+def generate_mock_register_action():
+    """Factory function to provide a MockRegisterAction fixture."""
+
+    class MockRegisterAction:
+        """Mock Register action function with call counter."""
+
+        def __init__(self):
+            self.called_counter = 0
+
+        def __call__(self, request, response, action, data=None):
+            self.called_counter += 1
+            del request
+            del action
+            del data
+            return response
+
+        def assert_called_once(self):
+            """Method to ensure that the mock fixture is envoked once."""
+            assert self.called_counter == 1
+
+    return MockRegisterAction()
+
+
+@pytest.fixture
+def mock_zipfile():
+    """Create a mock zipfile"""
+    return_value = requests.Response()
+    return_value.status_code = 200
+    return_value.raw = io.BytesIO()
+    with zipfile.ZipFile(return_value.raw, "w") as zip_file:
+        zip_file.writestr("key", "MOCK_KEY")
+        zip_file.writestr("session_data", "MOCK_SESSION_DATA")
+    return_value.raw.seek(0)
+    return return_value

@@ -181,7 +181,7 @@ def test_get_redirect_url(prod, expected):
 def get_aut_endpoint_response(curr_client, mock_blob, mock_session_id):
     """Return response from a mocked /auth endpoint."""
     with patch.dict(os.environ, {"SESSION_BUCKET": "MOCK_SESSION_BUCKET"}):
-        from google.cloud import storage  # pylint: disable=import-outside-toplevel
+        import google.cloud.storage as storage  # pylint: disable=import-outside-toplevel,consider-using-from-import
 
         with patch.object(storage.blob, "Blob", return_value=mock_blob):
             return curr_client.get(

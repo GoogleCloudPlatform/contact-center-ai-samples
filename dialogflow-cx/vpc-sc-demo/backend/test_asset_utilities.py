@@ -15,10 +15,13 @@
 """Module for testing asset_utilities.py."""
 
 import json
+import logging
+import os
 
-import asset_utilities
+import asset_utilities as asu
 import pytest
 import requests
+import status_utilities as su
 from conftest import MockReturnObject, assert_response
 from google.oauth2 import service_account
 from invoke import MockContext as MockContextBase
@@ -70,9 +73,7 @@ def test_get_access_policy_title_success():
             {"title": "MOCK_TITLE"},
         ),
     ):
-        result = asset_utilities.get_access_policy_title(
-            "MOCK_TOKEN", "MOCK_ACCESS_POLICY_ID"
-        )
+        result = asu.get_access_policy_title("MOCK_TOKEN", "MOCK_ACCESS_POLICY_ID")
     assert result == {"access_policy_title": "MOCK_TITLE"}
 
 
@@ -87,9 +88,7 @@ def test_get_access_policy_title_server_error():
             ["SERVER_ERROR"],
         ),
     ):
-        result = asset_utilities.get_access_policy_title(
-            "MOCK_TOKEN", "MOCK_ACCESS_POLICY_ID"
-        )
+        result = asu.get_access_policy_title("MOCK_TOKEN", "MOCK_ACCESS_POLICY_ID")
     assert_response(result, 500, ["SERVER_ERROR"])
 
 
@@ -115,7 +114,18 @@ def request_args():
                 "TF_VAR_project_id": "MOCK_PROJECT_ID",
                 "TF_VAR_bucket": "MOCK_BUCKET",
                 "TF_VAR_region": "MOCK_REGION",
-                "TF_VAR_access_policy_title": "null",
+                "TF_VAR_access_policy_name": "null",
+            },
+        ),
+        (
+            "",
+            False,
+            {
+                "GOOGLE_OAUTH_ACCESS_TOKEN": "MOCK_TOKEN",
+                "TF_VAR_project_id": "MOCK_PROJECT_ID",
+                "TF_VAR_bucket": "MOCK_BUCKET",
+                "TF_VAR_region": "MOCK_REGION",
+                "TF_VAR_access_policy_name": "null",
             },
         ),
         (
@@ -126,7 +136,7 @@ def request_args():
                 "TF_VAR_project_id": "MOCK_PROJECT_ID",
                 "TF_VAR_bucket": "MOCK_BUCKET",
                 "TF_VAR_region": "MOCK_REGION",
-                "TF_VAR_access_policy_title": "MOCK_ACCESS_POLICY_TITLE",
+                "TF_VAR_access_policy_name": "MOCK_ACCESS_POLICY_NAME",
             },
         ),
         (
@@ -137,9 +147,14 @@ def request_args():
                 "TF_VAR_project_id": "MOCK_PROJECT_ID",
                 "TF_VAR_bucket": "MOCK_BUCKET",
                 "TF_VAR_region": "MOCK_REGION",
-                "TF_VAR_access_policy_title": "MOCK_ACCESS_POLICY_TITLE",
+                "TF_VAR_access_policy_name": "MOCK_ACCESS_POLICY_NAME",
                 "TF_LOG": "DEBUG",
             },
+        ),
+        (
+            "BAD_ACCESS_POLICY_TITLE",
+            False,
+            {"response": "ERROR_RESPONSE"},
         ),
     ],
 )
@@ -147,10 +162,17 @@ def test_get_terraform_env(  # pylint: disable=redefined-outer-name
     access_policy_title, debug, expected, request_args
 ):
     """Test get_terraform_env."""
-    if access_policy_title:
-        request_args["access_policy_title"] = "MOCK_ACCESS_POLICY_TITLE"
+    if access_policy_title is None:
+        result = asu.get_terraform_env("MOCK_TOKEN", request_args, debug=debug)
 
-    result = asset_utilities.get_terraform_env("MOCK_TOKEN", request_args, debug=debug)
+    else:
+        request_args["access_policy_title"] = access_policy_title
+        if access_policy_title == "BAD_ACCESS_POLICY_TITLE":
+            return_value = {"response": "ERROR_RESPONSE"}
+        else:
+            return_value = {"access_policy_name": "MOCK_ACCESS_POLICY_NAME"}
+        with patch.object(su, "get_access_policy_name", return_value=return_value):
+            result = asu.get_terraform_env("MOCK_TOKEN", request_args, debug=debug)
     assert result == expected
 
 
@@ -164,6 +186,7 @@ def test_get_terraform_env(  # pylint: disable=redefined-outer-name
         (True, True),
     ],
 )
+@patch.dict(os.environ, {"TF_PLAN_STORAGE_BUCKET": "MOCK_STORAGE_BUCKET"})
 def test_tf_init(debug, exited, request_args):  # pylint: disable=redefined-outer-name
     """Test tf_init."""
     with patch.object(service_account, "Credentials", return_value="MOCK_CREDENTIALS"):
@@ -172,11 +195,11 @@ def test_tf_init(debug, exited, request_args):  # pylint: disable=redefined-oute
         context.set_result(
             MockPromise(MockResult(exited, "MOCK_STDOUT", "MOCK_STDERR"))
         )
-        result = asset_utilities.tf_init(
+        result = asu.tf_init(
             context,
             "MOCK_MODULE",
             "MOCK_WORKDIR",
-            asset_utilities.get_terraform_env(
+            asu.get_terraform_env(
                 "MOCK_ACCESS_TOKEN",
                 request_args,
                 debug=debug,
@@ -220,11 +243,11 @@ def test_tf_plan(debug, message, request_args):  # pylint: disable=redefined-out
     context = MockContext()
     context.set_result(MockPromise(MockResult(False, mock_stdout, "MOCK_STDERR")))
     with patch.object(service_account, "Credentials", return_value="MOCK_CREDENTIALS"):
-        result = asset_utilities.tf_plan(
+        result = asu.tf_plan(
             context,
             "MOCK_MODULE",
             "MOCK_WORKDIR",
-            asset_utilities.get_terraform_env(
+            asu.get_terraform_env(
                 "MOCK_ACCESS_TOKEN",
                 request_args,
                 debug=debug,
@@ -274,11 +297,11 @@ def test_tf_apply(debug, message, request_args):  # pylint: disable=redefined-ou
     context = MockContext()
     context.set_result(MockPromise(MockResult(False, mock_stdout, "MOCK_STDERR")))
     with patch.object(service_account, "Credentials", return_value="MOCK_CREDENTIALS"):
-        result = asset_utilities.tf_apply(
+        result = asu.tf_apply(
             context,
             "MOCK_MODULE",
             "MOCK_WORKDIR",
-            asset_utilities.get_terraform_env(
+            asu.get_terraform_env(
                 "MOCK_ACCESS_TOKEN",
                 request_args,
                 debug=debug,
@@ -308,7 +331,7 @@ def test_tf_apply(debug, message, request_args):  # pylint: disable=redefined-ou
     ]
     + [
         (False, False, "\n".join(resource_list))
-        for resource_list in asset_utilities.RESOURCE_GROUP.values()
+        for resource_list in asu.RESOURCE_GROUP.values()
     ],
 )
 def test_tf_state_list(
@@ -321,11 +344,11 @@ def test_tf_state_list(
     context = MockContext()
     context.set_result(MockPromise(MockResult(exited, stdout, "MOCK_STDERR")))
     with patch.object(service_account, "Credentials", return_value="MOCK_CREDENTIALS"):
-        result = asset_utilities.tf_state_list(
+        result = asu.tf_state_list(
             context,
             "MOCK_MODULE",
             "MOCK_WORKDIR",
-            asset_utilities.get_terraform_env(
+            asu.get_terraform_env(
                 "MOCK_ACCESS_TOKEN",
                 request_args,
                 debug=debug,
@@ -346,3 +369,43 @@ def test_tf_state_list(
             assert len(result["resources"]) == 1 + len(stdout.split())
         else:
             assert result == {"resources": ["MOCK_STDOUT"]}
+
+
+@pytest.mark.parametrize("request_debug", ["true", "false"])
+@pytest.mark.parametrize(
+    "logging_level",
+    [
+        logging.DEBUG,
+        logging.INFO,
+        logging.ERROR,
+    ],
+)
+def test_get_debug(request_debug, logging_level, mock_request):
+    """Test get_debug method."""
+    logging.root.level = logging_level
+    mock_request.args = {"debug": request_debug}
+    expected = request_debug == "true" or logging_level <= logging.DEBUG
+    assert asu.get_debug(mock_request) == expected
+
+
+@patch.object(requests, "get", return_value=MockReturnObject(0))
+def test_validate_project_id_failure(mock_requests_get):
+    """Test validate_project_id failure."""
+    result = asu.validate_project_id("MOCK_PROJECT_ID", "MOCK_ACCESS_TOKEN")
+    mock_requests_get.assert_called_once()
+    assert_response(
+        {"response": result},
+        500,
+        {
+            "status": "BLOCKED",
+            "reason": "UNKNOWN_PROJECT_ID",
+        },
+    )
+
+
+@patch.object(requests, "get", return_value=MockReturnObject(200))
+def test_validate_project_id_success(mock_requests_get):
+    """Test validate_project_id success."""
+    response = asu.validate_project_id("MOCK_PROJECT_ID", "MOCK_ACCESS_TOKEN")
+    mock_requests_get.assert_called_once()
+    assert response is None

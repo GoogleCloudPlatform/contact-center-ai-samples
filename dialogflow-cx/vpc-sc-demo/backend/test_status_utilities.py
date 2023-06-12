@@ -61,7 +61,7 @@ def test_get_access_policy_name_bad_token():
         result = su.get_access_policy_name(
             "MOCK_TOKEN", "MOCK_PROJECT_TITLE", "MOCK_PROJECT_ID"
         )
-        assert_response(result, 500, {"status": "BLOCKED", "reason": "UNAUTHENTICATED"})
+        assert_response(result, 200, {"status": "BLOCKED", "reason": "UNKNOWN_STATUS"})
 
 
 @pytest.mark.hermetic
@@ -799,6 +799,17 @@ def test_get_webhooks_server_error():
             "MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_PROJECT_ID", "MOCK_REGION"
         )
         assert_response(result, 500, {"error": "SERVER_ERROR"})
+
+
+@pytest.mark.hermetic
+@patch.object(requests, "get", return_value=MockReturnObject(200, {}))
+def test_get_webhooks_not_found(mock_requests_get):
+    """Test get_webhooks, webhook not found"""
+    result = su.get_webhooks(
+        "MOCK_TOKEN", "MOCK_PROJECT_ID", "MOCK_PROJECT_ID", "MOCK_REGION"
+    )
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "WEBHOOK_NOT_FOUND"})
+    mock_requests_get.assert_called_once()
 
 
 @pytest.mark.hermetic

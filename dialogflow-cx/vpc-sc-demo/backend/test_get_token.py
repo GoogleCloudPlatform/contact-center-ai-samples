@@ -14,9 +14,7 @@
 
 """Test module for get_token.py."""
 
-import io
 import json
-import zipfile
 
 import get_token
 import pytest
@@ -66,7 +64,7 @@ def test_get_token_from_auth_server_unknown_integration():
     mock_session_id = "UNKNOWN_SESSION_ID"
 
     result = get_token.get_token_from_auth_server(mock_session_id)
-    assert_response(result, 500, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
 
 
 @pytest.mark.hermetic
@@ -79,7 +77,31 @@ def test_get_token_from_auth_server_unknown_hermetic_401():
 
     with patch.object(requests, "get", return_value=return_value):
         result = get_token.get_token_from_auth_server(mock_session_id)
-    assert_response(result, 500, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "REJECTED_REQUEST"})
+
+
+@pytest.mark.hermetic
+@patch.object(RSA, "import_key", return_value="MOCK_KEY")
+@patch("builtins.open", mock_open(read_data="MOCK_DATE"))
+def test_get_token_from_auth_server_decryption_error(
+    mock_import_key,
+    mock_zipfile,
+):
+    """Test get_token_from_auth_server, decryption error occurs."""
+
+    class MockDecryptClass:  # pylint: disable=too-few-public-methods
+        """Mock out class PKCS1_OAEP"""
+
+        def decrypt(self, args):
+            """Mock decrypt method."""
+            del args
+            raise ValueError
+
+    with patch.object(requests, "get", return_value=mock_zipfile):
+        with patch.object(PKCS1_OAEP, "new", return_value=MockDecryptClass()):
+            result = get_token.get_token_from_auth_server("UNKNOWN_SESSION_ID")
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "DECRYPTION_ERROR"})
+    mock_import_key.assert_called_once()
 
 
 @pytest.mark.hermetic
@@ -105,16 +127,9 @@ def test_encryption_e2e():
 
 
 @pytest.mark.hermetic
-def test_get_token_from_auth_server_unknown_hermetic_200():
+def test_get_token_from_auth_server_unknown_hermetic_200(mock_zipfile):
     """Hermetic test of get_token_from_auth_server."""
     mock_session_id = "UNKNOWN_SESSION_ID"
-    return_value = requests.Response()
-    return_value.status_code = 200
-    return_value.raw = io.BytesIO()
-    with zipfile.ZipFile(return_value.raw, "w") as zip_file:
-        zip_file.writestr("key", "MOCK_KEY")
-        zip_file.writestr("session_data", "MOCK_SESSION_DATA")
-    return_value.raw.seek(0)
 
     class MockDecryptClass:  # pylint: disable=too-few-public-methods
         """Mock out class PKCS1_OAEP"""
@@ -126,7 +141,7 @@ def test_get_token_from_auth_server_unknown_hermetic_200():
 
     mock_token_dict = {"MOCK_TOKEN_KEY": "MOCK_TOKEN_VAL"}
 
-    with patch.object(requests, "get", return_value=return_value):
+    with patch.object(requests, "get", return_value=mock_zipfile):
         with patch("builtins.open", mock_open(read_data="MOCK_DATE")) as mock_file:
             with patch.object(RSA, "import_key", return_value="MOCK_KEY"):
                 with patch.object(PKCS1_OAEP, "new", return_value=MockDecryptClass()):
@@ -183,7 +198,7 @@ def test_get_token_failure_unknown(mock_request):
     ):
         result = get_token.get_token(mock_request, cache=cache)
     result = get_token.get_token(mock_request, cache=cache)
-    assert_response(result, 500, {"status": "BLOCKED", "reason": "UNKNOWN"})
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "UNKNOWN"})
 
 
 @pytest.mark.hermetic
@@ -227,7 +242,7 @@ def test_get_token_failure_bad_email(mock_request):
         new=mock_verify_oauth2_token_raise_value_error,
     ):
         result = get_token.get_token(mock_request, cache=cache)
-    assert_response(result, 500, {"status": "BLOCKED", "reason": "BAD_EMAIL"})
+    assert_response(result, 200, {"status": "BLOCKED", "reason": "BAD_EMAIL"})
 
 
 @pytest.mark.hermetic
@@ -271,7 +286,7 @@ def test_get_token_failure_success(token_type, expected, mock_request):
     else:
         assert_response(
             result,
-            500,
+            200,
             {
                 "status": "BLOCKED",
                 "reason": (
