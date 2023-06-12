@@ -35,11 +35,16 @@ use Google Cloud Conversational AI services, including:
 
 ## Samples
 
-* [Dialogflow CX Webhook Python Sample](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx): This project uses Google Cloud Functions to create a webhook for a Dialogflow
+*
+  [Dialogflow CX Webhook Python Sample](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx):
+  This project uses Google Cloud Functions to create a webhook for a Dialogflow
   CX agent
 
-* [Dialogflow CX Samples - Node.js](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx-nodejs)
-  * [Webhook Samples](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx-nodejs/dialogflow-cx-webhook-nodejs): Demonstrates how to integrate webhooks with Dialogflow CX.
+*
+  [Dialogflow CX Samples - Node.js](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx-nodejs)
+  *
+    [Webhook Samples](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx-nodejs/dialogflow-cx-webhook-nodejs):
+    Demonstrates how to integrate webhooks with Dialogflow CX.
 
 ## Contributing
 
