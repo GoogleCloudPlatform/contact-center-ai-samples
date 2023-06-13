@@ -61,7 +61,7 @@
     "prettier": "^2.8.1",
     "react-scripts": "^5.0.1",
     "stylelint": "^14.16.0",
-    "stylelint-config-standard": "^29.0.0"
+    "stylelint-config-standard": "^33.0.0"
   },
   "jest": {
     "collectCoverageFrom": [
