@@ -58,7 +58,7 @@ jobs:
       # Checkout the code base #
       ##########################
       - name: Harden Runner
-        uses: step-security/harden-runner@128a63446a954579617e875aaab7d2978154e969 # v2.0.0
+        uses: step-security/harden-runner@128a63446a954579617e875aaab7d2978154e969 # v2.4.0
         with:
           egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
 
@@ -66,9 +66,9 @@ jobs:
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
           fetch-depth: 0
-      - name: Install missing python packages
+      - name: Install missing Python packages
         run: sudo apt-get install -y --no-install-recommends python3-venv python3-setuptools
-      - name: Install Requirements
+      - name: Install Python requirements
         run: |-
           python3 -m venv .venv
           source .venv/bin/activate
@@ -80,6 +80,8 @@ jobs:
           pip install -r dialogflow-cx/vpc-sc-demo/backend/requirements.txt
           pip install -r dialogflow-cx/vpc-sc-demo/backend/requirements-test.txt
           mv .venv /home/runner/work/_temp/_github_workflow
+      - name: Install NPM requirements
+        run: npm install
       - name: Lint Code Base
         uses: github/super-linter/slim@45fc0d88288beee4701c62761281edfee85655d7 # v5.0.0
         env:

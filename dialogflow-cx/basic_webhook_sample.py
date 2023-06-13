@@ -104,7 +104,6 @@ class BasicWebhookSample(ds.DialogflowSample):
 
 
 if __name__ == "__main__":
-
     import argparse
 
     parser = argparse.ArgumentParser(

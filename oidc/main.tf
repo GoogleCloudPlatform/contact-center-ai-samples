@@ -41,18 +41,18 @@ resource "google_project_service" "service" {
     "iamcredentials.googleapis.com",
     "sts.googleapis.com",
   ])
-  service = each.key
-  project            = var.project_id
-  disable_on_destroy = true
+  service                    = each.key
+  project                    = var.project_id
+  disable_on_destroy         = true
   disable_dependent_services = true
 }
 
 resource "google_storage_bucket" "bucket" {
-  project = var.project_id
-  name     = "ccai-samples-df-tf"
-  location = "US"
+  project                     = var.project_id
+  name                        = "ccai-samples-df-tf"
+  location                    = "US"
   uniform_bucket_level_access = true
-  force_destroy = true
+  force_destroy               = true
 }
 
 resource "google_service_account" "oidc_sa" {
