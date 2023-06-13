@@ -42,9 +42,19 @@ use Google Cloud Conversational AI services, including:
 
 *
   [Dialogflow CX Samples - Node.js](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx-nodejs)
-  *
-    [Webhook Samples](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx-nodejs/dialogflow-cx-webhook-nodejs):
-    Demonstrates how to integrate webhooks with Dialogflow CX.
+
+*
+  [Webhook Samples](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx-nodejs/dialogflow-cx-webhook-nodejs):
+  Demonstrates how to integrate webhooks with Dialogflow CX
+
+*
+  [Shirt Order Agent - Using Terraform with Dialogflow CX](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx/shirt-order-agent):
+  Demonstrates how to use Terraform to provision a Dialogflow CX agent
+
+*
+  [Divebooker Agent - Increase intent coverage with generative response](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/divebooker-agent):
+  This agent is intended to be used with the Generative Response functionality
+  in Dialogflow CX and the corresponding codelab
 
 ## Contributing
 
