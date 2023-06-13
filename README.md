@@ -18,7 +18,6 @@ limitations under the License.
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![GitHub Super-Linter](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
-![Contact Center AI](https://storage.googleapis.com/gweb-cloudblog-publish/images/google_contact_center_ai.max-2200x2200.jpg)
 
 Welcome to the Google Cloud
 [Contact Center AI](https://cloud.google.com/solutions/contact-center) sample
@@ -42,9 +41,19 @@ use Google Cloud Conversational AI services, including:
 
 *
   [Dialogflow CX Samples - Node.js](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx-nodejs)
-  *
-    [Webhook Samples](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx-nodejs/dialogflow-cx-webhook-nodejs):
-    Demonstrates how to integrate webhooks with Dialogflow CX.
+
+*
+  [Webhook Samples](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx-nodejs/dialogflow-cx-webhook-nodejs):
+  Demonstrates how to integrate webhooks with Dialogflow CX
+
+*
+  [Shirt Order Agent - Using Terraform with Dialogflow CX](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/dialogflow-cx/shirt-order-agent):
+  Demonstrates how to use Terraform to provision a Dialogflow CX agent
+
+*
+  [Divebooker Agent - Increase intent coverage with generative response](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/divebooker-agent):
+  This agent is intended to be used with the Generative Response functionality
+  in Dialogflow CX and the corresponding codelab
 
 ## Contributing
 
