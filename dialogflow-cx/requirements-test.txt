@@ -13,4 +13,4 @@
 # limitations under the License.
 
 pytest==7.3.2
-pytest-rerunfailures==11.1.2
+pytest-rerunfailures==12.0
