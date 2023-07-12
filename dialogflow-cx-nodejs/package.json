@@ -8,7 +8,7 @@
     "mocha": "10.2.0"
   },
   "dependencies": {
-    "@google-cloud/dialogflow-cx": "3.5.0",
+    "@google-cloud/dialogflow-cx": "3.8.0",
     "axios": "1.4.0",
     "uuid": "9.0.0"
   }
