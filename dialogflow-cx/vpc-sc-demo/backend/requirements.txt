@@ -23,7 +23,7 @@ pycryptodome==3.18.0
 google-cloud-storage==2.9.0
 invoke==1.7.3
 werkzeug==2.3.6
-google-cloud-bigquery==3.11.0
+google-cloud-bigquery==3.11.4
 jsonschema==4.17.3
 types-jsonschema==4.17.0.8
-google-cloud-bigquery==3.11.0
+google-cloud-bigquery==3.11.4
