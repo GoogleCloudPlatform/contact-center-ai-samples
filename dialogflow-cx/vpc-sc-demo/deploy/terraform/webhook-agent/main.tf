@@ -14,7 +14,7 @@
 
 terraform {
   required_providers {
-    google  = "~> 4.37.0"
+    google  = "~> 4.77.0"
     time    = "~> 0.9.1"
     archive = "~> 2.2.0"
   }
