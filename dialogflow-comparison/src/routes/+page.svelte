@@ -48,7 +48,7 @@
   });
 </script>
 
-<Navbar let:hidden let:toggle class="mb-9 bg-[#E8F0FE] p-6">
+<Navbar class="mb-9 bg-[#E8F0FE] p-6">
   <NavBrand href="/">
     <img src="dialogflow-logo.png" class="mr-3 h-6 sm:h-9" alt="Dialogflow CX Logo" />
     <span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
