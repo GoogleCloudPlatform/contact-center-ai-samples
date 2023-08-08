@@ -1,8 +1,7 @@
 <script lang="ts">
   import { Navbar, NavBrand } from "flowbite-svelte";
+  import { Input, Button, ButtonGroup } from "flowbite-svelte";
   import { onMount } from "svelte";
-  import { Input, Label, Helper } from "flowbite-svelte";
-  import { Button, ButtonGroup } from "flowbite-svelte";
 
   var utterance: string;
 
@@ -51,8 +50,9 @@
 
 <Navbar let:hidden let:toggle class="mb-9 bg-[#E8F0FE] p-6">
   <NavBrand href="/">
+    <img src="dialogflow-logo.png" class="mr-3 h-6 sm:h-9" alt="Dialogflow CX Logo" />
     <span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-      Bot Comparison - Google Store Virtual Agent
+      Dialogflow Comparison - Google Cloud
     </span>
   </NavBrand>
 </Navbar>
@@ -71,7 +71,7 @@
         <Button color="blue" type="submit" on:click={() => fillAndSend(utterance, 0)}
           >Submit</Button>
       </ButtonGroup>
-      <Button class="mx-2" color="green" on:click={() => autoMode()}>Demo Mode</Button>
+      <Button class="mx-2" color="green" on:click={() => autoMode()}>Start Demo Mode</Button>
     </form>
   </div>
 </div>
