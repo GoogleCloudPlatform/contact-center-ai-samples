@@ -49,7 +49,7 @@
   });
 </script>
 
-<Navbar let:hidden let:toggle class="bg-[#E8F0FE] p-6 mb-9">
+<Navbar let:hidden let:toggle class="mb-9 bg-[#E8F0FE] p-6">
   <NavBrand href="/">
     <span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
       Bot Comparison - Google Store Virtual Agent
@@ -60,7 +60,7 @@
 <div class="flex text-center">
   <div class="w-0 grow">
     <form>
-      <ButtonGroup class="w-1/2 mb-9">
+      <ButtonGroup class="mb-9 w-1/2">
         <Input
           class="w-full"
           type="text"
