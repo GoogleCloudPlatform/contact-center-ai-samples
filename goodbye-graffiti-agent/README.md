@@ -30,7 +30,7 @@ The optional `--allow-unauthenticated` flag lets you reach your function without
 
 After the function deploys, note the url property from the output of the gcloud functions deploy command, or retrieve it with the command `gcloud functions describe lookupPlace --region REGION`. Replace REGION with the name of the Google Cloud region where you deployed your function. You will need the url when configuring the webhook in Dialogflow CX. 
 
-## Create, configure and deploy the Dialogflow CX agent
+## Create the agent and configure the webhook
 1. In your browser, navigate to the [Dialogflow CX console](https://dialogflow.cloud.google.com/cx/projects)
 1. Create a new agent (select the option **Build your own agent**). You must create the agent in the **global** region as this is the only region where the Phone Gateway integration is currently supported. You cannot change region once the agent is deployed. 
 1. [Restore](https://cloud.google.com/dialogflow/cx/docs/concept/agent#export) the Goodbye Graffiti agent exported in the JSON package file format (agent.zip) 
@@ -38,6 +38,8 @@ After the function deploys, note the url property from the output of the gcloud 
 1. Enter your function URL as the webhook URL and click Save.
 
 ![Dialogflow CX Webhook](images/webhook.png)
+
+## Configure the phone gateway
 
 1. Navigate to **Integrations** and click **Manage** on the CX Phone Gateway panel.
 1. Setup the [phone gateway](https://cloud.google.com/dialogflow/cx/docs/concept/integration/phone-gateway#setup) integration. 
