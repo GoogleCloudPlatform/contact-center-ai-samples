@@ -33,5 +33,6 @@ jobs:
         config_data: |
           extends: default
           rules:
-            line-length: disable
             comments: disable
+            line-length: disable
+            truthy: disable
