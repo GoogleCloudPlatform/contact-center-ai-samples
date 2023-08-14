@@ -18,4 +18,4 @@ gunicorn==20.1.0
 requests==2.31.0
 structlog==23.1.0
 
-google-auth==2.19.1
+google-auth==2.22.0
