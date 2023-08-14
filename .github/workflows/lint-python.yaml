@@ -29,3 +29,6 @@ jobs:
 
     - uses: sunnysid3up/python-linter@master
       name: Python Linter
+      with:
+        mypy-options: "--ignore-missing-imports --show-error-codes"
+        isort-options: "-w 100"
