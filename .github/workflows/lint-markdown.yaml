@@ -22,7 +22,6 @@ on:
 
 jobs:
   markdown-lint:
-    name: Lint changelog file
     runs-on: ubuntu-latest
 
     steps:
