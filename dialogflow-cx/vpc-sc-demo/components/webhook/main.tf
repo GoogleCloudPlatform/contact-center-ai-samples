@@ -24,7 +24,7 @@ variable "bucket" {
 
 terraform {
   required_providers {
-    google  = "~> 4.45.0"
+    google  = "~> 4.77.0"
     archive = "~> 2.4.0"
     time    = "~> 0.9.1"
   }

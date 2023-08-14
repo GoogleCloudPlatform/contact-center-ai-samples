@@ -108,7 +108,7 @@ provider "google" {
 
 terraform {
   required_providers {
-    google = "~> 4.37.0"
+    google = "~> 4.77.0"
   }
   #START_BACKEND
   backend "gcs" {

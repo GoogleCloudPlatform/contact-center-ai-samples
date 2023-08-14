@@ -19,7 +19,7 @@ variable "project_id" {
 
 terraform {
   required_providers {
-    google      = "~> 4.37.0"
+    google      = "~> 4.77.0"
     google-beta = "~> 4.68.0"
   }
   backend "gcs" {
