@@ -1,7 +1,7 @@
 {
-  "name": "cx-google-maps-webhook",
+  "name": "maps-function",
   "version": "1.0.0",
-  "description": "A webhook that invokes Google Maps Places API (can be consumed from Dialogflow CX)",
+  "description": "Webhook service required to integrate the goodbye-graffiti agent with Google Maps Geocode and Static API",
   "main": "index.js",
   "dependencies": {
     "@google-cloud/functions-framework": "^2.0.0",
