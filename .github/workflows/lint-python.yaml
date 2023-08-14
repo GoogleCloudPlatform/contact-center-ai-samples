@@ -24,12 +24,14 @@ jobs:
   tflint:
     runs-on: ubuntu-latest
      steps:
-    - uses: actions/checkout@v2
-    - name: Python Linter
-      uses: sunnysid3up/python-linter@master
-      with:
-        source: "src"
-        mypy-options: "--ignore-missing-imports --show-error-codes"
-        pylint-options: "--rcfile=setup.cfg"
-        isort-options: "-w 100"
-        django: true
+        - uses: actions/checkout@v2
+          name: Checkout source code
+
+        - uses: sunnysid3up/python-linter@master
+          name: Python Linter
+          with:
+            source: "src"
+            mypy-options: "--ignore-missing-imports --show-error-codes"
+            pylint-options: "--rcfile=setup.cfg"
+            isort-options: "-w 100"
+            django: true
