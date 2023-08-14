@@ -18,8 +18,11 @@ variable "project_id" {
 }
 
 terraform {
-  required_providers {
-    google = "~> 4.77.0"
+    required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 4.77.0"
+    }
   }
   backend "gcs" {
     bucket = null

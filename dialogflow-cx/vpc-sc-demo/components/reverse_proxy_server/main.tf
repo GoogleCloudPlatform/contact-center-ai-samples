@@ -30,10 +30,22 @@ variable "bucket" {
 
 terraform {
   required_providers {
-    google      = "~> 4.77.0"
-    google-beta = "~> 4.77.0"
-    archive     = "~> 2.4.0"
-    time        = "~> 0.9.1"
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 4.77.0"
+    }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = ">= 4.77.0"
+    }
+    archive = {
+      source  = "hashicorp/archive"
+      version = ">= 2.4.0"
+    }
+    null = {
+      source  = "hashicorp/time"
+      version = ">= 0.9.1"
+    }
   }
   backend "gcs" {
     bucket = null
