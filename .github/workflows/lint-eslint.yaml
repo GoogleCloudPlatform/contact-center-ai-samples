@@ -25,12 +25,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-        name: Checkout source code
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - run: npm install
-
-      - run: eslint
+      - uses: stefanoeb/eslint-action@1.0.2
