@@ -23,15 +23,25 @@ variable "bucket" {
 }
 
 terraform {
-  required_providers {
-    google  = "~> 4.77.0"
-    archive = "~> 2.4.0"
-    time    = "~> 0.9.1"
+    required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 4.77.0"
+    }
+    archive = {
+      source  = "hashicorp/archive"
+      version = ">= 2.4.0"
+    }
+    time = {
+      source  = "hashicorp/time"
+      version = ">= 0.9.1"
+    }
   }
   backend "gcs" {
     bucket = null
     prefix = null
   }
+  required_version = ">= 1.2.0"
 }
 
 variable "region" {
