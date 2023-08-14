@@ -23,15 +23,15 @@ on:
 jobs:
   python-linter:
     runs-on: ubuntu-latest
-     steps:
-      - uses: actions/checkout@v2
-        name: Checkout source code
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout source code
 
-      - uses: sunnysid3up/python-linter@master
-        name: Python Linter
-        with:
-          source: "src"
-          mypy-options: "--ignore-missing-imports --show-error-codes"
-          pylint-options: "--rcfile=setup.cfg"
-          isort-options: "-w 100"
-          django: true
+    - uses: sunnysid3up/python-linter@master
+      name: Python Linter
+      with:
+        source: "src"
+        mypy-options: "--ignore-missing-imports --show-error-codes"
+        pylint-options: "--rcfile=setup.cfg"
+        isort-options: "-w 100"
+        django: true
