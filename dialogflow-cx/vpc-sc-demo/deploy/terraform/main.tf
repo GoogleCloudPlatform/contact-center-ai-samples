@@ -119,6 +119,7 @@ terraform {
     prefix = null
   }
   #END_BACKEND
+  required_version = ">= 1.2.0"
 }
 
 resource "google_project_service" "serviceusage" {

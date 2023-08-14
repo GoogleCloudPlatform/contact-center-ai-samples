@@ -32,6 +32,7 @@ terraform {
     bucket = null
     prefix = null
   }
+  required_version = ">= 1.2.0"
 }
 
 variable "region" {

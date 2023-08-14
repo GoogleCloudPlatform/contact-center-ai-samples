@@ -13,7 +13,7 @@
 # limitations under the License.
 
 terraform {
-    required_providers {
+  required_providers {
     google = {
       source  = "hashicorp/google"
       version = ">= 4.77.0"
@@ -23,6 +23,7 @@ terraform {
       version = ">= 4.77.0"
     }
   }
+  required_version = ">= 1.2.0"
 }
 
 variable "project_id" {

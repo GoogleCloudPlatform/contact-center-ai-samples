@@ -31,6 +31,7 @@ terraform {
       version = ">= 0.9.1"
     }
   }
+  required_version = ">= 1.2.0"
 }
 
 variable "project_id" {
