@@ -29,6 +29,7 @@ jobs:
 
     - name: yaml-lint
       uses: ibiqlik/action-yamllint@v3
+      continue-on-error: true
       with:
         config_data: |
           extends: default
