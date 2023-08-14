@@ -23,13 +23,7 @@ The demo features:
 
 ## Deploy the Cloud Function
 To deploy the function, run the `gcloud functions deploy` command in the `maps-function` directory:
-gcloud functions deploy lookupPlace \
-  --runtime=nodejs20 \
-  --region=REGION \
-  --source=. \
-  --entry-point=lookupPlace \
-  --trigger-http \
-  --allow-unauthenticated
+`gcloud functions deploy lookupPlace --runtime=nodejs20 --region=REGION --source=. --entry-point=lookupPlace --trigger-http --allow-unauthenticated`
 
 Replace REGION with the name of the Google Cloud region where you want to deploy your function (for example, us-west1).
 The optional `--allow-unauthenticated` flag lets you reach your function without authentication.
@@ -38,15 +32,15 @@ After the function deploys, note the url property from the output of the gcloud 
 
 ## Import the Dialogflow CX agent
 1. In your browser, navigate to the [Dialogflow CX console](https://dialogflow.cloud.google.com/cx/projects)
-1. Create a new agent (select the option `Build your own agent`).
+1. Create a new agent (select the option **Build your own agent**).
 1. [Restore](https://cloud.google.com/dialogflow/cx/docs/concept/agent#export) the Goodbye Graffiti agent exported in the JSON package file format (agent.zip) 
-1. Once you have successfully restored the agent, select the **Manage** tab and open the **lookup-place** webhook
+1. Once you have successfully restored the agent, under the **Manage** tab open the definition of the **lookup-place** webhook
 1. Enter your function URL as the webhook URL and click Save.
 
 ![Dialogflow CX Webhook](images/webhook.png)
 
 ## Test the agent
-In the Dialogflow CX console, navigate to **Integrations** and in the CX Phone Gateway panel click **Manage**.
+In the Dialogflow CX console, navigate to **Integrations** and click **Manage** on the CX Phone Gateway panel.
 Copy the phone number.
 
 In your browser using Google Voice or directly from your phone call the number. You will receive a message with the Cloud Companion URL. Click the link to open the UI and test the agent.    
