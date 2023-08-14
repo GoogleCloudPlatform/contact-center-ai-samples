@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Lint Javascript
+name: Lint YAML
 
 on:
   push:
@@ -21,16 +21,11 @@ on:
     branches: [main]
 
 jobs:
-  eslint:
+  yaml-lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-        name: Checkout source code
+    - name: Check out code
+      uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - run: npm install
-
-      - run: eslint
+    - name: yaml-lint
+      uses: ibiqlik/action-yamllint@v3
