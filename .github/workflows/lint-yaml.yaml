@@ -11,19 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+---
+name: Lint YAML
 
-Flask==2.3.2
-Turbo-Flask==0.8.4
-gunicorn==20.1.0
-invoke==2.2.0
-requests==2.31.0
-google-auth==2.22.0
-google-crc32c==1.5.0
-pycryptodome==3.18.0
-google-cloud-storage==2.10.0
-invoke==2.2.0
-werkzeug==2.3.6
-google-cloud-bigquery==3.11.4
-jsonschema==4.17.3
-types-jsonschema==4.17.0.10
-google-cloud-bigquery==3.11.4
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  yaml-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: yaml-lint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          config_data: |
+            extends: default
+            rules:
+              comments: disable
+              line-length: disable
+              truthy: disable
