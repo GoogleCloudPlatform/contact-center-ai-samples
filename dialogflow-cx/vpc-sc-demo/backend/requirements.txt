@@ -25,5 +25,5 @@ invoke==2.2.0
 werkzeug==2.3.6
 google-cloud-bigquery==3.11.4
 jsonschema==4.17.3
-types-jsonschema==4.17.0.8
+types-jsonschema==4.17.0.10
 google-cloud-bigquery==3.11.4
