@@ -12,5 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-pytest==7.3.2
-pytest-rerunfailures==11.1.2
+pytest==7.4.0
+pytest-rerunfailures==12.0
