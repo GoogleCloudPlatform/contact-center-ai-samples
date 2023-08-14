@@ -1,0 +1,111 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+#################################
+#################################
+## Super Linter GitHub Actions ##
+#################################
+#################################
+name: Linting
+
+#
+# Documentation:
+# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
+#
+
+#############################
+# Start the job on all push #
+#############################
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+###############
+# Set the Job #
+###############
+permissions:  # added using https://github.com/step-security/secure-workflows
+  contents: read
+
+jobs:
+  build:
+    # Name the Job
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+    name: Linting
+    # Set the agent to run on
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10"]
+    ##################
+    # Load all steps #
+    ##################
+    steps:
+      ##########################
+      # Checkout the code base #
+      ##########################
+      - name: Harden Runner
+        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # v2.5.1
+        with:
+          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+
+      - name: Checkout Code
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+        with:
+          fetch-depth: 0
+      - name: Install missing Python packages
+        run: sudo apt-get install -y --no-install-recommends python3-venv python3-setuptools
+      - name: Install Python requirements
+        run: |-
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install -r dialogflow-cx/requirements.txt
+          pip install -r dialogflow-cx/requirements-test.txt
+          pip install -r dialogflow-cx/vpc-sc-auth-server/server/requirements.txt
+          pip install -r dialogflow-cx/vpc-sc-auth-server/server/requirements-test.txt
+          pip install -r dialogflow-cx/vpc-sc-demo/backend/requirements.txt
+          pip install -r dialogflow-cx/vpc-sc-demo/backend/requirements-test.txt
+          mv .venv /home/runner/work/_temp/_github_workflow
+      - name: Install NPM requirements
+        run: npm install
+      - name: Lint Code Base
+        uses: super-linter/super-linter@v5.2.0
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINTER_RULES_PATH: /
+          JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.json
+          VALIDATE_JAVASCRIPT_STANDARD: false
+          LOG_LEVEL: WARN
+          PYTHON_BLACK_CONFIG_FILE: pyproject.toml
+          PYTHON_ISORT_CONFIG_FILE: pyproject.toml
+          JSCPD_CONFIG_FILE: .jscpd.json
+          FILTER_REGEX_EXCLUDE: noxfile.py
+          PYTHON_FLAKE8_CONFIG_FILE: .flake8
+          VALIDATE_GITHUB_ACTIONS: false
+          TERRAFORM_TFLINT_CONFIG_FILE: .tflint.hcl
+          PYTHON_PYLINT_CONFIG_FILE: .python-lint
+          PYTHON_MYPY_CONFIG_FILE: .mypy.ini
+          DOCKERFILE_HADOLINT_FILE_NAME: .hadolint.yaml
+          MARKDOWN_CONFIG_FILE: .markdowmlint.jsonc
+          NATURAL_LANGUAGE_CONFIG_FILE: .textlintrc
+          YAML_CONFIG_FILE: .yaml-lint.yml
+          TERRAFORM_TERRASCAN_CONFIG_FILE: terrascan.toml
+          PYTHONPATH: "/github/workspace:/github/workflow/.venv/lib/python3.10/site-packages"
+          YAML_ERROR_ON_WARNING: true
+          CSS_FILE_NAME: .stylelintrc.json
+...
