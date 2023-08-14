@@ -24,17 +24,17 @@ jobs:
   tflint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-      name: Checkout source code
+      - uses: actions/checkout@v3
+        name: Checkout source code
 
-    - uses: terraform-linters/setup-tflint@v3
-      name: Setup TFLint
+      - uses: terraform-linters/setup-tflint@v3
+        name: Setup TFLint
 
-    - name: Show version
-      run: tflint --version
+      - name: Show version
+        run: tflint --version
 
-    - name: Init TFLint
-      run: tflint --init
+      - name: Init TFLint
+        run: tflint --init
 
-    - name: Run TFLint
-      run: tflint --recursive
+      - name: Run TFLint
+        run: tflint --recursive

@@ -24,16 +24,15 @@ jobs:
   yaml-lint:
     runs-on: ubuntu-latest
     steps:
-    - name: Check out code
-      uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v2
 
-    - name: yaml-lint
-      uses: ibiqlik/action-yamllint@v3
-      continue-on-error: true
-      with:
-        config_data: |
-          extends: default
-          rules:
-            comments: disable
-            line-length: disable
-            truthy: disable
+      - name: yaml-lint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          config_data: |
+            extends: default
+            rules:
+              comments: disable
+              line-length: disable
+              truthy: disable

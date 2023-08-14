@@ -24,10 +24,10 @@ jobs:
   markdown-lint:
     runs-on: ubuntu-latest
     steps:
-    - name: Check out code
-      uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v2
 
-    - name: Lint Markdown files
-      uses: DavidAnson/markdownlint-cli2-action@v11
-      with:
-        globs: '**/*.md'
+      - name: Lint Markdown files
+        uses: DavidAnson/markdownlint-cli2-action@v11
+        with:
+          globs: '**/*.md'
