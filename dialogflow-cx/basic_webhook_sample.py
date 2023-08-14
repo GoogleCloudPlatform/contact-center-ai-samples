@@ -17,12 +17,7 @@
 import delegators as dg
 import dialogflow_sample as ds
 from utilities import RequestMock
-from webhook.main import (
-    build_request_dict_basic,
-    extract_text,
-    get_webhook_uri,
-    webhook_fcn,
-)
+from webhook.main import build_request_dict_basic, extract_text, get_webhook_uri, webhook_fcn
 
 
 def get_expected_response(tag, input_text):
