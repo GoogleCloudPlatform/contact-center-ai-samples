@@ -95,13 +95,13 @@
 
   <div class="mx-20 mx-auto flex h-[60vh] pb-4">
     <div class="w-1/3 px-[3vw]">
-      <iframe src="/bot1" title="bot1" width="100%" style="height: 100%;" />
+      <iframe src="/bot1.html" title="bot1" width="100%" style="height: 100%;" />
     </div>
     <div class="w-1/3 px-[3vw]">
-      <iframe src="/bot2" title="bot2" width="100%" style="height: 100%;" />
+      <iframe src="/bot2.html" title="bot2" width="100%" style="height: 100%;" />
     </div>
     <div class="w-1/3 px-[3vw]">
-      <iframe src="/bot3" title="bot3" width="100%" style="height: 100%;" />
+      <iframe src="/bot3.html" title="bot3" width="100%" style="height: 100%;" />
     </div>
   </div>
 
