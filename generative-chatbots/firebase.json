@@ -1,7 +1,11 @@
 {
   "hosting": {
-    "target": "your-firebase-app-name",
     "public": "build",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    "target": "generative-chatbots",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
   }
 }

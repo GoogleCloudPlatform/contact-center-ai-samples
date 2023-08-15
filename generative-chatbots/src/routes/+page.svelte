@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Navbar, NavBrand } from "flowbite-svelte";
-  import { Input, Button, ButtonGroup } from "flowbite-svelte";
+  import { A, Input, Button, ButtonGroup } from "flowbite-svelte";
+  import { Card } from "flowbite-svelte";
   import { onMount } from "svelte";
 
   var utterance: string;
@@ -48,42 +49,102 @@
   });
 </script>
 
-<Navbar class="mb-9 bg-[#E8F0FE] p-6">
+<Navbar class="mb-9 bg-[#a3cef1] p-6">
   <NavBrand href="/">
     <img src="dialogflow-logo.png" class="mr-3 h-6 sm:h-9" alt="Dialogflow CX Logo" />
-    <span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-      Dialogflow Comparison - Google Cloud
+    <span class="self-center whitespace-nowrap text-xl font-semibold">
+      Generative Chatbots in Google Cloud
     </span>
   </NavBrand>
 </Navbar>
 
-<div class="flex text-center">
-  <div class="w-0 grow">
-    <form>
-      <ButtonGroup class="mb-9 w-1/2">
+<div class="mx-auto container">
+
+<form>
+  <div class="flex text-center mx-14 items-center mb-6">
+    <div class="w-full items-center">
+      <ButtonGroup class="w-full">
         <Input
-          class="w-full"
+          class="text-md"
           type="text"
           id="utterance"
           bind:value={utterance}
           placeholder="Ask me anything about products in the Google Store"
           required />
-        <Button color="blue" type="submit" on:click={() => fillAndSend(utterance, 0)}
+        <Button class="text-md" color="blue" type="submit" on:click={() => fillAndSend(utterance, 0)}
           >Submit</Button>
       </ButtonGroup>
-      <Button class="mx-2" color="green" on:click={() => autoMode()}>Start Demo Mode</Button>
-    </form>
+      </div>
+      <div class="grow text-end w-60">
+      <Button class="text-md" color="green" on:click={() => autoMode()}>Start Demo Mode</Button>
+    </div>
+  </div>
+</form>
+
+<div class="mx-20 flex h-[60vh] mx-auto pb-4">
+  <div class="w-1/3 px-[3vw]">
+    <iframe src="/bot1" title="bot1" width="100%" style="height: 100%;" />
+  </div>
+  <div class="w-1/3 px-[3vw]">
+    <iframe src="/bot2" title="bot2" width="100%" style="height: 100%;" />
+  </div>
+  <div class="w-1/3 px-[3vw]">
+    <iframe src="/bot3" title="bot3" width="100%" style="height: 100%;" />
   </div>
 </div>
 
-<div class="flex">
-  <div class="w-1/3">
-    <iframe src="/bot1.html" height="600" class="mx-auto" title="bot1" />
+<div class="mb-4 flex pb-6">
+  <div class="mx-auto w-1/3">
+    <Card class="mx-auto min-w-[80%]">
+      <div class="flex">
+        <img src="agent.svg" alt="Agent" width="100px" />
+        <div class="ml-4">
+          <p class="font-normal text-gray-700 dark:text-gray-400 text-sm">
+            <A
+              href="https://cloud.google.com/dialogflow/cx/docs/concept/generative-agent"
+              class="font-bold text-blue-600 hover:underline">
+              Generative AI Agent
+            </A>
+            creates responses using large language models (LLMs) and the content of your websites and documents
+          </p>
+        </div>
+      </div>
+    </Card>
   </div>
   <div class="w-1/3">
-    <iframe src="/bot2.html" height="600" class="mx-auto" title="bot2" />
+    <Card class="mx-auto min-w-[80%]">
+      <div class="flex">
+        <img src="support.svg" alt="Agent" width="100px" />
+        <div class="ml-4">
+          <p class="font-normal text-gray-700 dark:text-gray-400 text-sm">
+            <A
+              href="https://cloud.google.com/dialogflow/cx/docs/concept/generative-fallback"
+              class="font-bold text-blue-600 hover:underline">
+              Generative fallback
+            </A>
+            responds to users when your agent doesn't know the answer by calling an LLM with a custom prompt
+          </p>
+        </div>
+      </div>
+    </Card>
   </div>
   <div class="w-1/3">
-    <iframe src="/bot3.html" height="600" class="mx-auto" title="bot3" />
+    <Card class="mx-auto min-w-[80%]">
+      <div class="flex">
+        <img src="write.svg" alt="Agent" width="100px" />
+        <div class="ml-4">
+          <p class="font-normal text-gray-700 dark:text-gray-400 text-sm">
+            <A
+              href="https://cloud.google.com/dialogflow/cx/docs/concept/generators"
+              class="font-bold text-blue-600 hover:underline">
+              Generators
+            </A>
+            create dynamic responses at a specific point in a conversation by calling an LLM with a custom prompt
+          </p>
+        </div>
+      </div>
+    </Card>
   </div>
+</div>
+
 </div>
