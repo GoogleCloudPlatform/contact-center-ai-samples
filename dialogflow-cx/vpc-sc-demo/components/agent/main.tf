@@ -25,13 +25,20 @@ variable "access_token" {
 
 terraform {
   required_providers {
-    google = "~> 4.45.0"
-    time   = "~> 0.9.1"
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 4.77.0"
+    }
+    time = {
+      source  = "hashicorp/time"
+      version = ">= 0.9.1"
+    }
   }
   backend "gcs" {
     bucket = null
     prefix = null
   }
+  required_version = ">= 1.2.0"
 }
 
 variable "region" {

@@ -107,8 +107,11 @@ provider "google" {
 }
 
 terraform {
-  required_providers {
-    google = "~> 4.37.0"
+    required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 4.77.0"
+    }
   }
   #START_BACKEND
   backend "gcs" {
@@ -116,6 +119,7 @@ terraform {
     prefix = null
   }
   #END_BACKEND
+  required_version = ">= 1.2.0"
 }
 
 resource "google_project_service" "serviceusage" {
