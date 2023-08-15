@@ -1,19 +1,13 @@
-<script lang="ts">
-  import { onMount } from "svelte";
+<svelte:head>
+  <script
+    src="https://www.gstatic.com/dialogflow-console/fast/messenger-cx/bootstrap.js?v=1"></script>
+</svelte:head>
 
-  onMount(() => {
-    const script = document.createElement("script");
-    script.src = "https://www.gstatic.com/dialogflow-console/fast/messenger-cx/bootstrap.js?v=1";
-    script.async = true;
-    document.head.appendChild(script);
-  });
-</script>
-
-<div>
+<div style="height: 100vh;">
   <df-messenger
     df-cx="true"
-    chat-title="Vertex AI - PaLM API"
-    agent-id="a961ff0c-1bc9-4fa7-afb6-b8c640811358"
+    agent-id="b1c19144-4d2c-4c8f-9ccb-4f120203e32e"
+    chat-title="Generators"
     language-code="en"
     expand="true" />
 </div>
