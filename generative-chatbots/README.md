@@ -1,4 +1,4 @@
-# dialogflow-comparison
+# Generative Chatbots
 
 ## Overview
 
@@ -63,9 +63,9 @@ for more information.
 
 In your browser, navigate to your deployed app using a URL similar to:
 
-[https://dialogflow-comparison.web.app](https://dialogflow-comparison.web.app)
+[https://generative-chatbots.web.app](https://generative-chatbots.web.app)
 
-Congratulations, you've successfully deployed the Dialogflow Comparison Demo!
+Congratulations, you've successfully deployed the Generative Chatbots Demo!
 
 ## Additional resources
 
