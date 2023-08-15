@@ -1,4 +1,4 @@
-# dialogflow-comparison
+# Generative Chatbots
 
 ## Overview
 
@@ -42,6 +42,7 @@ for more information.
    you created in an earlier step
 1. To configure the default deploy target, add a line to your `firebase.json`
    with the name of your Firebase Hosting site, such as:
+
    ```json
    {
      "hosting": {
@@ -55,15 +56,16 @@ for more information.
      }
    }
    ```
+
 1. Run `firebase deploy`
 
 ## Access the app
 
 In your browser, navigate to your deployed app using a URL similar to:
 
-[https://dialogflow-comparison.web.app](https://dialogflow-comparison.web.app)
+[https://generative-chatbots.web.app](https://generative-chatbots.web.app)
 
-Congratulations, you've successfully deployed the Dialogflow Comparison Demo!
+Congratulations, you've successfully deployed the Generative Chatbots Demo!
 
 ## Additional resources
 

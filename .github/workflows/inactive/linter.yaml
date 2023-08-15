@@ -83,7 +83,7 @@ jobs:
       - name: Install NPM requirements
         run: npm install
       - name: Lint Code Base
-        uses: github/super-linter/slim@45fc0d88288beee4701c62761281edfee85655d7 # v5.0.0
+        uses: super-linter/super-linter@v5.2.0
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
