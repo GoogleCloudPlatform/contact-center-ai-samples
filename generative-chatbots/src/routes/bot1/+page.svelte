@@ -1,19 +1,13 @@
-<script lang="ts">
-  import { onMount } from "svelte";
+<svelte:head>
+  <script
+    src="https://www.gstatic.com/dialogflow-console/fast/messenger-cx/bootstrap.js?v=1"></script>
+</svelte:head>
 
-  onMount(() => {
-    const script = document.createElement("script");
-    script.src = "https://www.gstatic.com/dialogflow-console/fast/messenger-cx/bootstrap.js?v=1";
-    script.async = true;
-    document.head.appendChild(script);
-  });
-</script>
-
-<div>
+<div style="height: 100vh;">
   <df-messenger
     df-cx="true"
+    agent-id="001c3b48-8bc8-481b-adb1-cfa2e604d367"
     chat-title="Generative AI Agent"
-    agent-id="5e361182-376a-4507-bfa2-a394cb7e9c8e"
     language-code="en"
     expand="true" />
 </div>
