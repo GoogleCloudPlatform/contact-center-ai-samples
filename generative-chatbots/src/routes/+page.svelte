@@ -58,7 +58,7 @@
   </NavBrand>
   <NavUl>
     <NavLi href="/" active={true}>Home</NavLi>
-    <NavLi href="https://cloud.google.com/generative-ai-app-builder/docs/introduction"
+    <NavLi href="https://cloud.google.com/dialogflow/cx/docs/concept/generative-agent"
       >Documentation</NavLi>
     <NavLi href="https://codelabs.developers.google.com/codelabs/gen-app-builder-chat"
       >Codelab</NavLi>
