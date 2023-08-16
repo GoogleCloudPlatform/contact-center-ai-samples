@@ -54,7 +54,7 @@ To deploy the function, run the `gcloud functions deploy` command
 in the `maps-function` directory:
 
 ```cli
-gcloud functions deploy lookupPlace --runtime=nodejs20 --region=REGION 
+gcloud functions deploy lookupPlace --runtime=nodejs20 --region=REGION
 --source=. --entry-point=lookupPlace --trigger-http --allow-unauthenticated
 ```
 
@@ -92,8 +92,6 @@ Configure it with your Maps API key, see Webhook
 enter your function URL as the webhook URL.Click Save.
 
 ![Dialogflow CX Webhook](images/webhook.png)
-
-
 
 ## Configure the phone gateway
 
