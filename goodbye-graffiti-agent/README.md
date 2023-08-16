@@ -43,7 +43,8 @@ You must include your API key with both the Geocoding API and
 Maps Static API requests.
 Replace `YOUR_API_KEY` with your API key.
 1. Enable the Cloud Functions, Cloud Build, Artifact Registry,
-Cloud Run, Dialogflow API and Cloud Logging APIs
+Cloud Run, Dialogflow API and Cloud Logging
+[APIs](https://cloud.google.com/functions/docs/create-deploy-http-nodejs#create_a_project_with)
 1. Install and initialize the
 [gcloud CLI](https://cloud.google.com/sdk/docs/install).
 
