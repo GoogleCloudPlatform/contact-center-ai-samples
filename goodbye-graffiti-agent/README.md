@@ -14,7 +14,7 @@ The demo features:
 1. [Cloud Functions](https://cloud.google.com/functions/docs/configuring) to run the webhook service required to integrate the agent with Google Maps APIs. 
 
 ## Setup your Google Cloud Project
-1. Setup your [Google Cloud Project](https://developers.google.com/maps/documentation/maps-static/cloud-setup) 
+1. Setup your [Google Cloud Project](https://cloud.google.com/dialogflow/cx/docs/quick/setup) 
 1. To use Google Maps Platform you must enable the [Geocoding API](https://console.cloud.google.com/apis/library/geocoding-backend.googleapis.com?utm_source=Docs_EnableAPIs&utm_content=Docs_geocoding-backend&_gl=1*1syfwbs*_ga*MTMxNzQwMTEyNS4xNjkyMDE1OTQ1*_ga_NRWSTWS78N*MTY5MjAxNTk0Ni4xLjEuMTY5MjAxNjk4Ni4wLjAuMA..) and [Maps Static API](https://console.cloud.google.com/apis/library/static-maps-backend.googleapis.com?utm_source=Docs_EnableAPIs&utm_content=Docs_static-maps-backend&_gl=1*13fpvaq*_ga*MTMxNzQwMTEyNS4xNjkyMDE1OTQ1*_ga_NRWSTWS78N*MTY5MjAxNTk0Ni4xLjEuMTY5MjAxNjk4Ni4wLjAuMA..). 
 1. You must have at least one API key associated with your project. Go to the Google Maps Platform > Credentials [page](https://console.cloud.google.com/project/_/google/maps-apis/credentials?utm_source=Docs_CreateAPIKey&utm_content=Docs_static-maps-backend&_gl=1*8gesr0*_ga*MTMxNzQwMTEyNS4xNjkyMDE1OTQ1*_ga_NRWSTWS78N*MTY5MjAxNTk0Ni4xLjEuMTY5MjAxNzI2MS4wLjAuMA..) and create an [API key](https://developers.google.com/maps/documentation/maps-static/get-api-key#creating-api-keys).  
 1. Open file `index.js` located under `maps-function` folder. You must include your API key with both the Geocoding API and Maps Static API requests. Replace `YOUR_API_KEY` with your API key. 
