@@ -1,4 +1,3 @@
-#!/bin/bash
 # Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# shellcheck disable=SC1000-SC9999
+---
+name: Lint YAML
 
-pytest==7.4.0
-mock==4.0.3
-types-jsonschema==4.17.0.10
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  yaml-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: yaml-lint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          config_data: |
+            extends: default
+            rules:
+              comments: disable
+              line-length: disable
+              truthy: disable

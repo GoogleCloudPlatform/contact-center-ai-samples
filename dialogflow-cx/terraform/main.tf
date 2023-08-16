@@ -14,9 +14,16 @@
 
 terraform {
   required_providers {
-    archive = "~> 2.2.0"
-    google  = "4.45.0"
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 4.77.0"
+    }
+    archive = {
+      source  = "hashicorp/archive"
+      version = ">= 2.4.0"
+    }
   }
+  required_version = ">= 1.2.0"
 }
 
 variable "project_id" {

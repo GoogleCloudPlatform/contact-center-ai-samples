@@ -12,11 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-##########################
-## Hadolint config file ##
-##########################
+name: Lint Terraform
 
-failure-threshold: warning
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
-ignored:
-...
+jobs:
+  tflint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout source code
+
+      - uses: terraform-linters/setup-tflint@v3
+        name: Setup TFLint
+
+      - name: Show version
+        run: tflint --version
+
+      - name: Init TFLint
+        run: tflint --init
+
+      - name: Run TFLint
+        run: tflint --recursive

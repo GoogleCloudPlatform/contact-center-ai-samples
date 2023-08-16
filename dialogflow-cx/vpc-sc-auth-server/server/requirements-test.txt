@@ -14,10 +14,10 @@
 # limitations under the License.
 # shellcheck disable=SC1000-SC9999
 
-pytest==7.3.1
+pytest==7.4.0
 pytest-mypy==0.10.3
 mock==5.0.2
-invoke==2.1.2
-pyyaml==6.0
+invoke==2.2.0
+pyyaml==6.0.1
 coverage==7.2.7
 pytest-cov==4.1.0
