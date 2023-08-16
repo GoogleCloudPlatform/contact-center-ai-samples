@@ -8,26 +8,21 @@ graffiti vandalism.
 
 The demo features:
 
-1. [Generative Fallback](https://cloud.google.com/dialogflow/cx/docs/
-concept/generative-fallback)
+1. [Generative Fallback](https://cloud.google.com/dialogflow/cx/docs/concept/generative-fallback)
 to generate virtual agent responses when end-user input does not match
 an intent or parameter for form filling.
 1. [Generators](https://cloud.google.com/dialogflow/cx/docs/concept/generators)
 to greet the user and provide a summary of the report.
-1. [Google Maps Geocoding API](https://developers.google.com/maps/
-documentation/geocoding/requests-geocoding)
+1. [Google Maps Geocoding API](https://developers.google.com/maps/documentation/geocoding/requests-geocoding)
 to lookup latitude/longitude and formatted address of the graffiti location
-1. The [address collection prebuilt component](https://cloud.google.com/
-dialogflow/cx/docs/concept/prebuilt-component/address-collection)
+1. The [address collection prebuilt component](https://cloud.google.com/dialogflow/cx/docs/concept/prebuilt-component/address-collection)
 to assist the user with a step-by-step address collection process in case
 the request to the Geocode APIs returns zero results or the returned
 address is incorrect.
-1. [Maps Static API](https://developers.google.com/maps/
-documentation/maps-static/overview)
+1. [Maps Static API] (https://developers.google.com/maps/documentation/maps-static/overview)
 to visualize the location of the graffiti on the map.
-1. [Dialogflow CX Phone Gateway and Call Companion](https://cloud.google.com/
-dialogflow/cx/docs/concept/integration/phone-gateway) to provide a telephone
-interface to the agent and
+1. [Dialogflow CX Phone Gateway and Call Companion](https://cloud.google.com/dialogflow/cx/docs/concept/integration/phone-gateway)
+to provide a telephone interface to the agent and
 a a multi-modal (voice + visual) customer experience
 1. [Cloud Functions](https://cloud.google.com/functions/docs/configuring)
 to run the webhook service required to integrate the agent
