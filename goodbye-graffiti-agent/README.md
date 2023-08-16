@@ -32,7 +32,8 @@ with Google Maps APIs.
 
 1. Setup your [Google Cloud Project](https://cloud.google.com/dialogflow/cx/docs/quick/setup)
 1. To use Google Maps Platform you must enable the
-[Geocoding API](https://developers.google.com/maps/documentation/geocoding/cloud-setup#enabling-apis) and
+[Geocoding API](https://developers.google.com/maps/documentation/geocoding/cloud-setup#enabling-apis)
+and
 [Maps Static API](https://developers.google.com/maps/documentation/maps-static/cloud-setup#enabling-apis).
 1. You must have at least one API key associated with your project.
 Go to the Google Maps Platform > Credentials
@@ -51,8 +52,9 @@ Cloud Run, Dialogflow API and Cloud Logging APIs
 To deploy the function, run the `gcloud functions deploy` command
 in the `maps-function` directory:
 
-```
-gcloud functions deploy lookupPlace --runtime=nodejs20 --region=REGION --source=. --entry-point=lookupPlace --trigger-http --allow-unauthenticated
+```cli
+gcloud functions deploy lookupPlace --runtime=nodejs20 --region=REGION 
+--source=. --entry-point=lookupPlace --trigger-http --allow-unauthenticated
 ```
 
 Replace `REGION` with the name of the Google Cloud region where
@@ -77,7 +79,8 @@ You must create the agent in the **global** region as this is the
 only region where the Phone Gateway integration is currently supported.
 You cannot change region once the agent is deployed.
 1. [Restore](https://cloud.google.com/dialogflow/cx/docs/concept/agent#export)
-the Goodbye Graffiti agent exported in the JSON package file format (agent.zip).
+the Goodbye Graffiti agent exported in the JSON package file
+format (agent.zip).
 1. Once you have successfully restored the agent, under the **Manage** tab open
 the definition of the **lookup-place** webhook.
 1. Enter your function URL as the webhook URL and click Save.
