@@ -92,8 +92,7 @@ the definition of the **lookup-place** webhook.
 
 1. Navigate to **Integrations** and click **Manage** on the
 CX Phone Gateway panel.
-1. Setup the
-[phone gateway](https://cloud.google.com/dialogflow/cx/docs/concept/integration/phone-gateway#setup)integration.
+1. Setup the [phone gateway](https://cloud.google.com/dialogflow/cx/docs/concept/integration/phone-gateway#setup)integration.
 1. Select a phone number, then click **Show more settings** to enable
 the call companion feature.
 1. Copy the phone number.
