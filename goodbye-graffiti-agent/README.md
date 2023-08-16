@@ -87,7 +87,7 @@ and open the definition of the
 **prebuilt_components_address_collection:address_validation**
 webhook. Replace `<YOUR-API-KEY>` with your API key.
 1. Similarly open the definition of the **lookup_place** webhook and
-enter your function URL as the webhook URL and click Save.
+enter your function URL as the webhook URL.Click Save.
 
 ![Dialogflow CX Webhook](images/webhook.png)
 
