@@ -71,7 +71,7 @@ Replace `REGION` with the name of the Google Cloud region where
 you deployed your function.
 You will need the URL when configuring the webhook in Dialogflow CX.
 
-## Create the agent and configure the webhook
+## Create the agent and configure the webhooks
 
 1. In your browser, navigate to the
 [Dialogflow CX console](https://dialogflow.cloud.google.com/cx/projects)
@@ -82,11 +82,16 @@ You cannot change region once the agent is deployed.
 1. [Restore](https://cloud.google.com/dialogflow/cx/docs/concept/agent#export)
 the Goodbye Graffiti agent exported in the JSON package file
 format (agent.zip).
-1. Once you have successfully restored the agent, under the **Manage** tab open
-the definition of the **lookup-place** webhook.
-1. Enter your function URL as the webhook URL and click Save.
+1. Once you have successfully restored the agent, select the **Manage** tab
+and open the definition of the
+**prebuilt_components_address_collection:address_validation**
+webhook. Replace `<YOUR-API-KEY>` with your API key.
+1. Similarly open the definition of the **lookup_place** webhook and
+enter your function URL as the webhook URL and click Save.
 
 ![Dialogflow CX Webhook](images/webhook.png)
+
+
 
 ## Configure the phone gateway
 
