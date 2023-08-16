@@ -27,7 +27,7 @@ To deploy the function, run the `gcloud functions deploy` command in the `maps-f
 gcloud functions deploy lookupPlace --runtime=nodejs20 --region=REGION --source=. --entry-point=lookupPlace --trigger-http --allow-unauthenticated
 ```
 
-Replace REGION with the name of the Google Cloud region where you want to deploy your function (for example, us-west1).
+Replace `REGION` with the name of the Google Cloud region where you want to deploy your function (for example, `us-west1`).
 The optional `--allow-unauthenticated` flag lets you reach your function without authentication.
 
 After the function deploys, note the url property from the output of the gcloud functions deploy command, or retrieve it with the command `gcloud functions describe lookupPlace --region REGION`. Replace REGION with the name of the Google Cloud region where you deployed your function. You will need the url when configuring the webhook in Dialogflow CX. 
