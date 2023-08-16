@@ -22,8 +22,8 @@ google-crc32c==1.5.0
 pycryptodome==3.18.0
 google-cloud-storage==2.10.0
 invoke==2.2.0
-werkzeug==2.3.6
+werkzeug==2.3.7
 google-cloud-bigquery==3.11.4
-jsonschema==4.17.3
+jsonschema==4.19.0
 types-jsonschema==4.17.0.10
 google-cloud-bigquery==3.11.4
