@@ -19,7 +19,7 @@ to lookup latitude/longitude and formatted address of the graffiti location
 to assist the user with a step-by-step address collection process in case
 the request to the Geocode APIs returns zero results or the returned
 address is incorrect.
-1. [Maps Static API] (https://developers.google.com/maps/documentation/maps-static/overview)
+1. [Maps Static API](https://developers.google.com/maps/documentation/maps-static/overview)
 to visualize the location of the graffiti on the map.
 1. [Dialogflow CX Phone Gateway and Call Companion](https://cloud.google.com/dialogflow/cx/docs/concept/integration/phone-gateway)
 to provide a telephone interface to the agent and
@@ -30,8 +30,7 @@ with Google Maps APIs.
 
 ## Setup your Google Cloud Project
 
-1. Setup your [Google Cloud Project](https://cloud.google.com/dialogflow/
-cx/docs/quick/setup)
+1. Setup your [Google Cloud Project](https://cloud.google.com/dialogflow/cx/docs/quick/setup)
 1. To use Google Maps Platform you must enable the
 [Geocoding API](https://developers.google.com/maps/documentation/geocoding/cloud-setup#enabling-apis) and
 [Maps Static API](https://developers.google.com/maps/documentation/maps-static/cloud-setup#enabling-apis).
