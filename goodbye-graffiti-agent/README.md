@@ -38,14 +38,11 @@ with Google Maps APIs.
 1. Setup your [Google Cloud Project](https://cloud.google.com/dialogflow/
 cx/docs/quick/setup)
 1. To use Google Maps Platform you must enable the
-[Geocoding API](https://developers.google.com/maps/documentation/
-geocoding/cloud-setup#enabling-apis) and
-[Maps Static API](https://developers.google.com/maps/documentation/
-maps-static/cloud-setup#enabling-apis).
+[Geocoding API](https://developers.google.com/maps/documentation/geocoding/cloud-setup#enabling-apis) and
+[Maps Static API](https://developers.google.com/maps/documentation/maps-static/cloud-setup#enabling-apis).
 1. You must have at least one API key associated with your project.
 Go to the Google Maps Platform > Credentials
-[page](https://developers.google.com/maps/documentation/maps-static/
-get-api-key#creating-api-keys).
+[page](https://developers.google.com/maps/documentation/maps-static/get-api-key#creating-api-keys).
 1. Open file `index.js` located under `maps-function` folder.
 You must include your API key with both the Geocoding API and
 Maps Static API requests.
@@ -59,6 +56,7 @@ Cloud Run, Dialogflow API and Cloud Logging APIs
 
 To deploy the function, run the `gcloud functions deploy` command
 in the `maps-function` directory:
+
 ```
 gcloud functions deploy lookupPlace --runtime=nodejs20 --region=REGION --source=. --entry-point=lookupPlace --trigger-http --allow-unauthenticated
 ```
@@ -96,8 +94,7 @@ the definition of the **lookup-place** webhook.
 
 1. Navigate to **Integrations** and click **Manage** on the
 CX Phone Gateway panel.
-1. Setup the [phone gateway](https://cloud.google.com/dialogflow/cx/docs/
-concept/integration/phone-gateway#setup) integration.
+1. Setup the [phone gateway](https://cloud.google.com/dialogflow/cx/docs/concept/integration/phone-gateway#setup) integration.
 1. Select a phone number, then click **Show more settings** to enable
 the call companion feature.
 1. Copy the phone number.
@@ -106,9 +103,8 @@ the call companion feature.
 
 In your browser using Google Voice or directly from your phone, call the number.
 You will receive a message with the Cloud Companion URL.
-Click the link to open the UI and test the agent. 
+Click the link to open the UI and test the agent.
 
 ![Demo](images/demo.png)
 
 Congratulations, you've successfully deployed the Goodbye Graffiti demo!
-
