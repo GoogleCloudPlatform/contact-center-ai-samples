@@ -38,10 +38,14 @@ with Google Maps APIs.
 1. Setup your [Google Cloud Project](https://cloud.google.com/dialogflow/
 cx/docs/quick/setup)
 1. To use Google Maps Platform you must enable the
-[Geocoding API](https://console.cloud.google.com/apis/library/
-geocoding-backend.googleapis.com?utm_source=Docs_EnableAPIs&utm_content=Docs_geocoding-backend&_gl=1*1syfwbs*_ga*MTMxNzQwMTEyNS4xNjkyMDE1OTQ1*_ga_NRWSTWS78N*MTY5MjAxNTk0Ni4xLjEuMTY5MjAxNjk4Ni4wLjAuMA..) and [Maps Static API](https://console.cloud.google.com/apis/library/static-maps-backend.googleapis.com?utm_source=Docs_EnableAPIs&utm_content=Docs_static-maps-backend&_gl=1*13fpvaq*_ga*MTMxNzQwMTEyNS4xNjkyMDE1OTQ1*_ga_NRWSTWS78N*MTY5MjAxNTk0Ni4xLjEuMTY5MjAxNjk4Ni4wLjAuMA..). 
+[Geocoding API](https://developers.google.com/maps/documentation/
+geocoding/cloud-setup#enabling-apis) and
+[Maps Static API](https://developers.google.com/maps/documentation/
+maps-static/cloud-setup#enabling-apis).
 1. You must have at least one API key associated with your project.
-Go to the Google Maps Platform > Credentials [page](https://console.cloud.google.com/project/_/google/maps-apis/credentials?utm_source=Docs_CreateAPIKey&utm_content=Docs_static-maps-backend&_gl=1*8gesr0*_ga*MTMxNzQwMTEyNS4xNjkyMDE1OTQ1*_ga_NRWSTWS78N*MTY5MjAxNTk0Ni4xLjEuMTY5MjAxNzI2MS4wLjAuMA..) and create an [API key](https://developers.google.com/maps/documentation/maps-static/get-api-key#creating-api-keys).
+Go to the Google Maps Platform > Credentials
+[page](https://developers.google.com/maps/documentation/maps-static/
+get-api-key#creating-api-keys).
 1. Open file `index.js` located under `maps-function` folder.
 You must include your API key with both the Geocoding API and
 Maps Static API requests.
@@ -92,16 +96,17 @@ the definition of the **lookup-place** webhook.
 
 1. Navigate to **Integrations** and click **Manage** on the
 CX Phone Gateway panel.
-1. Setup the [phone gateway](https://cloud.google.com/dialogflow/cx/docs/concept/integration/phone-gateway#setup) integration.
+1. Setup the [phone gateway](https://cloud.google.com/dialogflow/cx/docs/
+concept/integration/phone-gateway#setup) integration.
 1. Select a phone number, then click **Show more settings** to enable
-the call companion feature. 
+the call companion feature.
 1. Copy the phone number.
 
 ## Test the agent
 
 In your browser using Google Voice or directly from your phone, call the number.
 You will receive a message with the Cloud Companion URL.
-Click the link to open the UI and test the agent.   
+Click the link to open the UI and test the agent. 
 
 ![Demo](images/demo.png)
 
