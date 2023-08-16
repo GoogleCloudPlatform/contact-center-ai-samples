@@ -14,21 +14,23 @@ The demo features:
 1. [Cloud Functions](https://cloud.google.com/functions/docs/configuring) to run the webhook service required to integrate the agent with Google Maps APIs. 
 
 ## Setup your Google Cloud Project
-1. Setup your [Google Cloud Project](https://developers.google.com/maps/documentation/maps-static/cloud-setup) 
+1. Setup your [Google Cloud Project](https://cloud.google.com/dialogflow/cx/docs/quick/setup) 
 1. To use Google Maps Platform you must enable the [Geocoding API](https://console.cloud.google.com/apis/library/geocoding-backend.googleapis.com?utm_source=Docs_EnableAPIs&utm_content=Docs_geocoding-backend&_gl=1*1syfwbs*_ga*MTMxNzQwMTEyNS4xNjkyMDE1OTQ1*_ga_NRWSTWS78N*MTY5MjAxNTk0Ni4xLjEuMTY5MjAxNjk4Ni4wLjAuMA..) and [Maps Static API](https://console.cloud.google.com/apis/library/static-maps-backend.googleapis.com?utm_source=Docs_EnableAPIs&utm_content=Docs_static-maps-backend&_gl=1*13fpvaq*_ga*MTMxNzQwMTEyNS4xNjkyMDE1OTQ1*_ga_NRWSTWS78N*MTY5MjAxNTk0Ni4xLjEuMTY5MjAxNjk4Ni4wLjAuMA..). 
 1. You must have at least one API key associated with your project. Go to the Google Maps Platform > Credentials [page](https://console.cloud.google.com/project/_/google/maps-apis/credentials?utm_source=Docs_CreateAPIKey&utm_content=Docs_static-maps-backend&_gl=1*8gesr0*_ga*MTMxNzQwMTEyNS4xNjkyMDE1OTQ1*_ga_NRWSTWS78N*MTY5MjAxNTk0Ni4xLjEuMTY5MjAxNzI2MS4wLjAuMA..) and create an [API key](https://developers.google.com/maps/documentation/maps-static/get-api-key#creating-api-keys).  
 1. Open file `index.js` located under `maps-function` folder. You must include your API key with both the Geocoding API and Maps Static API requests. Replace `YOUR_API_KEY` with your API key. 
-1. Enable the Cloud Functions, Cloud Build, Artifact Registry, Cloud Run, Dialogflow API and Cloud Logging APIs
+1. Enable the Cloud Functions, Cloud Build, Artifact Registry, Cloud Run, Dialogflow API and Cloud Logging [APIs](https://console.cloud.google.com/flows/enableapi?apiid=cloudfunctions.googleapis.com,%20%20%20%20%20cloudbuild.googleapis.com,artifactregistry.googleapis.com,%20%20%20%20%20run.googleapis.com,logging.googleapis.com&redirect=https://cloud.google.com/functions/docs/create-deploy-http-nodejs&_ga=2.176777133.982063149.1692018523-870547608.1691743190)
 1. Install and initialize the [gcloud CLI](https://cloud.google.com/sdk/docs/install).
 
 ## Deploy the Cloud Function
 To deploy the function, run the `gcloud functions deploy` command in the `maps-function` directory:
-`gcloud functions deploy lookupPlace --runtime=nodejs20 --region=REGION --source=. --entry-point=lookupPlace --trigger-http --allow-unauthenticated`
+```
+gcloud functions deploy lookupPlace --runtime=nodejs20 --region=REGION --source=. --entry-point=lookupPlace --trigger-http --allow-unauthenticated
+```
 
-Replace REGION with the name of the Google Cloud region where you want to deploy your function (for example, us-west1).
+Replace `REGION` with the name of the Google Cloud region where you want to deploy your function (for example, `us-west1`).
 The optional `--allow-unauthenticated` flag lets you reach your function without authentication.
 
-After the function deploys, note the url property from the output of the gcloud functions deploy command, or retrieve it with the command `gcloud functions describe lookupPlace --region REGION`. Replace REGION with the name of the Google Cloud region where you deployed your function. You will need the url when configuring the webhook in Dialogflow CX. 
+After the function deploys, note the url property from the output of the gcloud functions deploy command, or retrieve it with the command `gcloud functions describe lookupPlace --region REGION`. Replace `REGION` with the name of the Google Cloud region where you deployed your function. You will need the url when configuring the webhook in Dialogflow CX. 
 
 ## Create the agent and configure the webhook
 1. In your browser, navigate to the [Dialogflow CX console](https://dialogflow.cloud.google.com/cx/projects)
