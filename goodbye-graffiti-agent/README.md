@@ -85,7 +85,9 @@ format (agent.zip).
 1. Once you have successfully restored the agent, select the **Manage** tab
 and open the definition of the
 **prebuilt_components_address_collection:address_validation**
-webhook. Replace `<YOUR-API-KEY>` with your API key.
+webhook.
+Configure it with your Maps API key, see Webhook
+[setup](https://cloud.google.com/dialogflow/cx/docs/concept/prebuilt-component/address-collection#webhook_setup).
 1. Similarly open the definition of the **lookup_place** webhook and
 enter your function URL as the webhook URL.Click Save.
 
