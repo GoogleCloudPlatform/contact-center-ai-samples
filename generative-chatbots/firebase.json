@@ -2,10 +2,6 @@
   "hosting": {
     "public": "build",
     "target": "your-firebase-app-name",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
   }
 }
