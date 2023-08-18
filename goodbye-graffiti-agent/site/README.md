@@ -1,4 +1,4 @@
-# Gen App Builder (Chat App)
+# Goodbye Graffiti Site
 
 ## Overview
 
@@ -13,7 +13,7 @@ graffiti vandalism.
 1. Install [Node.js](https://nodejs.org/en) using your preferred method or
    package manager
 1. From this directory, run `npm install`
-1. Run `npm run build` to generate the static site in the `build` directory
+1. Run `npm start` to test your app locally
 
 ## Steps to deploy the web app to Firebase
 
@@ -23,7 +23,7 @@ graffiti vandalism.
    `your-firebase-app-name`)
 1. Install the [firebase CLI](https://firebase.google.com/docs/cli)
 1. Run `firebase init` in the app root and follow the prompts to select
-   `Hosting`, use the `build` directory, and confirm `N` to the followup
+   `Hosting`, use the `public` directory, and confirm `N` to the followup
    questions about rewrites, deploys, and the 404 and index pages.
 1. Run
    `firebase target:apply hosting your-firebase-app-name your-firebase-app-name`
@@ -52,18 +52,8 @@ graffiti vandalism.
 
 In your browser, navigate to your deployed app using a URL similar to:
 
-[https://gen-app-builder-chat.web.app/](https://gen-app-builder-chat.web.app/)
+[https://goodbye-graffiti-agent.web.app/](https://goodbye-graffiti-agent.web.app/)
 
 Congratulations, you've successfully deployed the Gen App Builder - Chat App
 Demo!
 
-## Additional resources
-
-You can continue learning about conversational AI and generative AI with
-these guides and resources:
-
-- [Documentation for Dialogflow CX](https://cloud.google.com/dialogflow/cx/docs)
-- [Overview of Generative AI Agent](https://cloud.google.com/generative-ai-app-builder/docs/agent-intro)
-- [Documentation for Generative AI Agent](https://cloud.google.com/generative-ai-app-builder/docs/agent-usage)
-- [Documentation for Gen App Builder](https://cloud.google.com/generative-ai-app-builder/docs/introduction)
-- [Generative AI in Google Cloud](https://cloud.google.com/ai/generative-ai)
