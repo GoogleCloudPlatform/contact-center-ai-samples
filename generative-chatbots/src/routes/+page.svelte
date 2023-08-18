@@ -94,7 +94,7 @@
               <p class="text-md h-fit font-normal text-gray-700">
                 These chatbots use <A
                   href="https://cloud.google.com/vertex-ai/docs/generative-ai/language-model-overview"
-                  class="font-bold text-blue-600 hover:underline">large langauge models (LLMs)</A> and
+                  class="font-bold text-blue-600 hover:underline">large language models (LLMs)</A> and
                 <A
                   href="https://cloud.google.com/ai/generative-ai"
                   class="font-bold text-blue-600 hover:underline">generative AI</A> functionality in
