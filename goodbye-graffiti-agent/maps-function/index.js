@@ -61,7 +61,7 @@
                   try {
                       var config = {
                         method: 'get',
-                        url: 'https://maps.googleapis.com/maps/api/geocode/json?address=' + location + '&key=AIzaSyBY8Vs6cReQZE4j-e1TILT8IX-AuQ-QZ98',
+                        url: 'https://maps.googleapis.com/maps/api/geocode/json?address=' + location + '&key=YOUR_API_KEY',
                         headers: { }
                       };
                           
@@ -85,7 +85,7 @@
                             // call companion payload
                             if(channel == "call-companion") {
                               // config static map
-                              var map_img = 'https://maps.googleapis.com/maps/api/staticmap?center=' + formatted_address + '&zoom=14&size=600x300&markers=color:red|' + lat + ',' + lng +'&key=AIzaSyBY8Vs6cReQZE4j-e1TILT8IX-AuQ-QZ98'
+                              var map_img = 'https://maps.googleapis.com/maps/api/staticmap?center=' + formatted_address + '&zoom=14&size=600x300&markers=color:red|' + lat + ',' + lng +'&key=YOUR_API_KEY'
                               payload = {
                                 "richContent": [
                                   {
