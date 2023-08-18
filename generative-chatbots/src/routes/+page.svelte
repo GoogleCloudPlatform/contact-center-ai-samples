@@ -89,7 +89,7 @@
     <Card class="mx-auto min-w-[100%]">
       <div class="flex">
         <div class="ml-4">
-          <Tabs contentClass="p-4 rounded-lg mt-4 leading-7" style="underline">
+          <Tabs contentClass="p-4 mt-4 leading-7" style="underline">
             <TabItem open title="What is this?">
               <p class="text-md h-fit font-normal text-gray-700">
                 These chatbots use <A
@@ -217,7 +217,7 @@
       <div class="mx-10 -mb-1 flex space-x-16 pb-5">
         <div class="w-1/3 content-center items-center justify-center">
           <div
-            class="mb-3 block rounded-3xl rounded-sm border border-b-4 border-l-4 border-r-4 border-t-4 border-gray-200 bg-white px-6 py-3 hover:bg-gray-100">
+            class="mb-3 block rounded-3xl border border-b-4 border-l-4 border-r-4 border-t-4 border-gray-200 bg-white px-6 py-3 hover:bg-gray-100">
             <div class="mb-3 mt-2 flex">
               <img src="agent.svg" alt="Agent" width="100px" />
               <div class="ml-4">
@@ -239,7 +239,7 @@
         </div>
         <div class="w-1/3">
           <div
-            class="mb-3 block rounded-3xl rounded-sm border border-b-4 border-l-4 border-r-4 border-t-4 border-gray-200 bg-white px-6 py-3 hover:bg-gray-100">
+            class="mb-3 block rounded-3xl border border-b-4 border-l-4 border-r-4 border-t-4 border-gray-200 bg-white px-6 py-3 hover:bg-gray-100">
             <div class="mb-3 mt-2 flex">
               <img src="support.svg" alt="Agent" width="100px" />
               <div class="ml-4">
@@ -262,7 +262,7 @@
         </div>
         <div class="w-1/3">
           <div
-            class="mb-3 block rounded-3xl rounded-sm border border-b-4 border-l-4 border-r-4 border-t-4 border-gray-200 bg-white px-6 py-3 hover:bg-gray-100">
+            class="mb-3 block rounded-3xl border border-b-4 border-l-4 border-r-4 border-t-4 border-gray-200 bg-white px-6 py-3 hover:bg-gray-100">
             <div class="mb-3 mt-2 flex">
               <img src="write.svg" alt="Agent" width="100px" />
               <div class="ml-4">
