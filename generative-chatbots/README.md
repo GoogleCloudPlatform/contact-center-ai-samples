@@ -2,21 +2,36 @@
 
 ## Overview
 
-[Generative AI Agent](https://cloud.google.com/generative-ai-app-builder/docs/agent-intro)
-is a feature within
-[Generative AI App Builder](https://cloud.google.com/generative-ai-app-builder)
-that is built on top of functionality in
-[Dialogflow CX](https://cloud.google.com/dialogflow).
+These virtual agents were built with
+[generative AI](https://cloud.google.com/ai/generative-ai) functionality in
+[Dialogflow CX](https://cloud.google.com/dialogflow/cx/docs/basics). The
+[Generative AI Agent](https://cloud.google.com/dialogflow/cx/docs/concept/generative-agent)
+chatbot queries indexed documents and data using
+[Enterprise Search](https://cloud.google.com/generative-ai-app-builder), and
+each chatbot calls large language models (LLMs) in
+[Vertex AI](https://cloud.google.com/vertex-ai) to generate dynamic,
+personalized responses to users based on your website content, structured data,
+or unstructured data. The static website is hosted on
+[Firebase](https://firebase.google.com/) and is using the [Dialogflow CX
+Messenger
+integration](https://cloud.google.com/dialogflow/cx/docs/concept/integration/dialogflow-messenger).
 
-With Generative AI Agent, you can provide a website domain, structured data, or
-unstructured data, then Generative AI Agent parses your content and creates a
-virtual agent that is powered by data stores and large language models. Your
-customers and end users can then have conversations with the agent and ask
-questions about the content. Refer to the
-[Generative AI Agent documentation](https://cloud.google.com/generative-ai-app-builder/docs/agent-usage)
-and codelab to
-[Create a Generative Chat App with Gen App Builder](https://codelabs.developers.google.com/codelabs/gen-app-builder-chat)
-for more information.
+You can learn more about each generative AI feature in
+[Dialogflow CX](https://cloud.google.com/dialogflow/cx/docs/basics) by viewing
+the documentation for
+[Generative AI Agent](https://cloud.google.com/dialogflow/cx/docs/concept/generative-agent),
+[Generative Fallback](https://cloud.google.com/dialogflow/cx/docs/concept/generative-fallback),
+and
+[Generators](https://cloud.google.com/dialogflow/cx/docs/concept/generators).
+You can build these chatbots yourself by following the codelabs for [Generative
+AI Agent](https://codelabs.developers.google.com/codelabs/gen-app-builder-chat),
+[Generative Fallback](https://codelabs.developers.google.com/codelabs/dialogflow-generative-fallback),
+and
+[Generators](https://codelabs.developers.google.com/codelabs/dialogflow-generator).
+You can also learn more about
+[Generative AI](https://cloud.google.com/ai/generative-ai) and
+[Generative AI Use Cases](https://cloud.google.com/use-cases/generative-ai) in
+Google Cloud.
 
 ## Steps to build the web app
 
@@ -65,7 +80,7 @@ In your browser, navigate to your deployed app using a URL similar to:
 
 [https://generative-chatbots.web.app](https://generative-chatbots.web.app)
 
-Congratulations, you've successfully deployed the Generative Chatbots Demo!
+Congratulations, you've successfully deployed the Generative Chatbots demo app!
 
 ## Additional resources
 
@@ -73,7 +88,7 @@ You can continue learning about conversational AI and generative AI with
 these guides and resources:
 
 - [Documentation for Dialogflow CX](https://cloud.google.com/dialogflow/cx/docs)
-- [Overview of Generative AI Agent](https://cloud.google.com/generative-ai-app-builder/docs/agent-intro)
-- [Documentation for Generative AI Agent](https://cloud.google.com/generative-ai-app-builder/docs/agent-usage)
-- [Documentation for Gen App Builder](https://cloud.google.com/generative-ai-app-builder/docs/introduction)
+- [Documentation for Generative AI Agent](https://cloud.google.com/dialogflow/cx/docs/concept/generative-agent)
+- [Documentation for Generative Fallback](https://cloud.google.com/dialogflow/cx/docs/concept/generative-fallback)
+- [Documentation for Generators](https://cloud.google.com/dialogflow/cx/docs/concept/generators)
 - [Generative AI in Google Cloud](https://cloud.google.com/ai/generative-ai)
