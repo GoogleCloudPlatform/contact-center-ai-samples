@@ -234,7 +234,7 @@
           </div>
           <iframe
             class="min-h-[50vh] min-w-full border border-b-0 border-l-0 border-r-0 border-t-0 border-gray-200"
-            src="/bot1"
+            src="/bot1.html"
             title="bot1" />
         </div>
         <div class="w-1/3">
@@ -257,7 +257,7 @@
           </div>
           <iframe
             class="min-h-[50vh] min-w-full border border-b-0 border-l-0 border-r-0 border-t-0 border-gray-200"
-            src="/bot2"
+            src="/bot2.html"
             title="bot2" />
         </div>
         <div class="w-1/3">
@@ -280,7 +280,7 @@
           </div>
           <iframe
             class="min-h-[50vh] min-w-full border border-b-0 border-l-0 border-r-0 border-t-0 border-gray-200"
-            src="/bot3"
+            src="/bot3.html"
             title="bot3" />
         </div>
       </div>
