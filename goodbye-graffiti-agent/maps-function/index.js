@@ -28,6 +28,7 @@
     let tag = req.body.fulfillmentInfo.tag;
     var payload = {};
     var caller_id = '<no-number>';
+    var channel;
 
     if (!!tag) {
         switch (tag) {
@@ -50,13 +51,17 @@
                   // Set location to the location param value collected from the user. 
                   // Location must be a place name or an address. Reserved characters (for example the plus sign "+") must be URL-encoded. 
                   location = encodeURI(req.body.sessionInfo.parameters['location'].original);
+                  
+                  // Identify channel to generate the right response payload
+                  channel = req.body.sessionInfo.parameters['channel'];
+
                   console.log('caller_id: ' + caller_id);
                   
                   // invokes Geocode APIs and looks for a match
                   try {
                       var config = {
                         method: 'get',
-                        url: 'https://maps.googleapis.com/maps/api/geocode/json?address=' + location + '&key=YOUR_API_KEY',
+                        url: 'https://maps.googleapis.com/maps/api/geocode/json?address=' + location + '&key=AIzaSyBY8Vs6cReQZE4j-e1TILT8IX-AuQ-QZ98',
                         headers: { }
                       };
                           
@@ -76,17 +81,35 @@
                             var lat = results[0].geometry.location.lat;
                             var lng = results[0].geometry.location.lng;
                             var formatted_address = results[0].formatted_address;
-
-                            // config static map
-                            var map_img = 'https://maps.googleapis.com/maps/api/staticmap?center=' + formatted_address + '&zoom=14&size=600x300&markers=color:red|' + lat + ',' + lng +'&key=YOUR_API_KEY'
-                            payload = {
-                              "richContent": [
-                                {
-                                  "type": "image",
-                                  "imageUrl": map_img
-                                }
-                              ]
-                            };
+                            
+                            // call companion payload
+                            if(channel == "call-companion") {
+                              // config static map
+                              var map_img = 'https://maps.googleapis.com/maps/api/staticmap?center=' + formatted_address + '&zoom=14&size=600x300&markers=color:red|' + lat + ',' + lng +'&key=AIzaSyBY8Vs6cReQZE4j-e1TILT8IX-AuQ-QZ98'
+                              payload = {
+                                "richContent": [
+                                  {
+                                    "type": "image",
+                                    "imageUrl": map_img
+                                  }
+                                ]
+                              };
+                            }  
+                            
+                            // df-messenger payload  
+                            if(channel == "df-messenger"){ 
+                              payload = {
+                                "richContent": [
+                                  [
+                                    {
+                                      "type": "image",
+                                      "rawUrl": map_img,
+                                      "accessibilityText": "Map image"
+                                    }
+                                  ]
+                                ]
+                              };
+                            }  
                             
                           } 
                           

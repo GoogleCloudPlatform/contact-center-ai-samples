@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.84.0">
+    <title>Goodbye Graffiti</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/starter-template/">
+    <!-- Bootstrap core CSS -->
+    <link href="/assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+    
+    <!-- Custom styles for this template -->
+    <link href="/assets/dist/css/starter-template.css" rel="stylesheet">
+  </head>
+  <body>
+    
+<div class="col-lg-8 mx-auto p-3 py-md-5">
+  <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
+    <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+      <span class="fs-4" style="color: #0d6efd;font-weight: bold;">Goodbye Graffiti</span>
+    </a>
+  </header>
+
+  <main>
+    <h1>Overview</h1>
+    <p class="fs-5 col-md-8">“Goodbye Graffiti” is a demo built on Dialogflow CX inspired by a number of online forms created by city councils and local governments to report graffiti vandalism.</p>
+    <p class="fs-5 col-md-8">Sometimes we feel more confortable speaking, others typing! The graffiti demo uses the latest Call Companion UI which provides a multi-modal (voice and visual) customer experience throughout your entire conversation with the agent.</p>
+
+    <p class="fs-5 col-md-8">Tell Mel you need to report a graffiti vandalism: <i>"Found some graffiti on the fence of my property this morning", "The north-east fence of St George's park has been painted by vandals", etc...</i></p>
+
+
+    <div class="mb-5">
+      <a href="tel:(720) 465-1642" class="btn btn-primary btn-lg px-4">Call Now</a>
+      <a href="https://github.com/GoogleCloudPlatform/contact-center-ai-samples/tree/main/goodbye-graffiti-agent" target="_blank" class="btn btn-primary btn-lg px-4">Source Code</a>
+    </div>
+
+    <div class="mb-5">
+      <img src="img/call-companion-ui.png" width="900px">
+    </div>
+
+    <h1>Features</h1>
+
+    <hr class="col-3 col-md-2 mb-5">
+
+    <div class="row g-5">
+      <div class="col-md-6">
+        <h2>Generators</h2>
+        <p>Generators use Google's latest generative large language models (LLMs), and prompts that you provide, to generate agent responses at runtime.</p>
+        <p>The demo leverages generators to greet the user and provide a summary of the report</p>
+        <ul class="icon-list">
+          <li><a href="https://cloud.google.com/dialogflow/cx/docs/concept/generators" rel="noopener" target="_blank">Documentation</a></li>
+          <li><a href="https://codelabs.developers.google.com/codelabs/dialogflow-generator#0" rel="noopener" target="_blank">Codelab</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-6">
+        <h2>Generative fallback</h2>
+        <p>Gen fallback uses Google's latest generative large language models (LLMs) to generate virtual agent responses when end-user input does not match an intent or parameter for form filling.</p>
+        <p>For example, if the user cannot provide the exact graffit location (which results in a no-match), the agent escalates to a human agent.</p>
+        <ul class="icon-list">
+          <li><a href="https://cloud.google.com/dialogflow/cx/docs/concept/generative-fallback" rel="noopener" target="_blank">Documentation</a></li>
+          <li><a href="https://codelabs.developers.google.com/codelabs/dialogflow-generative-fallback#0" rel="noopener" target="_blank">Codelab</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row g-5">
+      <div class="col-md-6">
+        <h2>Prebuilt components</h2>
+        <p>Prebuilt components are a collection of prebuilt flows provided by Dialogflow for common tasks and scenarios.</p>
+        <p>The address collection prebuilt component assists the user with a step-by-step address collection process in case the request to the Geocode APIs returns zero results or the returned address is incorrect.</p>
+        <ul class="icon-list">
+          <li><a href="https://cloud.google.com/dialogflow/cx/docs/concept/prebuilt-component/address-collection" target="_blank">Documentation</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-6">
+        <h2>Google Maps Platform</h2>
+        <p>The demo users the Geocoding API to convert an address or a place into latitude and longitude coordinates or to convert the current user's location into an address.</p>
+        <p>Static Maps are used to to visualize the location of the graffiti on a map</p>
+        <ul class="icon-list">
+          <li><a href="https://developers.google.com/maps/documentation/geocoding/requests-geocoding" target="_blank">Geocoding API</a></li>
+          <li><a href="https://developers.google.com/maps/documentation/maps-static/overview" target="_blank">Static Maps</a></li>
+        </ul>
+      </div>
+    </div>
+
+  </main>
+  
+</div>
+    <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger-cx/prod/df-messenger.min.js?v=1"></script>
+    <df-messenger
+      location="us-central1"
+      agent-id="58a25a82-a50f-4c77-9b11-432072e69ee5"
+      language-code="en">
+      <df-messenger-chat-bubble
+      chat-title="Hi, I am Mel!"
+      bot-writing-text="..."
+      placeholder-text="Report graffiti ...">
+      </df-messenger-chat-bubble>
+    </df-messenger>
+    <style>
+      df-messenger {
+        df-messenger-button-titlebar-color:#0d6efd;
+        z-index: 999;
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+      }
+    </style>
+
+    <script>
+      const dfMessenger = document.querySelector('df-messenger');
+      dfMessenger.addEventListener('df-chip-clicked', function (event) {
+        // Handle event
+
+        const options = {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        };
+
+        function success(pos) {
+          const crd = pos.coords;
+          var address;
+
+          console.log("Your current position is:");
+          console.log(`Latitude : ` + crd.latitude);
+          console.log(`Longitude: ` + crd.longitude);
+          console.log(`More or less ${crd.accuracy} meters.`);
+          var latlong = crd.latitude + ',' + crd.longitude;
+          var url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + latlong + '&key=AIzaSyBY8Vs6cReQZE4j-e1TILT8IX-AuQ-QZ98';
+          
+          axios.get(url).then(response =>{
+            address = JSON.stringify(response.data.results[0].formatted_address);      
+            dfMessenger.renderCustomText(`Thanks. The graffiti is located near: ` + address);
+            console.log(address);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+          
+        }
+
+        function error(err) {
+          console.warn(`ERROR(${err.code}): ${err.message}`);
+        }
+
+        navigator.geolocation.getCurrentPosition(success, error, options);
+      });  
+    </script>
+  </body>
+</html>
