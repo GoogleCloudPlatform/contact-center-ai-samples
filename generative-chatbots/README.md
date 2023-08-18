@@ -2,11 +2,11 @@
 
 ## Overview
 
-These chatbots use large
-[language models (LLMs)](https://cloud.google.com/vertex-ai/docs/generative-ai/language-model-overview)
-and [generative AI](https://cloud.google.com/ai/generative-ai) functionality in
-[Dialogflow CX](https://cloud.google.com/dialogflow/cx/docs/basics) to answer
-questions about [Google Store](https://store.google.com/) products.
+These chatbots demonstrate the behavior of different
+[generative AI](https://cloud.google.com/ai/generative-ai) features in
+[Dialogflow CX](https://cloud.google.com/dialogflow/cx/docs/basics) when
+answering questions about products in the
+[Google Store](https://store.google.com/).
 
 These virtual agents were built with
 [generative AI](https://cloud.google.com/ai/generative-ai) functionality in

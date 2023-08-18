@@ -92,19 +92,17 @@
           <Tabs contentClass="p-4 mt-4 leading-7" style="underline">
             <TabItem open title="What is this?">
               <p class="text-md h-fit font-normal text-gray-700">
-                These chatbots use <A
-                  href="https://cloud.google.com/vertex-ai/docs/generative-ai/language-model-overview"
-                  class="font-bold text-blue-600 hover:underline">large language models (LLMs)</A> and
+                These chatbots demonstrate the behavior of different
                 <A
                   href="https://cloud.google.com/ai/generative-ai"
-                  class="font-bold text-blue-600 hover:underline">generative AI</A> functionality in
+                  class="font-bold text-blue-600 hover:underline">generative AI</A> features in
                 <A
                   href="https://cloud.google.com/dialogflow/cx/docs/basics"
-                  class="font-bold text-blue-600 hover:underline">Dialogflow CX</A> to answer questions
-                about <A
+                  class="font-bold text-blue-600 hover:underline">Dialogflow CX</A> when answering questions
+                about products in the <A
                   href="https://store.google.com/"
                   class="font-bold text-blue-600
-                hover:underline">Google Store</A> products
+                hover:underline">Google Store</A>
               </p>
             </TabItem>
             <TabItem title="How to use">
