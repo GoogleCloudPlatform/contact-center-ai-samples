@@ -21,7 +21,7 @@ graffiti vandalism.
    `your-firebase-app-name`)
 1. Install the [firebase CLI](https://firebase.google.com/docs/cli)
 1. Run `firebase init` in the app root and follow the prompts to select
-   `Hosting`, use the `public` directory, and confirm `N` to the followup
+   `Hosting`, use the `views` directory, and confirm `N` to the followup
    questions about rewrites, deploys, and the 404 and index pages.
 1. Run
    `firebase target:apply hosting your-firebase-app-name your-firebase-app-name`
