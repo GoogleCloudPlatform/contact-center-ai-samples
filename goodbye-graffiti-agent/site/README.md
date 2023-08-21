@@ -2,8 +2,6 @@
 
 ## Overview
 
-## Overview
-
 “Goodbye Graffiti” is a demo built on Dialogflow CX inspired by a number of
 online forms created by city councils and local governments to report
 graffiti vandalism.
@@ -56,4 +54,3 @@ In your browser, navigate to your deployed app using a URL similar to:
 
 Congratulations, you've successfully deployed the Gen App Builder - Chat App
 Demo!
-
