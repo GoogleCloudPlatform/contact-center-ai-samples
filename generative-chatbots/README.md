@@ -9,7 +9,7 @@ answering questions about products in the
 [Google Store](https://store.google.com/).
 
 You can view the deployed version of the demo app at
-https://generative-chatbots.web.app/.
+[generative-chatbots.web.app](https://generative-chatbots.web.app/).
 
 These virtual agents were built with
 [generative AI](https://cloud.google.com/ai/generative-ai) functionality in
