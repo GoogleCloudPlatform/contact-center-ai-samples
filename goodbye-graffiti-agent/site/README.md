@@ -34,7 +34,7 @@ graffiti vandalism.
    {
      "hosting": {
        "target": "your-firebase-app-name",  # <--- Add this line
-       "public": "build",
+       "public": "views",
        "ignore": [
          "firebase.json",
          "**/.*",
