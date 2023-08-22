@@ -1,7 +1,11 @@
 {
   "hosting": {
-    "target": "your-firebase-app-name",
-    "public": "build",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    "target": "blood-donation-agent",
+    "public": "views",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
   }
 }
