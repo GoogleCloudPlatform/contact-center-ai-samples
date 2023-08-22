@@ -36,7 +36,8 @@ To setup Twilio (Text Messaging) integration refer to this [repository](https://
    `your-firebase-app-name`)
 1. Install the [firebase CLI](https://firebase.google.com/docs/cli)
 1. Run `firebase init` in the app root and follow the prompts to select
-   `Hosting`, use the `public` directory, configure it as a single-page app and confirm `N` to the followup
+   `Hosting`, use the `public` directory, configure it as a single-page app
+   and confirm `N` to the followup
    questions about automatic builds and deploys.
 1. Run
    `firebase target:apply hosting your-firebase-app-name your-firebase-app-name`
