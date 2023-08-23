@@ -11,7 +11,7 @@ eligibility requirements.
 
 ## Steps to build and deploy the agent
 
-The export of the agent as a JSON package is located in the app root. 
+The export of the agent as a JSON package is located in the app root.
 The steps to build and deploy the agent are illustrated in this
 [codelab](https://codelabs.developers.google.com/codelabs/dialogflow-generator)
 
@@ -19,7 +19,8 @@ The steps to build and deploy the agent are illustrated in this
 
 The agent is integrated with Twilio Voice. To setup the voice integration, see
 the [documentation](https://cloud.google.com/dialogflow/cx/docs/concept/integration/twilio).
-To setup Twilio (Text Messaging) integration refer to this [repository](https://github.com/GoogleCloudPlatform/dialogflow-integrations/tree/master/cx/twilio). 
+To setup Twilio (Text Messaging) integration refer to this
+[repository](https://github.com/GoogleCloudPlatform/dialogflow-integrations/tree/master/cx/twilio).
 
 ## Steps to build the web app
 
