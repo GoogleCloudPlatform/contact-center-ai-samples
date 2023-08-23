@@ -1,6 +1,6 @@
 {
-  "name": "dialogflow-messanger-app",
-  "description": "Simple Node.js application that provides a customizable chat dialog with an agent deployed on DF CX. Uses Dialogflow Messanger integration",
+  "name": "goodbye-graffiti-agent",
+  "description": "Site for the Goodbye graffiti demo",
   "version": "0.0.2",
   "private": true,
   "license": "Apache-2.0",
