@@ -125,7 +125,7 @@
                   class="font-bold text-blue-600 hover:underline">Generative AI Agent</A> chatbot queries
                 indexed documents and data using <A
                   href="https://cloud.google.com/generative-ai-app-builder"
-                  class="font-bold text-blue-600 hover:underline">Enterprise Search</A
+                  class="font-bold text-blue-600 hover:underline">Vertex AI Search</A
                 >, and each chatbot calls large language models (LLMs) in <A
                   href="https://cloud.google.com/vertex-ai"
                   class="font-bold
@@ -290,7 +290,7 @@
         class="font-medium text-blue-600 hover:underline"
         href="https://cloud.google.com/dialogflow">Dialogflow CX</A> and <A
         class="font-medium text-blue-600 hover:underline"
-        href="https://cloud.google.com/generative-ai-app-builder">Gen App Builder</A>
+        href="https://cloud.google.com/generative-ai-app-builder">Vertex AI Conversation</A>
       in <A class="font-medium text-blue-600 hover:underline" href="https://cloud.google.com/"
         >Google Cloud</A>
     </p>

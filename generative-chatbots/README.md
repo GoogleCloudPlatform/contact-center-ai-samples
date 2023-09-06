@@ -16,7 +16,7 @@ These virtual agents were built with
 [Dialogflow CX](https://cloud.google.com/dialogflow/cx/docs/basics). The
 [Generative AI Agent](https://cloud.google.com/dialogflow/cx/docs/concept/generative-agent)
 chatbot queries indexed documents and data using
-[Enterprise Search](https://cloud.google.com/generative-ai-app-builder), and
+[Vertex AI Search](https://cloud.google.com/generative-ai-app-builder), and
 each chatbot calls large language models (LLMs) in
 [Vertex AI](https://cloud.google.com/vertex-ai) to generate dynamic,
 personalized responses to users based on your website content, structured data,
