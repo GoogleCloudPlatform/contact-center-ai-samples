@@ -6,6 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.84.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Blood Donation</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/starter-template/">
@@ -43,9 +44,9 @@
 
   <main>
     <h1>Overview</h1>
-    <p class="fs-5 col-md-8">“Blood Donation” is a demo built on Dialogflow CX inspired by the Australian Red Cross Lifeblood eligibility quiz.</p>
-    <p class="fs-5 col-md-8">Donate is a helpful and polite chatbot at "Save a life". Its task is to assist people who want to donate blood and ensure they meet the required eligibility requirements.</p>
-    <p class="fs-5 col-md-8">Ask Donate about the eligibility quiz or FAQs such as: <i>"What age do I need to be to donate?", "I've just come back from a trip to Africa. Can I donate?", etc...</i></p>
+    <p class="fs-5 col-md-9">“Blood Donation” is a demo built on Dialogflow CX inspired by the Australian Red Cross Lifeblood eligibility quiz.</p>
+    <p class="fs-5 col-md-9">Donate is a helpful and polite chatbot at "Save a life". Its task is to assist people who want to donate blood and ensure they meet the required eligibility requirements.</p>
+    <p class="fs-5 col-md-9">Take the eligibility quiz or ask Donate FAQs such as: <i>"What age do I need to be to donate?", "I've just come back from a trip to Africa. Can I donate?", etc...</i></p>
     <h1 class="mb-4">Try it yourself! Call <span class="text-danger"><b>(518) 873-4275</b></span></h1>
     <div class="mb-5">
       <a href="tel:(518) 873-4275" class="btn btn-primary btn-lg px-4">Call Now</a>
@@ -53,7 +54,7 @@
     </div>
 
     <div class="mb-5">
-      <h5>Scan the QR code on mobile</h5>
+      <h5>Scan the QR code on mobile and opt-in</h5>
       <img src="img/qr-code.svg" width="150px">
     </div>
 
@@ -86,11 +87,11 @@
     <div class="row g-5">
       <div class="col-md-6">
         <span class="fs-4" style="color: #E42313;font-weight: bold;">Generative AI Agent</span>
-        <p>With Generative AI Agent, you can provide a website domain, structured data, or unstructured data, then Generative AI Agent parses your content and creates a virtual agent that is powered by data stores and large language models. Your customers and end users can then have conversations with the agent and ask questions about the content.</p>
+        <p>With Generative AI Agent (functionality in Vertex AI Conversation) you can provide a website domain, structured data, or unstructured data, then Generative AI Agent parses your content and creates a virtual agent that is powered by data stores and large language models. Your customers and end users can then have conversations with the agent and ask questions about the content.</p>
         <p>The agent uses a data store created from the public pages of the Australian Red Cross Lifeblood website related to blood eligibility.</p>
         <ul class="icon-list">
           <li><a href="https://cloud.google.com/generative-ai-app-builder/docs/agent-intro" target="_blank">Documentation</a></li>
-          <li><a href="https://codelabs.developers.google.com/codelabs/gen-app-builder-chat" target="_blank">Codelab</a></li>
+          <li><a href="https://codelabs.developers.google.com/codelabs/vertex-ai-conversation" target="_blank">Codelab</a></li>
         </ul>
       </div>
 
@@ -112,6 +113,25 @@
 
 </div>
     <script src="assets/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
+    <df-messenger
+      location="us-central1"
+      agent-id="8b12c8fd-edac-4818-878c-bc96e3ed7910"
+      language-code="en">
+      <df-messenger-chat-bubble
+      chat-title="Hi, I am Donate"
+      bot-writing-text="..."
+      placeholder-text="Ask about eligibility">
+      </df-messenger-chat-bubble>
+    </df-messenger>
+    <style>
+      df-messenger {
+        z-index: 999;
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        --df-messenger-primary-color: #E42313;
+      }
+    </style>
   </body>
 </html>
