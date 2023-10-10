@@ -14,7 +14,7 @@ You can view the deployed version of the demo app at
 These virtual agents were built with
 [generative AI](https://cloud.google.com/ai/generative-ai) functionality in
 [Dialogflow CX](https://cloud.google.com/dialogflow/cx/docs/basics). The
-[Generative AI Agent](https://cloud.google.com/dialogflow/cx/docs/concept/generative-agent)
+[Data Store Agent](https://cloud.google.com/dialogflow/cx/docs/concept/data-store-agent)
 chatbot queries indexed documents and data using
 [Vertex AI Search](https://cloud.google.com/generative-ai-app-builder), and
 each chatbot calls large language models (LLMs) in
@@ -28,12 +28,12 @@ integration](https://cloud.google.com/dialogflow/cx/docs/concept/integration/dia
 You can learn more about each generative AI feature in
 [Dialogflow CX](https://cloud.google.com/dialogflow/cx/docs/basics) by viewing
 the documentation for
-[Generative AI Agent](https://cloud.google.com/dialogflow/cx/docs/concept/generative-agent),
+[Data Store Agent](https://cloud.google.com/dialogflow/cx/docs/concept/data-store-agent),
 [Generative Fallback](https://cloud.google.com/dialogflow/cx/docs/concept/generative-fallback),
 and
 [Generators](https://cloud.google.com/dialogflow/cx/docs/concept/generators).
-You can build these chatbots yourself by following the codelabs for [Generative
-AI Agent](https://codelabs.developers.google.com/codelabs/gen-app-builder-chat),
+You can build these chatbots yourself by following the codelabs for
+[Data Store Agent](https://codelabs.developers.google.com/codelabs/vertex-ai-conversation),
 [Generative Fallback](https://codelabs.developers.google.com/codelabs/dialogflow-generative-fallback),
 and
 [Generators](https://codelabs.developers.google.com/codelabs/dialogflow-generator).
@@ -97,7 +97,7 @@ You can continue learning about conversational AI and generative AI with
 these guides and resources:
 
 - [Documentation for Dialogflow CX](https://cloud.google.com/dialogflow/cx/docs)
-- [Documentation for Generative AI Agent](https://cloud.google.com/dialogflow/cx/docs/concept/generative-agent)
+- [Documentation for Data Store Agent](https://cloud.google.com/dialogflow/cx/docs/concept/data-store-agent)
 - [Documentation for Generative Fallback](https://cloud.google.com/dialogflow/cx/docs/concept/generative-fallback)
 - [Documentation for Generators](https://cloud.google.com/dialogflow/cx/docs/concept/generators)
 - [Generative AI in Google Cloud](https://cloud.google.com/ai/generative-ai)

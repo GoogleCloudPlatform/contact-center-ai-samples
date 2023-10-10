@@ -66,8 +66,8 @@
       >Source code</NavLi>
   </NavUl>
   <Dropdown trigger="hover" triggeredBy="#nav-docs" class="z-20 p-1">
-    <DropdownItem href="https://cloud.google.com/dialogflow/cx/docs/concept/generative-agent"
-      >Generative AI Agent</DropdownItem>
+    <DropdownItem href="https://cloud.google.com/dialogflow/cx/docs/concept/data-store-agent"
+      >Data Store Agent</DropdownItem>
     <DropdownItem href="https://cloud.google.com/dialogflow/cx/docs/concept/generative-fallback"
       >Generative Fallback</DropdownItem>
     <DropdownItem href="https://cloud.google.com/dialogflow/cx/docs/concept/generators"
@@ -75,7 +75,7 @@
   </Dropdown>
   <Dropdown trigger="hover" triggeredBy="#nav-codelabs" class="z-20 p-1">
     <DropdownItem href="https://codelabs.developers.google.com/codelabs/gen-app-builder-chat"
-      >Generative AI Agent</DropdownItem>
+      >Data Store Agent</DropdownItem>
     <DropdownItem
       href="https://codelabs.developers.google.com/codelabs/dialogflow-generative-fallback"
       >Generative Fallback</DropdownItem>
@@ -121,8 +121,8 @@
                   href="https://cloud.google.com/dialogflow/cx/docs/basics"
                   class="font-bold text-blue-600 hover:underline">Dialogflow CX</A
                 >. The <A
-                  href="https://cloud.google.com/dialogflow/cx/docs/concept/generative-agent"
-                  class="font-bold text-blue-600 hover:underline">Generative AI Agent</A> chatbot queries
+                  href="https://cloud.google.com/dialogflow/cx/docs/concept/data-store-agent"
+                  class="font-bold text-blue-600 hover:underline">Data Store Agent</A> chatbot queries
                 indexed documents and data using <A
                   href="https://cloud.google.com/generative-ai-app-builder"
                   class="font-bold text-blue-600 hover:underline">Vertex AI Search</A
@@ -156,8 +156,8 @@
                   href="https://cloud.google.com/dialogflow/cx/docs/basics"
                   class="font-bold text-blue-600 hover:underline">Dialogflow CX</A> by viewing the documentation
                 for <A
-                  href="https://cloud.google.com/dialogflow/cx/docs/concept/generative-agent"
-                  class="font-bold text-blue-600 hover:underline">Generative AI Agent</A
+                  href="https://cloud.google.com/dialogflow/cx/docs/concept/data-store-agent"
+                  class="font-bold text-blue-600 hover:underline">Data Store Agent</A
                 >, <A
                   href="https://cloud.google.com/dialogflow/cx/docs/concept/generative-fallback"
                   class="font-bold text-blue-600 hover:underline">Generative Fallback</A
@@ -166,7 +166,7 @@
                   class="font-bold text-blue-600 hover:underline">Generators</A
                 >. You can build these chatbots yourself by following the codelabs for <A
                   href="https://codelabs.developers.google.com/codelabs/gen-app-builder-chat"
-                  class="font-bold text-blue-600 hover:underline">Generative AI Agent</A
+                  class="font-bold text-blue-600 hover:underline">Data Store Agent</A
                 >, <A
                   href="https://codelabs.developers.google.com/codelabs/dialogflow-generative-fallback"
                   class="font-bold text-blue-600 hover:underline">Generative Fallback</A
@@ -221,9 +221,9 @@
               <div class="ml-4">
                 <p class="text-sm font-normal text-gray-700">
                   <A
-                    href="https://cloud.google.com/dialogflow/cx/docs/concept/generative-agent"
+                    href="https://cloud.google.com/dialogflow/cx/docs/concept/data-store-agent"
                     class="font-bold text-blue-600 hover:underline">
-                    Generative AI Agent
+                    Data Store Agent
                   </A>
                   uses LLMs to generate responses based on the content of your websites and documents
                 </p>
@@ -245,7 +245,7 @@
                   <A
                     href="https://cloud.google.com/dialogflow/cx/docs/concept/generative-fallback"
                     class="font-bold text-blue-600 hover:underline">
-                    Generative fallback
+                    Generative Fallback
                   </A>
                   uses LLMs with a custom prompt to respond to users when your chatbot doesn't know the
                   answer

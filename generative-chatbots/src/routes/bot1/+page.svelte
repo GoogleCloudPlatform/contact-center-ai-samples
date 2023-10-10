@@ -7,7 +7,7 @@
   <df-messenger
     df-cx="true"
     agent-id="001c3b48-8bc8-481b-adb1-cfa2e604d367"
-    chat-title="Generative AI Agent"
+    chat-title="Data Store Agent"
     language-code="en"
     expand="true" />
 </div>
