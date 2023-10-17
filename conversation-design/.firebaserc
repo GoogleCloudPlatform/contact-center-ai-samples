@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "conversation-design-docs"
+  },
+  "targets": {
+    "conversation-design-docs": {
+      "hosting": {
+        "conversation-design": [
+          "conversation-design"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

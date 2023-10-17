@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "public": "site",
+    "target": "conversation-design",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

@@ -1,3 +1,23 @@
 site_name: Conversation Design
 theme:
   name: material
+  features:
+    - navigation.sections
+nav:
+  - Overview:
+    - index.md
+    - what-is-conversation-design.md
+    - learn-about-conversation.md
+  - Conversation design process:
+    - how-do-i-get-started.md
+    - create-a-persona.md
+    - design-for-the-long-tail.md
+    - gather-requirements.md
+    - help-users-find-your-action.md
+    - is-conversation-the-right-fit.md
+    - scale-your-design.md
+    - test-and-iterate.md
+    - write-sample-dialogs.md
+  - Style guide:
+    - language.md
+    - capitalization-and-punctuation.md
