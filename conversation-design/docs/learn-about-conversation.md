@@ -3,25 +3,30 @@
 New to conversation design? Here are a few high-level principles and concepts to
 get you started before you write your first sample dialog.
 
-The Cooperative Principle
+## The Cooperative Principle
 
 Watch this video for a crash course on how to write dialog that's comfortable,
 frictionless, and user-centric by applying the Cooperative Principle.
+
+<iframe width="560" height="315"
+src="https://www.youtube.com/embed/wuDP_eygsvs?si=YyUg_C-VOuKTfNTm"
+title="YouTube video player" frameborder="0" allow="accelerometer; autoplay;
+clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+allowfullscreen></iframe>
 
 According to the Cooperative Principle, efficient communication relies on the
 assumption that there's an undercurrent of cooperation between conversational
 participants.
 
 The Cooperative Principle can be understood in terms of four rules, called
-Grice's Maxims.
+[Grice's Maxims](http://www.ucl.ac.uk/ls/studypacks/Grice-Logic.pdf).
 
-We instinctively cooperate in terms of...	Maxim (or rule)
-
-- ...the truth of what we say	Maxim of Quality
-- ...the quantity of information that we provide	Maxim of Quantity
-- ...the relevance of what we contribute	Maxim of Relevance
-- ...the way we strive to communicate clearly, without obscurity or ambiguity
-  Maxim of Manner
+| We instinctively cooperate in terms of...                                   | Maxim (or rule)    |
+|-----------------------------------------------------------------------------|--------------------|
+| ...the truth of what we say                                                 | Maxim of Quality   |
+| ...the quantity of information that we provide                              | Maxim of Quantity  |
+| ...the relevance of what we contribute                                      | Maxim of Relevance |
+| ...the way we strive to communicate clearly, without obscurity or ambiguity | Maxim of Manner    |
 
 Research has shown that people respond to technology as they would to another
 human. This means users rely on their existing model of human-to-human
@@ -29,18 +34,78 @@ conversation and follow the Cooperative Principle even when interacting with the
 persona of a conversational user interface, and they expect your persona to
 follow it, too.
 
-Expect users to be informative.
+<table class="grid">
+  <tr>
+    <td>
+      <span style="font-size:20px;">Expect users to be informative.</span>
+      <br/>
+      Because users are cooperative, they often offer more information than is literally required of them.
+    </td>
+    <td>
+      <img src="/static/informative-do.png">
+    </td>
+    <td>
+      <img src="/static/informative-dont.png">
+    </td>
+  </tr>
+  <tr>
+    <td>
+    </td>
+    <td>
+      <span style="color:green; font-weight:bold; font-size: 16px;">Do.</span>
+    </td>
+    <td>
+      <span style="color:red; font-weight:bold; font-size: 16px;">Don't.</span>
+    </td>
+  </tr>
+  <tr>
+    <td>
+    </td>
+    <td>
+      <span style="font-size:14px;">Not only did this user answer the question about shoe-type, they also specified the size, in an attempt to find what they want quickly. Expect this kind of behavior from repeat users who know what other questions will be asked.</span>
+    </td>
+    <td>
+      <span style="font-size:14px;">Here, the persona was only expecting the answer to the question about shoe-type. Cooperative users will be frustrated by having to repeat the shoe size again.</span>
+    </td>
+  </tr>
+</table>
 
-Because users are cooperative, they often offer more information than is
-literally required of them.
+<table class="grid">
+  <tr>
+    <td>
+      <span style="font-size:20px;">Get the dialog back on track.</span>
+      <br/>
+      Your persona won't always be able to handle cooperative responses. In these cases, rely on lightweight and conversational error handling to get the dialog back on track in a way that doesn't draw attention to the error.
+    </td>
+    <td>
+      <img src="/static/informative-do.png">
+    </td>
+    <td>
+      <img src="/static/informative-dont.png">
+    </td>
+  </tr>
+  <tr>
+    <td>
+    </td>
+    <td>
+      <span style="color:green; font-weight:bold; font-size: 16px;">Do.</span>
+    </td>
+    <td>
+      <span style="color:red; font-weight:bold; font-size: 16px;">Don't.</span>
+    </td>
+  </tr>
+  <tr>
+    <td>
+    </td>
+    <td>
+      If your persona is expecting a numerical answer, then cooperative/informative responses like these won't be understood. So handle this No Match error with a rapid reprompt.
+    </td>
+    <td>
+      Avoid responding with long reprompts when possible. In this case, the shorter reprompt will serve the same purpose, without making the user wait as long.
+    </td>
+  </tr>
+</table>
 
-Do.
-
-Not only did this user answer the question about shoe-type, they also specified the size, in an attempt to find what they want quickly. Expect this kind of behavior from repeat users who know what other questions will be asked.
-
-Don't.
-
-Here, the persona was only expecting the answer to the question about shoe-type. Cooperative users will be frustrated by having to repeat the shoe size again.
 
 Get the dialog back on track.
 Your persona won't always be able to handle cooperative responses. In these cases, rely on lightweight and conversational error handling to get the dialog back on track in a way that doesn't draw attention to the error.

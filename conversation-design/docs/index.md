@@ -2,7 +2,7 @@
 
 ## Designing Actions on Google
 
-<img width="400" align="right" alt="Intro image" src="static/intro-anim.gif">
+<img width="400" align="right" alt="Intro image" src="/static/intro-anim.gif">
 Creating Actions for the Google Assistant requires a breadth of design expertise
 (for example, voice user interface design, interaction design, visual design,
 motion design, and UX writing) that we’ve refined into a single discipline:

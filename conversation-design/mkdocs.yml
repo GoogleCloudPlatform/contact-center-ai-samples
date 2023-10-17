@@ -14,6 +14,9 @@ markdown_extensions:
 extra:
   generator: false
 
+extra_css:
+  - style/extra.css
+
 nav:
   - Overview:
       - "Welcome": index.md

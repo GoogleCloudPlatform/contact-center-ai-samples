@@ -83,41 +83,8 @@ doesn’t start for another hour.
 Conversation design is about teaching computers to be fluent in human
 conversation and its conventions.
 
-<table>
-  <tr>
-    <td>
-      <b>Start with what humans do</b>
-    </td>
-    <td>
-      Conversations with a computer should not feel awkward or break patterns
-      that adapt to the communication system users learned first and know best.
-      This helps create an intuitive and frictionless experience.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>Adapt to technical limitations</b>
-    </td>
-    <td>
-      In some ways, computers fall short of human capabilities. Technical
-      limitations introduce scenarios that don’t occur in human-to-human
-      conversation. For example, human conversation never fails due to an
-      unrecoverable error. Human conversation doesn’t require starting with a
-      specific word or phrase, e.g., “Ok Google”. In these cases, rely on user
-      research to determine the best approach.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>Leverage technical strengths</b>
-    </td>
-    <td>
-      In other ways, computers can exceed human capabilities. They don’t get
-      tired of being asked the same questions. They aren’t offended by being
-      given commands. There’s no need to pepper their responses with filler
-      words or other formulaic language, e.g., ums and ahs. They can quickly
-      find and share information. Look for opportunities to avoid annoyance,
-      streamline conversations, and exceed expectations.
-    </td>
-  </tr>
-</table>
+| Principle                      | Description                                                                                                                                                                                                                                                                                                                                                                                                          |
+|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Start with what humans do      | Conversations with a computer should not feel awkward or break patterns that adapt to the communication system users learned first and know best. This helps create an intuitive and frictionless experience.                                                                                                                                                                                                        |
+| Adapt to technical limitations | In some ways, computers fall short of human capabilities. Technical limitations introduce scenarios that don’t occur in human-to-human conversation. For example, human conversation never fails due to an unrecoverable error. Human conversation doesn’t require starting with a specific word or phrase, e.g., “Ok Google”. In these cases, rely on user research to determine the best approach.                 |
+| Leverage technical strengths   | In other ways, computers can exceed human capabilities. They don’t get tired of being asked the same questions. They aren’t offended by being given commands. There’s no need to pepper their responses with filler words or other formulaic language, e.g., ums and ahs. They can quickly find and share information. Look for opportunities to avoid annoyance, streamline conversations, and exceed expectations. |
