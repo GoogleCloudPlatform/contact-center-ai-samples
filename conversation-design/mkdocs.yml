@@ -9,15 +9,39 @@ nav:
     - what-is-conversation-design.md
     - learn-about-conversation.md
   - Conversation design process:
-    - how-do-i-get-started.md
-    - create-a-persona.md
-    - design-for-the-long-tail.md
-    - gather-requirements.md
-    - help-users-find-your-action.md
-    - is-conversation-the-right-fit.md
-    - scale-your-design.md
-    - test-and-iterate.md
-    - write-sample-dialogs.md
+    - conversation-design-process/how-do-i-get-started.md
+    - conversation-design-process/create-a-persona.md
+    - conversation-design-process/design-for-the-long-tail.md
+    - conversation-design-process/gather-requirements.md
+    - conversation-design-process/help-users-find-your-action.md
+    - conversation-design-process/is-conversation-the-right-fit.md
+    - conversation-design-process/scale-your-design.md
+    - conversation-design-process/test-and-iterate.md
+    - conversation-design-process/write-sample-dialogs.md
   - Style guide:
-    - language.md
-    - capitalization-and-punctuation.md
+    - style-guide/language.md
+    - style-guide/capitalization-and-punctuation.md
+  - Conversational components:
+    - conversational-components/building-blocks-overview.md
+    - conversational-components/acknowledgements.md
+    - conversational-components/apologies.md
+    - conversational-components/commands.md
+    - conversational-components/confirmations.md
+    - conversational-components/discourse-markers.md
+    - conversational-components/earcons.md
+    - conversational-components/endings.md
+    - conversational-components/errors.md
+    - conversational-components/greetings.md
+    - conversational-components/informational-statements.md
+    - conversational-components/questions.md
+    - conversational-components/suggestions.md
+    - conversational-components/chips.md
+  - Visual components:
+    - visual-components/visual-components-overview.md
+    - visual-components/customization.md
+    - visual-components/basic-card.md
+    - visual-components/browsing-carousel.md
+    - visual-components/carousel.md
+    - visual-components/list.md
+    - visual-components/media-response.md
+    - visual-components/table.md
