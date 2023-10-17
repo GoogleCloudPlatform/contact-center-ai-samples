@@ -1,11 +1,19 @@
 site_name: Conversation Design
+
 theme:
   name: material
   features:
     - navigation.sections
+
+markdown_extensions:
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
 nav:
   - Overview:
-    - index.md
+    - "Welcome": index.md
     - what-is-conversation-design.md
     - learn-about-conversation.md
   - Conversation design process:
