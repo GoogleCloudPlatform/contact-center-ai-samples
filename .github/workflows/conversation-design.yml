@@ -14,9 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: pip install -r requirements.txt
+      - run: mkdocs build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_CONVERSATION_DESIGN_DOCS }}"
           projectId: conversation-design-docs
           entryPoint: conversation-design
+          channelId: live
