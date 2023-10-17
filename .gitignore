@@ -184,7 +184,6 @@ dialogflow-cx/terraform/webhook
 .coverage
 coverage
 .nyc_output
-docs/
 out/
 build/
 system-test/secrets.js
