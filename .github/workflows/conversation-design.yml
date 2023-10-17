@@ -1,0 +1,21 @@
+name: Deploy Conversation Design site to Firebase
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: conversation-design
+    steps:
+      - uses: actions/checkout@v2
+      - run: pip install -r requirements.txt
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_CONVERSATION_DESIGN_DOCS }}"
+          projectId: conversation-design-docs
