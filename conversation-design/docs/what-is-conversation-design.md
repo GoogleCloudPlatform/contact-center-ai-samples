@@ -56,27 +56,35 @@ were designed to evoke a consistent persona.
 Developers of third-party Actions have to create their own personas. Typically,
 this starts with brainstorming adjectives (for example, friendly, trustworthy)
 and narrowing them down to a short list. This list becomes a short description,
-often accompanied by images. For detailed guidance, see Create a persona.
+often accompanied by images. For detailed guidance, see
+[Create a persona](conversation-design-process/create-a-persona.md).
 
 ### User persona
 
 Think of a few specific people you expect to use your Actions. Try to have two
 to three different types, for example, a millenial vs a working parent. These
 user personas will help you avoid designing only for yourself and your goals.
-For detailed guidance, see Identify your users. A user persona is a specific,
-but brief, description of an individual user.
+For detailed guidance, see
+[Identify your users](conversation-design-process/gather-requirements.md).
 
-User persona: Amy, 32, is an Android developer who designs and builds advanced
-game applications. She’s a member of Women Who Code. She lives in Austin, and
-travels often for work.
+A user persona is a specific, but brief, description of an individual user:
 
-Add goals and context to create a user journey.
+<figure markdown>
+  ![User persona for Amy](static/user-persona-amy.jpg){ width="300" }
+  <figcaption>User persona: Amy, 32, is an Android developer who designs and
+  builds advanced game applications. She’s a member of Women Who Code. She lives
+  in Austin, and travels often for work.</figcaption>
+</figure>
 
-User goals: She’s planning her trip to Mountain View for Google I/O, hoping to
-make the most out of her trip.
+Add goals and context to create a user journey:
 
-User context: She’s at her favorite local tearoom since her meeting nearby
-doesn’t start for another hour.
+<figure markdown>
+  ![User journey](static/user-journey.jpg){ width="300" }
+  <figcaption>User goals: She’s planning her trip to Mountain View for Google
+  I/O, hoping to make the most out of her trip. User context: She’s at her
+  favorite local tearoom since her meeting nearby doesn’t start for another
+  hour.</figcaption>
+</figure>
 
 ## Conversation for computers
 
