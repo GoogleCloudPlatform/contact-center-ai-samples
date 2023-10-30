@@ -111,7 +111,7 @@
 </div>
     <script src="assets/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger-cx/prod/df-messenger.min.js?v=1"></script>
+    <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
     <df-messenger
       location="us-central1"
       agent-id="58a25a82-a50f-4c77-9b11-432072e69ee5"
@@ -152,7 +152,7 @@
           console.log(`Longitude: ` + crd.longitude);
           console.log(`More or less ${crd.accuracy} meters.`);
           var latlong = crd.latitude + ',' + crd.longitude;
-          var url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + latlong + '&key=YOUR-API-KEY';
+          var url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + latlong + '&key=AIzaSyBY8Vs6cReQZE4j-e1TILT8IX-AuQ-QZ98';
 
           axios.get(url).then(response =>{
             console.log(response.data.results[0]);
