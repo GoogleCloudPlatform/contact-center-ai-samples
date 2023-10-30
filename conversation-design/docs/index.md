@@ -29,9 +29,9 @@ Topic | Description
 [Draft a conversation](conversation-design-process/write-sample-dialogs.md) | Write sample dialogs to informally experiment with and evaluate different design strategies
 [Design for multiple devices](conversation-design-process/scale-your-design.md) | Learn how to scale your design to help users wherever they are
 [Style guide](style-guide/language.md) | Make sure that you’re using a conversational style and following some basic copy editing rules by reviewing the style guide
-[Conversational components](conversational-components/conversational-components-overview.md) | For guidance on writing prompts and crafting fluid conversations, start by learning about all the conversational components that make up prompts
+[Conversational components](conversational-components/overview.md) | For guidance on writing prompts and crafting fluid conversations, start by learning about all the conversational components that make up prompts
 [Error handling](conversational-components/errors.md) | One poorly handled error can outweigh dozens of successful interactions, so learn how to get users back on track quickly and seamlessly
-[Visual components](visual-components/visual-components-overview.md) | Get guidance on when and how to use cards, carousels, lists, and other visual components
+[Visual components](visual-components/overview.md) | Get guidance on when and how to use cards, carousels, lists, and other visual components
 
 ## Other resources
 
