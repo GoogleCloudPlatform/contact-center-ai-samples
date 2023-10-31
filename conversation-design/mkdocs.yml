@@ -4,15 +4,21 @@ theme:
   name: material
   features:
     - navigation.sections
+    - toc.integrate
 
 markdown_extensions:
+  - admonition
   - attr_list
   - md_in_html
+  - pymdownx.details
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.superfences
   - pymdownx.tasklist:
       custom_checkbox: true
+  - toc:
+      toc_depth: 2
 
 extra:
   generator: false

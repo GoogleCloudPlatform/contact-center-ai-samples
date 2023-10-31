@@ -2,10 +2,7 @@
 
 Here’s an overview of the conversation design process.
 
-<figure markdown>
-  ![Design process flowchart](../static/design-process-flowchart.png)
-  <figcaption>Flowchart of the conversation design process</figcaption>
-</figure>
+![Design process flowchart](../static/design-process-flowchart.png){ align=right width="500" }
 
 For clarity, we’ve shown this as a linear process. However, in practice, these
 are not discrete steps that are fully completed before the next is begun. To
