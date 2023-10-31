@@ -1,8 +1,3 @@
----
-hide:
-  - toc
----
-
 # Conversation Design
 
 ## Designing Actions on Google
