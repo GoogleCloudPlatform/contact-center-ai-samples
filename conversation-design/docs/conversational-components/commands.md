@@ -50,7 +50,7 @@ Think of one-shot commands as shortcuts, allowing users to give multiple pieces 
 
 ### Build multi-turn dialogs for novices and one-shot commands for experts
 
-**Allow a multi-turn dialog for novice users** | **Help users remember** | *Allow one-shot commands for expert users*
+Allow a multi-turn dialog for novice users | Help users remember | Allow one-shot commands for expert users
 ---|---|---
 *The customer is unfamiliar with the florist's inventory and options. A dialog is necessary for success.* | *No longer a novice, the customer is more confident in asking for what they want. Some customers are content with this level of expertise*. | *Over time, the customer will remember the multiple components of their order and the one-shot command. The customer is now an expert and can order their custom bouquet using a single phrase. Note that not all customers will want to do this.*
 **Misoflowers:** Hi, I'm your florist at Misoflowers. Do you want to browse our selection of pre-arranged bouquets, or would you like to create your own? | **Misoflowers:** Welcome back. Are you interested in our pre-arranged bouquets, or would you like to create your own? | **Misoflowers:** Hi again. Do you want to start with our pre-arranged bouquets, or would you rather create your own?
