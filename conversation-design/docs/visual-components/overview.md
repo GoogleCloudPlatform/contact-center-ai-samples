@@ -1,4 +1,4 @@
-# Overview of visual components
+# Overview
 
 Visual components include cards, carousels, lists, and other visual assets.
 Visual components are useful if you're presenting detailed information, but they

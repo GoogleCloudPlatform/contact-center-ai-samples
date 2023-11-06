@@ -1,5 +1,7 @@
 # Discourse markers
 
+## TODO: EDITS
+
 When we communicate, we mark how upcoming words or phrases relate to previous
 discourse (i.e., spoken or written language used in a social context). These
 discourse markers ease comprehension by providing a preview of what’s coming up
