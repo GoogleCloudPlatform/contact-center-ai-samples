@@ -9,7 +9,7 @@ opinion is required. The good news is that you can (and should) get insight,
 quickly and easily, into whether your design will work for users before writing
 a single line of code.
 
-### Get feedback to see if your dialog is working
+## Get feedback to see if your dialog is working
 
 **Find someone unfamiliar with your project to try out your dialog.** Getting
 feedback during the design process exposes usability issues and gives you the

@@ -40,7 +40,6 @@ as long as it's highly relevant to their query.
   persona. Try to offer actions the user could take with this information or
   related information they might be interested in.
 
-
 ### For some answers, a simple informational statement is sufficient
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
@@ -89,7 +88,7 @@ In this example, a narrow-focus question is used for disambiguation.
 ![Info statement menus 1 do](../static/infostmt-menus1-do.png){ width="300" } | ![Info statement menus 1 don't](../static/infostmt-menus1-dont.png){ width="300" }
 If the user requires information before making a choice, provide the information first, then ask the question. (Or use phrasing like "which of these...") | Don't ask a question and then keep speaking. See [turn-taking](../learn-about-conversation.md).
 
-###  Menus are often incorporated into narrow-focus questions
+### Menus are often incorporated into narrow-focus questions
 
 In this example, a narrow-focus question is used for disambiguation.
 

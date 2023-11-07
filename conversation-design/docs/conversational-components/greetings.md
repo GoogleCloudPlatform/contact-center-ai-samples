@@ -30,7 +30,6 @@ to see how this Conversational Action was built using Dialogflow.
 ![Greetings number genie 2 do](../static/greetings-numbergenie2-do.png){ width="300" } | ![Greetings number genie 2 don't](../static/greetings-numbergenie2-dont.png){ width="300" } | ![Greetings number genie 2.1 don't](../static/greetings-numbergenie2.1-dont.png){ width="300" }
 **Set expectations.** Build on real-world knowledge by tapping into users' existing mental model for how guessing games are played. "I'm thinking of a number..." does this quickly and efficiently. No further explanation is needed. Saying "first guess" sets the user's expectations that this will be a back-and-forth conversation that allows the user to continue refining their guess. | Don't repeat your Action's name—either the user or the Assistant has already said "Number Genie" as part of the invocation. Avoid explanations, especially of familiar concepts like how to play a guessing game. | Don't overwhelm the user with lots of details upfront. They'll discover how the game works as they start to play.
 
-
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>  | <span style="color: red;">Don't</span>
 ---|---|---
 ![Greetings number genie 3 do](../static/greetings-numbergenie3-do.png){ width="300" } | ![Greetings number genie 3 don't](../static/greetings-numbergenie3-dont.png){ width="300" } | ![Greetings number genie 3.1 don't](../static/greetings-numbergenie3.1-dont.png){ width="300" }

@@ -18,21 +18,21 @@ Teaching commands discourages experimentation and undermines trust. The implied 
 
 ## Usage
 
-### Focus on what the user can do rather than on what they can say.
+### Focus on what the user can do rather than on what they can say
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
 ![Focus on commands do](../static/focuscommands-do.png){ width="300" } | ![Focus on commands don't](../static/focuscommands-dont.png){ width="300" }
 Focusing on actions reduces cognitive load. The user simply has to learn that they can continue browsing shoes or complete their purchase. They're already experts at both of these. | Focusing on what the user can say increases cognitive load by requiring memorization. The user not only has to learn that they can continue browsing shoes or complete their purchase, but they also have to memorize the commands "keep shopping" and "check out". It also gives the impression that only these exact phrases will work.
 
-### Use verb phrases to indicate actions the user can take. Users will be cooperative and echo them.
+### Use verb phrases to indicate actions the user can take. Users will be cooperative and echo them
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
 ![Verbal commands do](../static/verbcommands-do.png){ width="300" } | ![Verbal commands don't](../static/verbcommands-dont.png){ width="300" }
 Ask a question and let the user answer in their own words (for example, "learn from the experts", "I wanna try the demos", "relaxing sounds good", etc.). | Avoid this artifact from touchtone phone systems (for example, "To leave a message, press 1.").
 
-### After a No Match error, it's okay to offer suggestions of things the user could say when they could benefit from more support.
+### After a No Match error, it's okay to offer suggestions of things the user could say when they could benefit from more support
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---

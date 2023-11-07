@@ -39,7 +39,6 @@ Maximum text length per chip | 25 characters
 User response | By default, when a user taps a chip, the text of that chip then becomes the user response. So make sure you include all your chips as training phrases that trigger an intent. If you’re using Dialogflow, go [here](https://cloud.google.com/dialogflow/cx/docs/concept/intent) to read more about intents.
 URLs (optional) | Chips can link out to external websites.
 
-
 ## Guidelines
 
 Chips should be
@@ -79,7 +78,7 @@ confirm what the chip is referencing.
 ![Multi novisual no device do](../static/multi-novisual-no-device-do.png){ width="300" } | ![Multi novisual no device don't](../static/multi-novisual-no-device-dont.png){ width="300" }
 Use the prompts to give an overview. Use the visuals to provide additional detail. | Don't force the reader to scan and read. Your persona should reduce the work the user needs to do, which includes the effort of scanning through detailed information.
 
-### Don’t repeat options shown in a list or carousel.
+### Don’t repeat options shown in a list or carousel
 
 Lists and carousels are optimized for helping users make a selection. In these
 cases, use chips to help the user refine the list or to say they don’t want any

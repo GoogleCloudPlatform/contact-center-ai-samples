@@ -80,7 +80,7 @@ only in situations when there are plans to build the requested functionality.
 ![Unsupported intent do](../static/endings-unsupportedintent-do.png){ width="300" } | ![Unsupported intent don't](../static/endings-unsupportedintent-dont.png){ width="300" }
 Do take responsibility and briefly let the user know their request isn't supported. | Don't be overly apologetic. Don't use "yet" if the feature isn't coming soon.
 
-# Error
+## Errors
 
 Unfortunately, sometimes conversations end due to an unrecoverable error. See error handling for details on how to handle Max No Input errors, Max No Match errors, and System errors.
 
