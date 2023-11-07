@@ -19,7 +19,7 @@ them. For example:
 - What words and phrases do they use to talk about these tasks?
 - What situations or circumstances trigger these tasks?
 
-# Accommodate all users
+## Accommodate all users
 
 While it’s important to optimize for your most frequent users, don’t do so at
 the expense of other users’ experiences. A well-designed product is inclusive
@@ -78,7 +78,8 @@ What’s the format of the session information? Is it plain text, audio, or othe
 If the content is plain text, was it written to be seen or to be heard? |
 How long is it? Or how long does it take to read? |
 
-Often, some reformatting needs to happen before some types of content can be appropriately rendered in text-to-speech (TTS).
+Often, some reformatting needs to happen before some types of content can be
+appropriately rendered in text-to-speech (TTS).
 
 ## Identify your key use cases
 

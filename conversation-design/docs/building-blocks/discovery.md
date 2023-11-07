@@ -48,7 +48,8 @@ Define invocation phrases that specifically describe how users might ask for
 things your Action can do. These phrases let users deep-link directly into a
 specific portion of your Action’s functionality.
 
-Users can either 1) add an invocation phrase to the end of an explicit invocation, or 2) use one on its own as an implicit invocation.
+Users can either 1) add an invocation phrase to the end of an explicit
+invocation, or 2) use one on its own as an implicit invocation.
 
 - "Ok Google. Talk to Google I/O 18 **about the keynote**"
 - "Ok Google. Speak to Google I/O 18 **about finding a session**"

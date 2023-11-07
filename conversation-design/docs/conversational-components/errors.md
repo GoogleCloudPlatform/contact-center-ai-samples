@@ -16,16 +16,17 @@ occurred.
 Keep in mind the following considerations:
 
 - **Cooperation**
-    - Assume the user is being cooperative, and what they'
-  re saying is relevant and valid. Users are just trying to accomplish something; it's your job to figure out what that is.
+    - Assume the user is being cooperative, and what they're saying is relevant
+      and valid. Users are just trying to accomplish something; it's your job to
+      figure out what that is.
 
 - **Transparency**
-    - Be honest and transparent when explaining why something doesn'
-  t work.
+    - Be honest and transparent when explaining why something doesn't work.
 
 - **Context-specific**
-    - Good error handling is context-specific. Even though you'
-  re asking for the same information, the conversational context is different on the second or third attempt.
+    - Good error handling is context-specific. Even though you' re asking for
+      the same information, the conversational context is different on the
+      second or third attempt.
 
 There are 3 types of errors:
 
@@ -33,9 +34,7 @@ There are 3 types of errors:
 ---|---|---|---
 Imagine you're talking to someone and... | ...they don't respond to you. | No Input | The Action hasn't heard the user's response, or the user hasn't responded by the time the microphone closes.
  | ...they say something that confuses you. | No Match | The Action can't understand or interpret the user's response in context.
- | ...they ask you to do something you can'
-t do. | System error | The systems that the Action depends on for information can'
-t complete the task.
+ | ...they ask you to do something you can't do. | System error | The systems that the Action depends on for information can't complete the task.
 
 ## No Match
 

@@ -32,7 +32,7 @@ banking application, the persona could be modeled after an idealized bank teller
 the bank teller makes this new experience feel familiar, since users’ real-world
 banking knowledge can guide them.
 
-### Follow these steps to create your persona:
+### Follow these steps to create your persona
 
 - **Step 1:** Brainstorm a list of adjectives (e.g., friendly, technologically
   competent). Focus on the qualities you want users to perceive when talking to
@@ -63,14 +63,14 @@ personality traits like warmth, confidence, intelligence, etc. People can’t he
 but do this with virtual assistants, too—so guide the assumptions they make
 about your Action by choosing a voice that is consistent with your persona.
 
-## There are 2 types of voices:
+## There are 2 types of voices
 
 Type | Description | Pros | Cons
 ---|---|---|---
 Synthesized | The Actions on Google platform provides a variety of text-to-speech (TTS) voices that speak different languages. Go to [Languages and Locales](https://developers.google.com/actions/localization/languages-locales) to hear them. Note that you can adjust the way the synthesized speech sounds by using [Speech Synthesis Markup Language (SSML)](https://developers.google.com/actions/reference/ssml). For example, you may want to add silence or pauses, specify how numbers should be read, or adjust the intonation. | <ul><li>Hear prompts as soon as you’ve written them</li><li>Make quick and easy edits</li><li>Localization is built-in</li></ul> | <ul><li>Can sound unnatural or robotic</li><li>Less expressive. Difficult to convey humor, sarcasm, etc.</li><li>Few voices to choose from</li></ul>
 Recorded | You can hire a professional voice actor, or even try using your own voice. Either way, you’ll need to record all the audio that will be used in your Action. | <ul><li>Natural and human</li><li>Very expressive. Can convey humor, sarcasm, etc.</li><li>Unlimited voices to choose from</li></ul> | <ul><li>Edits require re-recording</li><li>Recordings have to be localized</li><li>Requires robust management system for audio files</li></ul>
 
-### Choose the best voice for your persona by holding an audition.
+### Choose the best voice for your persona by holding an audition
 
 - **Step 1:** Write a few spoken prompts that your persona would say. Or better
   yet, write a sample dialog. These will be the lines used for the audition.
@@ -95,7 +95,7 @@ Recorded | You can hire a professional voice actor, or even try using your own v
 ---|---
 Key Adjectives | <ul><li>Practical/straightforward</li><li>Techie</li><li>Techie</li><li>Enthusiastic</li><li>I/O expert</li></ul>
 Characters who embody those adjectives | Who would be an I/O expert? <ul><li>I/O Planning Committee member</li><li>Speaker at I/O</li><li>Google Developer Expert</li><li>Google Developer Group organizer</li><li>Frequent I/O attendee</li></ul>
-Short description |	The Keeper of I/O-Specific Knowledge is a Google Developer Expert who believes strongly in the power of technology. A skilled networker, they spend their time answering questions on StackOverflow, building apps for big brands, and helping Google run madewithcode.com. They've attended I/O for the past 7 years and are a trusted member of the developer community. As a spokesperson for I/O, they take this responsibility very seriously, but, of course, they’re still going to have fun doing it.
+Short description | The Keeper of I/O-Specific Knowledge is a Google Developer Expert who believes strongly in the power of technology. A skilled networker, they spend their time answering questions on StackOverflow, building apps for big brands, and helping Google run madewithcode.com. They've attended I/O for the past 7 years and are a trusted member of the developer community. As a spokesperson for I/O, they take this responsibility very seriously, but, of course, they’re still going to have fun doing it.
 Voice chosen | Of the available TTS voices for United States English, Female 2 ranked highest on practical/straightforward and techie
 
 Check out this two-part blog post for more details on how we
