@@ -16,17 +16,17 @@ occurred.
 Keep in mind the following considerations:
 
 - **Cooperation**
-   - Assume the user is being cooperative, and what they're saying is relevant
-     and valid. Users are just trying to accomplish something; it's your job to
-     figure out what that is.
+    - Assume the user is being cooperative, and what they're saying is relevant
+      and valid. Users are just trying to accomplish something; it's your job to
+      figure out what that is.
 
 - **Transparency**
-   - Be honest and transparent when explaining why something doesn't work.
+    - Be honest and transparent when explaining why something doesn't work.
 
 - **Context-specific**
-   - Good error handling is context-specific. Even though you' re asking for
-     the same information, the conversational context is different on the
-     second or third attempt.
+    - Good error handling is context-specific. Even though you' re asking for
+      the same information, the conversational context is different on the
+      second or third attempt.
 
 There are 3 types of errors:
 

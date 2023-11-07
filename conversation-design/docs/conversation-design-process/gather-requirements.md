@@ -99,7 +99,7 @@ handful of loyal power users.
 Do some user research on how users complete this task today and the language
 they use to describe it.
 
-### Example from the Google I/O 18 Action
+### Learnings from the Google I/O 18 Action
 
 If you haven’t already, be sure to read these blog posts for a deep dive on how
 we
