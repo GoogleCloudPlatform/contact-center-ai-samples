@@ -3,7 +3,7 @@ site_name: Conversation Design
 theme:
   name: material
   features:
-    - navigation.sections
+    - navigation.footer
     - toc.integrate
 
 markdown_extensions:
