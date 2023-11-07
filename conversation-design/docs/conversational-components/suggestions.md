@@ -3,57 +3,54 @@
 Your persona can provide suggestions to help the user answer a question.
 Suggestions can also be used as hints to help the user discover new features.
 
-Usage
+## Usage
 
-Once you’ve decided to offer a suggestion, you have to decide where to put it:
+Once you've decided to offer a suggestion, you have to decide where to put it:
 the spoken prompts or the chips.
 
-Suggestions in the spoken prompts:
+### Suggestions for spoken prompts
 
 This is appropriate for conversations on smart speakers, on headphones, on smart
-displays, or in the car. Even though some of these devices have screens, there’s
+displays, or in the car. Even though some of these devices have screens, there's
 no guarantee the user is looking at it or is close enough to interact with
-chips, so the suggestions must go in the spoken prompts. Provide examples of
-conversational phrases the user could say
+chips, so the suggestions must go in the spoken prompts.
 
-Do.
+### Provide examples of conversational phrases the user could say
 
-Offer a few randomized examples.
+<span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
+---|---
+![](../static/suggestions-spokenprompts1-do.png){ width="300" } | ![](../static/suggestions-spokenprompts1-dont.png){ width="300" }
+Offer a few randomized examples. | Don't assume a screen is available to the user.
 
+### Examples are better than instructions
 
-Don't.
+<span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
+---|---
+![](../static/examples-do.png){ width="300" } | ![](../static/examples-dont.png){ width="300" }
+Offer examples like "between 2 and 5". | Don't provide instructions like "say a time of day".
 
-Don’t assume a screen is available to the user.
+### Suggestions for chips
 
-Examples are better than instructions
-
-Do.
-
-Offer examples like “between 2 and 5”.
-
-
-Don't.
-
-Don’t provide instructions like “say a time of day”.
-
-Suggestions in the chips:
 This is appropriate for all conversations on devices with screens.
-Use chips to suggest answers.
-This is most helpful for wide-focus questions, though all questions can benefit from the quick-tap response they enable.
 
-Do.
+### Use chips to suggest answers
 
-Provide popular answers in the chips. If there are multiple categories, try to provide one example of each.
+This is most helpful for wide-focus questions, though all questions can benefit
+from the quick-tap response they enable.
 
+<span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
+---|---
+![](../static/providerange-newdo.png){ width="300" } | ![](../static/providerange-newdont.png){ width="300" }
+Provide popular answers in the chips. If there are multiple categories, try to provide one example of each. | Don't put suggestions in both the spoken prompt and the chips. It makes the spoken prompt unnecessarily time consuming.
 
-Don't.
+## Hints and discoverability
 
-Don’t put suggestions in both the spoken prompt and the chips. It makes the spoken prompt unnecessarily time consuming.
-
-Hints and discoverability
 Hints can be used to help users discover new features.
-Consider adding a discoverability hint to the end of a related query. Users should only hear the hint once, so be sure to use a counter.
 
-Do.
+Consider adding a discoverability hint to the end of a related query. Users
+should only hear the hint once, so be sure to use a counter.
 
-Provide clear motivation for any action you want the user to take. Tell the user why they might want to do something before telling them how to do it.
+<span style="color: green;">Do</span> |
+---|
+![](../static/relationbtwncomponents4-do.png){ width="300" } |
+Provide clear motivation for any action you want the user to take. Tell the user why they might want to do something before telling them how to do it. |
