@@ -2,12 +2,7 @@
 default: true
 
 # MD013/line-length - Line length
-MD013:
-  line_length: 80
-  code_blocks: false
-  tables: false
-  headings: false
-  headers: false
+MD013: false
 
 # MD033/no-inline-html - Inline HTML
 MD033: false
