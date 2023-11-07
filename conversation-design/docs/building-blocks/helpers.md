@@ -15,7 +15,6 @@ for more technical guidance.
 
 ## Types of helpers and what they do
 
-
 Helper type | Info you can ask for | Call the helper or get results
 ---|---|---
 User information | <ul><li>Display name</li><li>Given name</li><li>Family name</li><li>Coarse/general device location (zip code and city)</li><li>Precise device location (coordinates and street address)</li></ul> | <ul><li>[Call the helper](https://developers.google.com/assistant/df-asdk/helpers#calling_the_helper)</li><li>[Get the results](https://developers.google.com/assistant/df-asdk/helpers#getting_the_results_of_the_helper)</li></ul>
