@@ -5,7 +5,7 @@ discovery process easier by designing for all the ways users can call on, or
 invoke, your Action.
 
 For information about | So that users can find it by | See these articles
----|---|
+---|---|---
 Designing to promote discovery of your Action | Naming your Action specifically | [Explicit invocations](../building-blocks/discovery.md)
  | Naming your Action and something it can do | [Invocation phrases](../conversation-design-process/help-users-find-your-action.md)
  | Asking for a task your Action can perform | [Implicit invocations and built-in intents](../conversation-design-process/help-users-find-your-action.md)

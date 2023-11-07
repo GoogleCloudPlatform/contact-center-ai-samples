@@ -1,4 +1,4 @@
-## What is conversation design?
+# What is conversation design?
 
 Conversation design is a design language based on human conversation (similar to
 how [material design](https://material.io/guidelines/) is a design language

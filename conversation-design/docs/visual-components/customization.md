@@ -36,14 +36,14 @@ This color should be the one most often associated with your brand.
 ### Primary and background colors can work together to enhance the expression of your brand
 
 <figure markdown style="float: left;">
-  ![](../static/pesto-white.png){ width="400" }
+  ![Pesto white](../static/pesto-white.png){ width="400" }
   <figcaption>
     Choose a primary color first.
   </figcaption>
 </figure>
 
 <figure markdown style="float: right;">
-  ![](../static/pesto-yellow.png){ width="400" }
+  ![Pesto yellow](../static/pesto-yellow.png){ width="400" }
   <figcaption>
     After you choose a primary color, pick a background color that goes with
     both the primary color and the secondary text color.
@@ -53,7 +53,7 @@ This color should be the one most often associated with your brand.
 ### Choosing your primary and background colors from the same color family can help make your Action a cohesive experience
 
 <figure markdown>
-  ![](../static/primarycolor.png){ width="400" }
+  ![Primary color](../static/primarycolor.png){ width="400" }
   <figcaption>
     The background color can be a lighter version of the primary color.
   </figcaption>
@@ -62,7 +62,7 @@ This color should be the one most often associated with your brand.
 ### Choosing a complementary color for your background can make your primary color stand out even more
 
 <figure markdown>
-  ![](../static/complementarycolor.png){ width="400" }
+  ![Complementary color](../static/complementarycolor.png){ width="400" }
   <figcaption>
     The background color can be a complementary color.
   </figcaption>
@@ -86,7 +86,7 @@ Note that to ensure foreground legibility, we apply a dark protection mask on
 the background image. Text will automatically turn to white.
 
 <figure markdown>
-  ![](../static/example1.png){ width="400" }
+  ![Card with background image](../static/example1.png){ width="400" }
   <figcaption>
     This basic card uses a background image. A background image will replace any
     background color, so choose the option that best represents your brand.
@@ -96,7 +96,7 @@ the background image. Text will automatically turn to white.
 ### If your Action has multiple dialog turns, choose a background image that works with different dialog turns
 
 <figure markdown>
-  ![](../static/example2.png){ width="400" }
+  ![Card with background image with turns](../static/example2.png){ width="400" }
   <figcaption>
     The image needs to be neutral enough to maintain your desired look and feel
     through multiple dialog turns. Here, the same background image applies to
@@ -122,7 +122,7 @@ Foundation.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/typography-do.png){ width="300" } | ![](../static/typography-dont.png){ width="300" }
+![Typography do](../static/typography-do.png){ width="300" } | ![Typography don't](../static/typography-dont.png){ width="300" }
 With its bold typeface and bright color, this font stands out against the background and attracts attention to the card title. | Without the heavier weight, this font is hard to read and fails to draw the eye to the title before the body text.
 
 ## Shape
@@ -137,7 +137,7 @@ that's suitable to your overall brand style.
 ### Use angled corners if your brand incorporates sharp edges and clean lines
 
 <figure markdown>
-  ![](../static/shapesharp.png){ width="400" }
+  ![Angled corners](../static/shapesharp.png){ width="400" }
   <figcaption>
     Your logo is a good place to look for guidance on which shape to choose. In
     this example, the logo is sharp and angular, so angled corners are in line
@@ -148,7 +148,7 @@ that's suitable to your overall brand style.
 ### Use curved corners if they fit your brand's overall style
 
 <figure markdown>
-  ![](../static/shaperound.png){ width="400" }
+  ![Round corners](../static/shaperound.png){ width="400" }
   <figcaption>
     Other components can also guide you in your decision. Here, the action
     button's rounded edges and the logo both match the curved corners of the

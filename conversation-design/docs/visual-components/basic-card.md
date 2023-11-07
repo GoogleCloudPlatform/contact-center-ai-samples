@@ -8,7 +8,7 @@ users.
 Here's an example of what a basic card looks like when all required and optional
 fields are completed.
 
-![](../static/basiccardmapped.png){ width="400" }
+![Basic card example](../static/basiccardmapped.png){ width="400" }
 
 !!! note
     For code examples, see the
@@ -39,19 +39,19 @@ information to the user.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/summarize-do.png){ width="300" } | ![](../static/summarize-dont.png){ width="300" }
+![Summarize do](../static/summarize-do.png){ width="300" } | ![Summarize don't](../static/summarize-dont.png){ width="300" }
 Summarize things like event details using a basic card. This allows users to scan it quickly for the information they want. | It's less efficient to present information like event details in the prompts.
 
 ### Give the short answer in the prompts and the related details in the card
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/put-deets-in-card-do.png){ width="300" } | ![](../static/put-deets-in-card-dont.png){ width="300" }
+![Put details in cards do](../static/put-deets-in-card-do.png){ width="300" } | ![Put details in cards don't](../static/put-deets-in-card-dont.png){ width="300" }
 Use the spoken and display prompts to give the specific answer to the user's directed question (11:30 AM in this example). Use the visuals for related details. | Avoid redundancy between the spoken prompt, display prompt, and visuals.
 
 ### A picture is worth a thousand words
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/usingpics-do.png){ width="300" } | ![](../static/usingpics-dont.png){ width="300" }
+![Using pictures do](../static/usingpics-do.png){ width="300" } | ![Using pictures don't](../static/usingpics-dont.png){ width="300" }
 Sometimes an image is the best way to convey information to the user. | Though the description is nice, a picture would have been better.

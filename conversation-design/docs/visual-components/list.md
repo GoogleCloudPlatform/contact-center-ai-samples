@@ -9,7 +9,7 @@ either saying its title or tapping it.
 Here's an example of what a list looks like when all required and optional
 fields are completed.
 
-![](../static/listmappeddaisies.png){ width="600" }
+![List example](../static/listmappeddaisies.png){ width="600" }
 
 !!! note
     For code examples, see the
@@ -61,7 +61,7 @@ easy to say, and uniquely identify each item.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/titles-list-do.png){ width="300" } | ![](../static/titles-list-dont.png){ width="300" }
+![Titles list do](../static/titles-list-do.png){ width="300" } | ![Titles list don't](../static/titles-list-dont.png){ width="300" }
 Each item title should be as short as possible while staying distinct from the other items. | Don't repeat words or phrases across titles, e.g., "42 and its relation to...". They don't help uniquely identify the item, and the title will be too long to fit on the screen.
 
 ### Keep descriptions concise by only including helpful, relevant information
@@ -71,7 +71,7 @@ important information first.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/descriptions-do.png){ width="300" } | ![](../static/descriptions-dont.png){ width="300" }
+![Descriptions do](../static/descriptions-do.png){ width="300" } | ![Descriptions don't](../static/descriptions-dont.png){ width="300" }
 List item descriptions should only contain information that differentiates them from each other and is relevant within the context of the user's request of your Action. | Avoid presenting irrelevant information in your list item descriptions; this takes valuable space away from information the user actually needs to make a choice.
 
 ### If your list only has 2 items, consider whether a simple either/or question is sufficient to help the user make their decision
@@ -81,7 +81,7 @@ content adds value.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/shortlist-do.png){ width="300" } | ![](../static/shortlist-dont.png){ width="300" }
+![Short list do](../static/shortlist-do.png){ width="300" } | ![Short list don't](../static/shortlist-dont.png){ width="300" }
 If you're only presenting two options, simply asking the question may be the best way to help the user make a decision. | In this case, visuals aren't necessary to present the important information. Chips will help the user respond if they need suggestions.
 
 ### Avoid lists of 1 item
@@ -91,5 +91,5 @@ choose from. Actions on Google only allows lists of 2 items or more.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/lists-avoid-do.png){ width="300" } | ![](../static/lists-avoid-dont.png){ width="300" }
+![Lists avoid do](../static/lists-avoid-do.png){ width="300" } | ![Lists avoid don't](../static/lists-avoid-dont.png){ width="300" }
 Instead of a 1-item list, present the user with more information on the 1 option that's available to them. | Don't make the user choose when there's only 1 option.

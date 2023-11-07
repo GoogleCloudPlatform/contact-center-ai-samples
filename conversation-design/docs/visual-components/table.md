@@ -9,7 +9,7 @@ you want users to interact, consider using a [list](list.md) instead.
 
 Here's an example of what a table looks like.
 
-![](../static/tablecardmapped.png){ width="600" }
+![Table example](../static/tablecardmapped.png){ width="600" }
 
 !!! note
     For code examples, see the
@@ -56,7 +56,7 @@ be overwhelming.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/tablecard-brevity-do.png){ width="300" } | ![](../static/tablecard-brevity-dont.png){ width="300" }
+![Table card brevity do](../static/tablecard-brevity-do.png){ width="300" } | ![Table card brevity don't](../static/tablecard-brevity-dont.png){ width="300" }
 To improve scannability, only include useful information in your table. If you have additional columns with nice-to-know details, prioritize your most important information so that it will display on all surfaces. | The lack of detail in this table makes it hard to tell which team won each game, and non-essential information (the game number) is placed at the front, hiding helpful details like the Win/Loss column and the opposing teams' names.
 
 ### Keep the core of the message in the prompts
@@ -66,5 +66,5 @@ directly address the user's request and move the conversation forward.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/tablecard-prompts-do.png){ width="300" } | ![](../static/tablecard-prompts-dont.png){ width="300" }
+![Table card prompts do](../static/tablecard-prompts-do.png){ width="300" } | ![Table card prompts don't](../static/tablecard-prompts-dont.png){ width="300" }
 The prompts should both 1) answer the user's question and 2) propel the conversation with a question. | Don't assume that the user has immediate access to the screen; the prompts should always provide the direct answer to the user's question. Also, without a question, the prompts here fail to push the interaction forward.

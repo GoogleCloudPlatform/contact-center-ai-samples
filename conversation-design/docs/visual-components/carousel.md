@@ -9,7 +9,7 @@ by either saying its title or tapping it.
 Here's an example of what a carousel looks like when all required and optional
 fields are completed.
 
-![](../static/carouselmapped.png){ width="600" }
+![Carousel example](../static/carouselmapped.png){ width="600" }
 
 !!! note
     For code examples, see the
@@ -63,7 +63,7 @@ easy to say, and uniquely identify each item.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/titles-do.png){ width="300" } | ![](../static/titles-dont.png){ width="300" }
+![Titles do](../static/titles-do.png){ width="300" } | ![Titles don't](../static/titles-dont.png){ width="300" }
 Each item title should be as short as possible while staying distinct from the other items. | Never use the same title for multiple items. And avoid titles that are very similar.
 
 ### Introduce the carousel with a short overview
@@ -77,7 +77,7 @@ Consider including information about the following:
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/overview-do.png){ width="300" } | ![](../static/overview-dont.png){ width="300" }
+![Overview do](../static/overview-do.png){ width="300" } | ![Overview don't](../static/overview-dont.png){ width="300" }
 Let the user know why you've suggested these specific items. | Don't leave the user wondering why your Action is showing these specific items.
 
 ### Encourage the user to choose one of the items from the carousel, but don't force them to pick one
@@ -88,5 +88,5 @@ of these" to let them indicate they don't want any of the options.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/choice-do.png){ width="300" } | ![](../static/choice-dont.png){ width="300" }
+![Choice do](../static/choice-do.png){ width="300" } | ![Choice don't](../static/choice-dont.png){ width="300" }
 Make it clear to the user that they need to select something from the carousel. Here, the chips allow them to choose "none of these" or to refine the results (for example, by only showing "patchwork sneakers"). | Don't simply show the user a carousel. Ask them a question in a way that makes it clear what happens if they choose an item.

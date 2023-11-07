@@ -15,19 +15,19 @@ becomes part of the conversation as the user’s response.
 
 Offer chips that clarify user goals and intent
 
-![](../static/refine.png){ width="300" }
+![Refine topics](../static/refine.png){ width="300" }
 
 ### Discover related topics, next steps, and pivots
 
 Show related entities and queries
 
-![](../static/discover.png){ width="300" }
+![Related entities and queries](../static/discover.png){ width="300" }
 
 ### Take action
 
 Surface relevant actions
 
-![](../static/relevantactions.png){ width="300" }
+![Surface relevant actions](../static/relevantactions.png){ width="300" }
 
 ## Requirements
 
@@ -58,7 +58,7 @@ cover the full range of options rather than focusing exclusively on one topic.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/providerange-do.png){ width="300" } | ![](../static/providerange-dont.png){ width="300" }
+![Provide range do](../static/providerange-do.png){ width="300" } | ![Provide range don't](../static/providerange-dont.png){ width="300" }
 
 ### Move the conversation forward, but don’t put words in the user’s mouth
 
@@ -67,7 +67,7 @@ might say.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/bebrief-do.png){ width="300" } | ![](../static/bebrief-dont.png){ width="300" }
+![Be brief do](../static/bebrief-do.png){ width="300" } | ![Be brief don't](../static/bebrief-dont.png){ width="300" }
 
 ### Favor verb-noun combinations
 
@@ -76,7 +76,7 @@ confirm what the chip is referencing.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/multi-novisual-no-device-do.png){ width="300" } | ![](../static/multi-novisual-no-device-dont.png){ width="300" }
+![Multi novisual no device do](../static/multi-novisual-no-device-do.png){ width="300" } | ![Multi novisual no device don't](../static/multi-novisual-no-device-dont.png){ width="300" }
 Use the prompts to give an overview. Use the visuals to provide additional detail. | Don't force the reader to scan and read. Your persona should reduce the work the user needs to do, which includes the effort of scanning through detailed information.
 
 ### Don’t repeat options shown in a list or carousel.
@@ -87,5 +87,5 @@ of those options.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/multi-no-device-do.png){ width="300" } | ![](../static/multi-no-device-dont.png){ width="300" }
+![Multi no device do](../static/multi-no-device-do.png){ width="300" } | ![Multi no device do](../static/multi-no-device-dont.png){ width="300" }
 Use the prompts to give an overview. Use the visuals to provide additional detail. | Don't force the reader to scan and read. Your persona should reduce the work the user needs to do, which includes the effort of scanning through detailed information.

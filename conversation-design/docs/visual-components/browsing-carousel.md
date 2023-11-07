@@ -10,7 +10,7 @@ Pages).
 Here's an example of what a browsing carousel looks like when all required and
 optional fields are completed.
 
-![](../static/browsingcarouselmapped.png){ width="600" }
+![Browsing carousel exmaple](../static/browsingcarouselmapped.png){ width="600" }
 
 !!! note
     For code examples, see the
@@ -69,5 +69,5 @@ ask the user a question since you won't hear their reply.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/transparent-do.png){ width="300" } | ![](../static/transparent-dont.png){ width="300" }
+![Be transparent do](../static/transparent-do.png){ width="300" } | ![Be transparent don't](../static/transparent-dont.png){ width="300" }
 Let users know that selecting an item will take them outside of the Action. | Don't ask a question when the mic is closed, and don't mislead users. Here, it isn't clear to the user that if they select a hotel, they'll no longer be talking to Ibento and will be taken to the hotel's webpage.

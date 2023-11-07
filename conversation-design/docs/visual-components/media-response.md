@@ -7,7 +7,7 @@ music, news, or podcasts.
 
 Here’s an example of what a media response looks like.
 
-![](../static/mediaplayermapped.png){ width="600" }
+![Media response example](../static/mediaplayermapped.png){ width="600" }
 
 !!! note
     For code examples, see the
@@ -64,5 +64,5 @@ Introduce the media briefly, and let the user pivot to something else.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/chips-do.png){ width="300" } | ![](../static/chips-dont.png){ width="300" }
+![Chips do](../static/chips-do.png){ width="300" } | ![Chips don't](../static/chips-dont.png){ width="300" }
 When playing audio, always include chips for the user to pivot to some other action or progress the flow. | Don’t include media controls as chips.

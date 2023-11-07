@@ -9,7 +9,7 @@ the user won't know when, or how, to respond.
 Questions fall on a continuum from wide- to narrow-focus, based on the range of
 responses they elicit.
 
-![](../static/wide2narrowqs-table.png)
+![Wide to narrow questions table](../static/wide2narrowqs-table.png)
 
 When designing a question, think about where it should fall on the continuum
 from wide to narrow focus. Consider the pros and cons in the table below.
@@ -40,7 +40,7 @@ users time to respond to the question.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/turntaking2-do.png){ width="300" } | ![](../static/turntaking2-dont.png){ width="300" }
+![Turn taking 2 do](../static/turntaking2-do.png){ width="300" } | ![Turn taking 2 don't](../static/turntaking2-dont.png){ width="300" }
 Prompt the user with only a single question at a time. | Don't overwhelm the user with options and questions.
 
 ## Critical use cases for narrow-focus questions
@@ -59,7 +59,7 @@ See [errors](errors.md) for details.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/questions-critical-errorhandling-do.png){ width="300" } | ![](../static/questions-critical-errorhandling-dont.png){ width="300" }
+![Questions critical error handling do](../static/questions-critical-errorhandling-do.png){ width="300" } | ![Questions critical error handling don't](../static/questions-critical-errorhandling-dont.png){ width="300" }
 Provide extra help when there's an error. | Don't slow all users down with details that most won't need to answer the question. Remember, irrelevant speech is time consuming.
 
 ### Disambiguation
@@ -70,7 +70,7 @@ it's okay to ask the user for more information.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/questions-critical-disambiguation-do.png){ width="300" } | ![](../static/questions-critical-disambiguation-dont.png){ width="300" }
+![Questions critical disambiguation do](../static/questions-critical-disambiguation-do.png){ width="300" } | ![Questions critical disambiguation don't](../static/questions-critical-disambiguation-dont.png){ width="300" }
 To resolve ambiguity, ask the user a narrow-focus question. | The user's request is ambiguous. This response would've been appropriate if the user has ordered pink roses for their mom in the past.
 
 ### Explicit confirmations
@@ -86,7 +86,7 @@ cases:
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/questions-critical-explicitconfirmations-do.png){ width="300" } | ![](../static/questions-critical-explicitconfirmations-dont.png){ width="300" }
+![Questions critical explicit confirmations do](../static/questions-critical-explicitconfirmations-do.png){ width="300" } | ![Questions critical explicit confirmations don't](../static/questions-critical-explicitconfirmations-dont.png){ width="300" }
 Before deleting user data, use narrow-focus questions to confirm. | It would be difficult to recover from an error here.
 
 ## Learn from what users said
@@ -110,5 +110,5 @@ the question to narrow its focus.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/questions-learnfromusers-do.png){ width="300" } | ![](../static/questions-learnfromusers-dont.png){ width="300" }
+![Questions learn from users do](../static/questions-learnfromusers-do.png){ width="300" } | ![Questions learn from users don't](../static/questions-learnfromusers-dont.png){ width="300" }
 Rephrase questions to make the options clear. | Typically, intonation and context will make it clear to the user that this is an either/or question, not a yes/no question. But if users are having trouble, consider rephrasing.

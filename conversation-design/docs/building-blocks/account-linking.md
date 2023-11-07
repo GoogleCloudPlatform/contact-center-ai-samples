@@ -52,7 +52,8 @@ Use Google Sign-In if:
 
 - Your Action(s) target only the Assistant
 - You don't have an existing authentication system
-- You have an existing authentication system and only want to link to users who signed up to your existing apps using their @gmail.com address
+- You have an existing authentication system and only want to link to users who
+  signed up to your existing apps using their @gmail.com address
 
 ## OAuth and Google Sign-In
 

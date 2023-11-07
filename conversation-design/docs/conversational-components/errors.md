@@ -48,12 +48,12 @@ Here are a few possible causes of No Match errors.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/errors-whynomatch1.png){ width="300" } | ![](../static/errors-whynomatch2.png){ width="300" }
+![Why no match 1](../static/errors-whynomatch1.png){ width="300" } | ![Why no match 2](../static/errors-whynomatch2.png){ width="300" }
 The user doesn't respond fully or clearly, possibly hesitating, changing their mind or not completing their sentence. | The user might not be speaking to the Action.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/errors-whynomatch3.png){ width="300" } | ![](../static/errors-whynomatch4.png){ width="300" }
+![Why no match 3](../static/errors-whynomatch3.png){ width="300" } | ![Why no match 4](../static/errors-whynomatch4.png){ width="300" }
 The user says something relevant to the question, task, or domain, but the Action doesn't understand it. This might occur when either the user's response isn't included in the recognition grammar, or it's given in a noisy environment. | The user wants to switch topics entirely.
 
 ### 1st level No Match (rapid reprompt)
@@ -67,12 +67,12 @@ repetition of the original [question](questions.md).
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/errors-1stlevelnomatch1-do.png){ width="300" } | ![](../static/errors-1stlevelnomatch1-dont.png){ width="300" }
+![Errors 1st level no match do](../static/errors-1stlevelnomatch1-do.png){ width="300" } | ![Errors 1st level no match don't](../static/errors-1stlevelnomatch1-dont.png){ width="300" }
 Reiterate the question quickly and succinctly. | Don't dwell on or over-explain the error.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/errors-1stlevelnomatch2-do.png){ width="300" } | ![](../static/errors-1stlevelnomatch2-dont.png){ width="300" }
+![Errors 1st level no match 2 do](../static/errors-1stlevelnomatch2-do.png){ width="300" } | ![Errors 1st level no match 2 don't](../static/errors-1stlevelnomatch2-dont.png){ width="300" }
 Combine [apologies](apologies.md) with [questions](questions.md). | Don't provide examples for simple responses. Avoid escalating detail in the 1st No Match prompt (exceptions below).
 
 There are exceptions when the user could benefit from more support in the 1st No
@@ -80,12 +80,12 @@ Match prompt.
 
 <span style="color: green;">Do</span> |
 ---|
-![](../static/errors-1stlevelnomatch3-do.png){ width="300" } |
+![Errors 1st level no match 3 do](../static/errors-1stlevelnomatch3-do.png){ width="300" } |
 Including additional information can help users respond by narrowing down their request. |
 
 <span style="color: green;">Do</span> |
 ---|
-![](../static/errors-1stlevelnomatch3.2-do.png){ width="300" } |
+![Errors 1st level no match 3.2 do](../static/errors-1stlevelnomatch3.2-do.png){ width="300" } |
 Allow users more guidance when reasonable, particularly after [wide-focus questions](questions.md). |
 
 ### 2nd level No Match (escalating detail)
@@ -98,12 +98,12 @@ or instructions.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/errors-2ndlevelnomatch1-do.png){ width="300" } | ![](../static/errors-2ndlevelnomatch1-dont.png){ width="300" }
+![Errors 2nd level no match 1 do](../static/errors-2ndlevelnomatch1-do.png){ width="300" } | ![Errors 2nd level no match 1 don't](../static/errors-2ndlevelnomatch1-dont.png){ width="300" }
 Try to be helpful, providing your best guess at relevant information that can be useful. | Don't repeat the same thing over and over. The user is stuck and needs additional guidance.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/errors-2ndlevelnomatch2-do.png){ width="300" } | ![](../static/errors-2ndlevelnomatch2-dont.png){ width="300" }
+![Errors 2nd level no match 2 do](../static/errors-2ndlevelnomatch2-do.png){ width="300" } | ![Errors 2nd level no match 2 don't](../static/errors-2ndlevelnomatch2-dont.png){ width="300" }
 Talk to the user like you're having a human-to-human conversation. | Make sure that you're not being condescending!
 
 ### Max No Match
@@ -113,14 +113,14 @@ frustration.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/errors-maxnomatch1-do.png){ width="300" } | ![](../static/errors-maxnomatch1-dont.png){ width="300" }
+![Errors max no match 1 do](../static/errors-maxnomatch1-do.png){ width="300" } | ![Errors max no match 1 don't](../static/errors-maxnomatch1-dont.png){ width="300" }
 End the conversation gracefully when there's nothing you can do to help the user. | Vague promises, particularly when you don't know what the user has asked for, are unhelpful and erode user confidence.
 
 Let users know if there are other ways they can complete their task.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/errors-maxnomatch1-do.png){ width="300" } | ![](../static/errors-maxnomatch1-dont.png){ width="300" }
+![Errors max no match 1 do](../static/errors-maxnomatch1-do.png){ width="300" } | ![Errors max no match 1 don't](../static/errors-maxnomatch1-dont.png){ width="300" }
 Next steps can be better than nothing, even when the user has to do it themselves. | Don't recommend trying again in a few minutes or on another device if it's unlikely to fix the issue.
 
 ## No Input
@@ -136,12 +136,12 @@ Here are a few possible causes of No Input errors.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/errors-whynoinputs1.png){ width="300" } | ![](../static/errors-whynoinputs2.png){ width="300" }
+![Errors why no inputs 1](../static/errors-whynoinputs1.png){ width="300" } | ![Errors why no inputs 2](../static/errors-whynoinputs2.png){ width="300" }
 The user left the room, is distracted, or maybe changed their mind. | There's no speech, just noise.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/errors-whynoinputs3.png){ width="300" } | ![](../static/errors-whynoinputs4.png){ width="300" }
+![Errors why no inputs 3](../static/errors-whynoinputs3.png){ width="300" } | ![Errors why no inputs 4](../static/errors-whynoinputs4.png){ width="300" }
 The user is thinking or unsure about how to respond. | The user spoke before the mic opened.
 
 ### 1st level No Input
@@ -150,7 +150,7 @@ When writing No Input prompts, assume that the user hasn't heard the question.
 
 <span style="color: green;">Do</span> | <span style="color: red;">Don't</span>
 ---|---
-![](../static/errors-1stlevelnoinput1-do.png){ width="300" } | ![](../static/errors-1stlevelnoinput1-dont.png){ width="300" }
+![Errors 1st level no input 1 do](../static/errors-1stlevelnoinput1-do.png){ width="300" } | ![Errors 1st level no input 1 don't](../static/errors-1stlevelnoinput1-dont.png){ width="300" }
 Repeat the question (by rephrasing) in a similar and concise way. | Don't say "I didn't hear you", because it's likely the user hasn't said anything. And don't assume the user heard the first question or remembers the options that were offered.
 
 There are exceptions when the user could benefit from more support in the first
@@ -158,19 +158,19 @@ No Input prompt.
 
 <span style="color: green;">Do</span> |
 ---|
-![](../static/errors-1stlevelnoinput2-do.png){ width="300" } |
+![Errors 1st level no input 2 do](../static/errors-1stlevelnoinput2-do.png){ width="300" } |
 When there's a good chance the user might be stumped, see if you can provide more support. |
 
 <span style="color: green;">Do</span> |
 ---|
-![](../static/errors-1stlevelnoinput2.1-do.png){ width="300" } |
+![Errors 1st level no input 2.1 do](../static/errors-1stlevelnoinput2.1-do.png){ width="300" } |
 Users might not respond to a [wide-focus question](questions.md) because they don't know what they can say. So give them some options. |
 
 If information is not required, then move on to the next step in the dialog.
 
 <span style="color: green;">Do</span> |
 ---|
-![](../static/errors-1stlevelnoinput3-do.png){ width="300" } |
+![Errors 1st level no input 3 do](../static/errors-1stlevelnoinput3-do.png){ width="300" } |
 Continue to the next step if the information isn't required. However, make sure to not penalize the user, e.g., by skipping over something perceived as important or interesting without an opportunity to provide it later. |
 
 ### 2nd level No Input
@@ -179,7 +179,7 @@ Give users one more opportunity to respond before exiting.
 
 <span style="color: green;">Do</span> |
 ---|
-![](../static/errors-2ndlevelnoinput-do.png){ width="300" } |
+![Errors 2nd level no input do](../static/errors-2ndlevelnoinput-do.png){ width="300" } |
 Restate the question to give the user one more chance to respond. |
 
 ### Max No Input
@@ -189,7 +189,7 @@ attempts.
 
 <span style="color: green;">Do</span> |
 ---|
-![](../static/errors-maxnoinput-do.png){ width="300" } |
+![Errors max no input do](../static/errors-maxnoinput-do.png){ width="300" } |
 End the conversation gracefully when the user stops engaging. |
 
 ## Error counters
@@ -226,10 +226,10 @@ Evaluate every system your Action depends on and account for all possible errors
 
 <span style="color: green;">Do</span> |
 ---|
-![](../static/errors-systemerrors1-do.png){ width="300" } |
+![System errors 1 do](../static/errors-systemerrors1-do.png){ width="300" } |
 Try to be transparent without being overly technical. See if there are any next steps you might offer. |
 
 <span style="color: green;">Do</span> |
 ---|
-![](../static/errors-systemerrors2-do.png){ width="300" } |
+![System errors 2 do](../static/errors-systemerrors2-do.png){ width="300" } |
 Try to provide feedback on how the request was invalid and educate the user where possible. |
