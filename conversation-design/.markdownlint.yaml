@@ -8,6 +8,9 @@ MD007:
 # MD013/line-length - Line length
 MD013: false
 
+# MD032/blanks-around-lists - Lists should be surrounded by blank lines
+MD032: false
+
 # MD033/no-inline-html - Inline HTML
 MD033: false
 
