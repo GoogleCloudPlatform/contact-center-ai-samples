@@ -23,9 +23,9 @@ When designing conversations we want to ensure that we are divergent when it com
 
 Topic | Description | Activity 
 ---|---|---
-Introduction | Find out why conversation design is important and what is its ultimate goal | Action VS Information
-Identify your key use cases | Learn when conversation is a good fit for a usecase. Then understand the differences between head intents and supplementals in the context of a user-agent dialogue | Create your personas and journeys
-Identify your users | Now focus on your users. Who are they? What are their goals? What’s their context?
+Introduction | Find out why conversation design is important and what is its ultimate goal
+Identify your key use cases | Learn when conversation is a good fit for a usecase. Then understand the differences between head intents and supplementals in the context of a user-agent dialogue | Action VS Information
+Identify your users | Now focus on your users. Who are they? What are their goals? What’s their context? | Create your personas and journeys
 Pick your persona | A persona forms an emotional connection with users. Learn how Generative AI can help gain user trust and make experiences a bit more human
 Write sample dialogs | Sample dialogs give you a quick, low-fidelity sense of the "sound-and-feel" of the interaction you're designing. | Create a sample dialog
 Test and Iterate | Discover the Wizard of Oz prototyping | Test the dialog
