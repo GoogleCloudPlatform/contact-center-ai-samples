@@ -41,7 +41,8 @@ nav:
       - conversation-design-process/design-for-the-long-tail.md
       - conversation-design-process/scale-your-design.md
       - conversation-design-process/help-users-find-your-action.md
-      - conversation-design-process/conversation-design-workshop.md
+  - Workshops:
+      - "Conversation design workshop": conversation-design-workshop.md
   - Style guide:
       - style-guide/language.md
       - style-guide/capitalization-and-punctuation.md

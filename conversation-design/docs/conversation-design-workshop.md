@@ -1,6 +1,4 @@
-# The Conversation Design Workshop
-
-![Workshop header](../static/workshop-header.png){width="700"}
+![Workshop header](./static/workshop-header.png){width="700"}
 
 ## What is it?
 At Google, we believe that conversation design is a fundamental discipline that lies at the heart of natural and intuitive conversations with users. To help customers and partners get a jump start on the conversation design process, Google has created a 2-day workshop that can bring business and IT teams together to learn best practices and design principles for conversational agents before moving into the development of sample dialogs and implementing high-level conversational flows.
@@ -37,5 +35,5 @@ Use [this deck](https://conversation-design.web.app/static/conversation-design-w
 
 ## Workshop Preview
 
-![Intents](../static/head-intents-supplementals.png){width="300"}
-![Identify users](../static/identify-users.png){width="300"}![Wizard Oz](../static/wizard-of-oz.png){width="300"}
+![Intents](./static/head-intents-supplementals.png){width="300"}
+![Identify users](./static/identify-users.png){width="300"}![Wizard Oz](./static/wizard-of-oz.png){width="300"}
