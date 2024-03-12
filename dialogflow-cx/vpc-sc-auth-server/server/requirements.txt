@@ -24,4 +24,4 @@ google-auth==2.22.0
 google-cloud-secret-manager==2.16.3
 google-cloud-storage==2.10.0
 google-crc32c==1.5.0
-pycryptodome==3.18.0
+pycryptodome==3.19.1
