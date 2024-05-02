@@ -152,7 +152,7 @@
           console.log(`Longitude: ` + crd.longitude);
           console.log(`More or less ${crd.accuracy} meters.`);
           var latlong = crd.latitude + ',' + crd.longitude;
-          var url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + latlong + '&key=AIzaSyBY8Vs6cReQZE4j-e1TILT8IX-AuQ-QZ98';
+          var url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + latlong + '&key=YOUR_API_KEY';
 
           axios.get(url).then(response =>{
             console.log(response.data.results[0]);
