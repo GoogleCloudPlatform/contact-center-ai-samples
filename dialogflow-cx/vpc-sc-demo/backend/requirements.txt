@@ -19,7 +19,7 @@ invoke==2.2.0
 requests==2.31.0
 google-auth==2.22.0
 google-crc32c==1.5.0
-pycryptodome==3.18.0
+pycryptodome==3.19.1
 google-cloud-storage==2.10.0
 invoke==2.2.0
 werkzeug==2.3.7
