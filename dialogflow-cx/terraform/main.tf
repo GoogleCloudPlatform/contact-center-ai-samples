@@ -54,7 +54,7 @@ data "archive_file" "source" {
 
 resource "google_storage_bucket_object" "archive" {
   name       = "index.zip"
-  bucket     = "ccai-samples-df-tf"
+  bucket     = "${var.project_id}-ccai-samples-df-tf"
   source     = data.archive_file.source.output_path
   depends_on = [data.archive_file.source]
 }

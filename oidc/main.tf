@@ -53,7 +53,7 @@ resource "google_project_service" "service" {
 
 resource "google_storage_bucket" "bucket" {
   project                     = var.project_id
-  name                        = "ccai-samples-df-tf"
+  name                        = "${var.project_id}-ccai-samples-df-tf"
   location                    = "US"
   uniform_bucket_level_access = true
   force_destroy               = true
