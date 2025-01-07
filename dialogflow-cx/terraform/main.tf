@@ -65,7 +65,7 @@ resource "google_cloudfunctions_function" "function" {
   description           = "Basic webhook"
   runtime               = "python39"
   available_memory_mb   = 128
-  source_archive_bucket = "ccai-samples-df-tf"
+  source_archive_bucket = "${var.project_id}-ccai-samples-df-tf"
   source_archive_object = google_storage_bucket_object.archive.name
   trigger_http          = true
   timeout               = 60
