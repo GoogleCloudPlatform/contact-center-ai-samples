@@ -121,7 +121,9 @@ def generate_log():
             },
             {
                 "start_timestamp_usec": timestamp + response_delay * 4,
-                "text": "Can you give me more details about the problem with your {0}?".format(device),
+                "text": "Can you give me more details about the problem with your {0}?".format(
+                    device
+                ),
                 "role": "AGENT",
                 "user_id": 2,
             },
@@ -133,7 +135,9 @@ def generate_log():
             },
             {
                 "start_timestamp_usec": timestamp + response_delay * 6,
-                "text": "And what is the status shown in the settings on the {0}?".format(device),
+                "text": "And what is the status shown in the settings on the {0}?".format(
+                    device
+                ),
                 "role": "AGENT",
                 "user_id": 2,
             },
