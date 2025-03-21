@@ -4,22 +4,25 @@ import time
 import PureCloudPlatformClientV2
 from PureCloudPlatformClientV2.rest import ApiException
 
-print('-------------------------------------------------------------')
-print('- Execute Bulk Action on recordings-')
-print('-------------------------------------------------------------')
+print("-------------------------------------------------------------")
+print("- Execute Bulk Action on recordings-")
+print("-------------------------------------------------------------")
 
 # Credentials for the aws bucket
-CLIENT_ID = ''
-CLIENT_SECRET = ''
-ORG_REGION = ''
+CLIENT_ID = ""
+CLIENT_SECRET = ""
+ORG_REGION = ""
 
 # Set environment
 region = PureCloudPlatformClientV2.PureCloudRegionHosts[ORG_REGION]
 PureCloudPlatformClientV2.configuration.host = region.get_api_host()
 
 # OAuth when using Client Credentials
-api_client = PureCloudPlatformClientV2.api_client.ApiClient() \
-            .get_client_credentials_token(CLIENT_ID, CLIENT_SECRET)
+api_client = (
+    PureCloudPlatformClientV2.api_client.ApiClient().get_client_credentials_token(
+        CLIENT_ID, CLIENT_SECRET
+    )
+)
 
 
 # Get the api
@@ -36,7 +39,7 @@ query.integration_id = ""
 query.conversation_query = {
     "interval": "2023-12-01T00:00:00.000Z/2024-01-07T00:00:00.000Z",
     "order": "asc",
-    "orderBy": "conversationStart"
+    "orderBy": "conversationStart",
 }
 print(query)
 try:
@@ -55,7 +58,7 @@ while True:
     try:
         get_recording_job_response = recording_api.get_recording_job(job_id)
         job_state = get_recording_job_response.state
-        if job_state != 'PENDING':
+        if job_state != "PENDING":
             break
         else:
             print("Job state PENDING...")
@@ -65,9 +68,11 @@ while True:
         sys.exit()
 
 
-if job_state == 'READY':
+if job_state == "READY":
     try:
-        execute_job_response = recording_api.put_recording_job(job_id, {"state": "PROCESSING"})
+        execute_job_response = recording_api.put_recording_job(
+            job_id, {"state": "PROCESSING"}
+        )
         job_state = execute_job_response.state
         print(f"Successfully execute recording bulk job { execute_job_response}")
     except ApiException as e:
@@ -79,7 +84,7 @@ else:
 
 # Call delete_recording_job api
 # Can be canceled also in READY and PENDING states
-if job_state == 'PROCESSING':
+if job_state == "PROCESSING":
     try:
         cancel_job_response = recording_api.delete_recording_job(job_id)
         print(f"Successfully cancelled recording bulk job { cancel_job_response}")
@@ -101,4 +106,3 @@ try:
 except ApiException as e:
     print(f"Exception when calling RecordingApi->get_recording_jobs: { e }")
     sys.exit()
-
