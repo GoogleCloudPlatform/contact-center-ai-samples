@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@google-cloud/dialogflow-cx": "4.0.0",
-    "axios": "1.4.0",
+    "axios": "1.8.2",
     "uuid": "9.0.0"
   }
 }
