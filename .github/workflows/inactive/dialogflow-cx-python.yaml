@@ -18,7 +18,7 @@ env:
   OIDC_SERVICE_ACCOUNT: ${{ secrets.OIDC_SERVICE_ACCOUNT }}
   TERRAFORM_IMAGE: 'hashicorp/terraform:1.1.7'
 on:
-  pull_request_target:
+  pull_request:
     branches: [main]
     paths:
       - .github/workflows/dialogflow-cx-python.yaml
