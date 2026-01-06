@@ -45,8 +45,8 @@ echo \
 }' | sudo tee /etc/docker/mount/nginx.conf
 
 mkdir /etc/docker/mount/ssl
-gsutil cp gs://vpc-sc-demo-nicholascain14/ssl/server.crt /etc/docker/mount/ssl/server.crt
-gsutil cp gs://vpc-sc-demo-nicholascain14/ssl/server.key /etc/docker/mount/ssl/server.key
+gcloud storage cp gs://vpc-sc-demo-nicholascain14/ssl/server.crt /etc/docker/mount/ssl/server.crt
+gcloud storage cp gs://vpc-sc-demo-nicholascain14/ssl/server.key /etc/docker/mount/ssl/server.key
 
 echo \
 '
