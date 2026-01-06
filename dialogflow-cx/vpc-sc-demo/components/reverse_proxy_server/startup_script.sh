@@ -60,7 +60,7 @@ openssl genrsa -out ${ssl_key} 2048
 openssl req -nodes -new -sha256 -key ${ssl_key} -subj "/CN=webhook.internal" -out ${ssl_csr}
 openssl x509 -req -days 3650 -in ${ssl_csr} -signkey ${ssl_key} -out ${ssl_crt} -extfile <(printf "\nsubjectAltName='DNS:webhook.internal'")
 openssl x509 -in ${ssl_crt} -out ${ssl_der} -outform DER
-gsutil cp ${ssl_der} gs://"${BUCKET?}"/server.der
+gcloud storage cp ${ssl_der} gs://"${BUCKET?}"/server.der
 
 echo \
 '

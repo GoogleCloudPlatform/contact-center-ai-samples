@@ -18,8 +18,8 @@ source config.env
 gcloud --quiet auth login "${PRINCIPAL?}" --no-launch-browser
 gcloud config set project "${PROJECT_ID?}"
 
-gsutil mb gs://"${PROJECT_BUCKET?}"
-gsutil retention set 1d gs://"${PROJECT_BUCKET?}"
+gcloud storage buckets create gs://"${PROJECT_BUCKET?}"
+gcloud storage buckets update --retention-period=1d gs://"${PROJECT_BUCKET?}"
 gcloud auth configure-docker "${REGION?}-docker.pkg.dev"
 gcloud artifacts repositories create "${ARTIFACT_REGISTRY?}" --location "${REGION?}" --repository-format "docker"
 gcloud secrets create application-client-secret --replication-policy="automatic"
