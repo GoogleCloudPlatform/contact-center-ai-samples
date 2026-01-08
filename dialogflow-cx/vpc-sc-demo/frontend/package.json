@@ -23,7 +23,7 @@
     "react-dom": "^18.2.0",
     "react-pdf": "^5.7.2",
     "@tanstack/react-query": "^4.0.5",
-    "react-router-dom": "^6.3.0",
+    "react-router-dom": "^6.30.3",
     "react-syntax-highlighter": "^15.5.0",
     "typeface-roboto": "^1.1.13",
     "web-vitals": "^2.1.4"
