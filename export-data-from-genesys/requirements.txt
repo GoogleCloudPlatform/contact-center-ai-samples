@@ -23,7 +23,7 @@ grpcio-status==1.51.1
 idna==3.4
 importlib-metadata==6.0.0
 proto-plus==1.22.2
-protobuf==4.21.12
+protobuf==4.25.8
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 requests==2.28.1
