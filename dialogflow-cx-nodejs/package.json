@@ -10,6 +10,6 @@
   "dependencies": {
     "@google-cloud/dialogflow-cx": "4.0.0",
     "axios": "1.4.0",
-    "uuid": "9.0.0"
+    "uuid": "14.0.0"
   }
 }
