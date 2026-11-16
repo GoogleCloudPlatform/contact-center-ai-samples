@@ -93,7 +93,7 @@ def test_restricted_services_status_no_project(app, endpoint):
 def get_result(
     app,
     endpoint,
-    mock_project_id="MOCK_PROJECT_ID",
+    mock_project_id="mock-project-id",
     mock_region=None,
     mock_webhook_name=None,
 ):

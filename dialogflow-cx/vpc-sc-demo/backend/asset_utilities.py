@@ -18,6 +18,8 @@
 import json
 import logging
 import os
+import re
+import shlex
 
 import flask
 import google.auth.transport.requests
@@ -85,6 +87,14 @@ RESOURCE_GROUP = {
     },
 }
 
+PREFIX_PATTERN = re.compile(r"^terraform/[a-z][a-z0-9-]{4,28}[a-z0-9]$")
+VALID_TARGETS = frozenset(RESOURCE_GROUP.keys()).union(*RESOURCE_GROUP.values())
+
+
+def is_valid_target(target):
+    """Return True if target is an allowlisted Terraform resource or module."""
+    return isinstance(target, str) and target in VALID_TARGETS
+
 
 def get_credentials():
     """Helper function to get service account credentials."""
@@ -136,6 +146,11 @@ def get_terraform_env(access_token, request_args, debug=False):
 @task
 def tf_init(context, module, workdir, env, prefix):
     """Initialize terraform."""
+    if not isinstance(prefix, str) or not PREFIX_PATTERN.fullmatch(prefix):
+        return Response(
+            status=400,
+            response=json.dumps({"status": "BLOCKED", "reason": "INVALID_PREFIX"}),
+        )
     user_access_token = env.pop("GOOGLE_OAUTH_ACCESS_TOKEN")
     debug = "TF_LOG" in env
 
@@ -143,14 +158,17 @@ def tf_init(context, module, workdir, env, prefix):
     request = google.auth.transport.requests.Request()
     credentials.refresh(request)
     env["GOOGLE_OAUTH_ACCESS_TOKEN"] = credentials.token
+    access_token_cfg = shlex.quote(f'access_token={env["GOOGLE_OAUTH_ACCESS_TOKEN"]}')
+    bucket_cfg = shlex.quote(f'bucket={os.environ["TF_PLAN_STORAGE_BUCKET"]}')
+    prefix_cfg = shlex.quote(f"prefix={prefix}")
     promise = context.run(
         (
-            f"cp {module} {workdir} && "
-            f"terraform -chdir={workdir} init "
+            f"cp {shlex.quote(module)} {shlex.quote(workdir)} && "
+            f"terraform -chdir={shlex.quote(workdir)} init "
             "-upgrade -reconfigure "
-            f'-backend-config="access_token={env["GOOGLE_OAUTH_ACCESS_TOKEN"]}" '
-            f'-backend-config="bucket={os.environ["TF_PLAN_STORAGE_BUCKET"]}" '
-            f'-backend-config="prefix={prefix}"'
+            f"-backend-config={access_token_cfg} "
+            f"-backend-config={bucket_cfg} "
+            f"-backend-config={prefix_cfg}"
         ),
         warn=True,
         hide=True,
@@ -180,15 +198,23 @@ def tf_init(context, module, workdir, env, prefix):
 @task
 def tf_plan(context, module, workdir, env, target=None):
     """Create terraform plan."""
+    if target is not None and not is_valid_target(target):
+        return {
+            "response": Response(
+                status=400,
+                response=json.dumps({"status": "BLOCKED", "reason": "INVALID_TARGET"}),
+            )
+        }
     debug = "TF_LOG" in env
-    target_option = f"-target={target}" if target else ""
+    target_option = f"-target={shlex.quote(target)}" if target else ""
     json_option = "-json" if not debug else ""
     promise = context.run(
         (
-            f"cp {module} {workdir} && "
-            f'terraform -chdir="{workdir}" plan {json_option} '
+            f"cp {shlex.quote(module)} {shlex.quote(workdir)} && "
+            f"terraform -chdir={shlex.quote(workdir)} plan {json_option} "
             "-refresh-only -var "
-            f'access_token=\'{env["GOOGLE_OAUTH_ACCESS_TOKEN"]}\' {target_option}'
+            f'{shlex.quote("access_token=" + env["GOOGLE_OAUTH_ACCESS_TOKEN"])} '
+            f"{target_option}"
         ),
         warn=True,
         hide=True,
@@ -246,17 +272,23 @@ def tf_apply(  # pylint: disable=too-many-arguments,too-many-locals
     verbose=False,
 ):
     """Apply terraform plan."""
+    if target is not None and not is_valid_target(target):
+        return Response(
+            status=400,
+            response=json.dumps({"status": "BLOCKED", "reason": "INVALID_TARGET"}),
+        )
     debug = "TF_LOG" in env
-    target_option = f"-target={target}" if target else ""
+    target_option = f"-target={shlex.quote(target)}" if target else ""
     json_option = "-json" if not debug else ""
     destroy_option = "--destroy" if destroy else ""
-    verbose_option = 'export TF_LOG="DEBUG" &&' if verbose else ""
+    verbose_option = 'export TF_LOG="DEBUG" && ' if verbose else ""
+    access_token_var = shlex.quote(f'access_token={env["GOOGLE_OAUTH_ACCESS_TOKEN"]}')
 
     promise = context.run(
-        f"cp {module} {workdir} &&"
+        f"cp {shlex.quote(module)} {shlex.quote(workdir)} && "
         f"{verbose_option}"
-        f'terraform -chdir="{workdir}" apply -lock-timeout=10s {json_option}'
-        f' --auto-approve -var access_token=\'{env["GOOGLE_OAUTH_ACCESS_TOKEN"]}\' '
+        f"terraform -chdir={shlex.quote(workdir)} apply -lock-timeout=10s {json_option}"
+        f" --auto-approve -var {access_token_var} "
         f"{destroy_option} {target_option}",
         warn=True,
         hide=None,
@@ -297,9 +329,8 @@ def tf_state_list(context, module, workdir, env):
     """Get list of all states."""
     debug = "TF_LOG" in env
     promise = context.run(
-        f'\
-    cp {module} {workdir} &&\
-    terraform -chdir="{workdir}" state list',
+        f"cp {shlex.quote(module)} {shlex.quote(workdir)} && "
+        f"terraform -chdir={shlex.quote(workdir)} state list",
         warn=True,
         hide=True,
         asynchronous=True,
@@ -342,6 +373,11 @@ def get_debug(request):
 
 def validate_project_id(project_id, access_token):
     """Confirm if the current project_id is valid for current user."""
+    if not su.is_valid_project_id(project_id):
+        return flask.Response(
+            status=500,
+            response=json.dumps({"status": "BLOCKED", "reason": "UNKNOWN_PROJECT_ID"}),
+        )
     headers = {}
     headers["Authorization"] = f"Bearer {access_token}"
     response = requests.get(

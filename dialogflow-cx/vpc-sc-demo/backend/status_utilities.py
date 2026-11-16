@@ -16,12 +16,22 @@
 
 import json
 import logging
+import re
 
 import flask
 import get_token
 import requests
 
 logger = logging.getLogger(__name__)
+
+PROJECT_ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]{4,28}[a-z0-9]$")
+
+
+def is_valid_project_id(project_id):
+    """Return True if project_id matches valid GCP project ID syntax."""
+    return isinstance(project_id, str) and bool(
+        PROJECT_ID_PATTERN.fullmatch(project_id)
+    )
 
 
 def get_project_number(token, project_id):
@@ -472,6 +482,15 @@ def get_token_and_project(request):
             "response": flask.Response(
                 status=200,
                 response=json.dumps({"status": "BLOCKED", "reason": "NO_PROJECT_ID"}),
+            )
+        }
+    if not is_valid_project_id(response["project_id"]):
+        return {
+            "response": flask.Response(
+                status=200,
+                response=json.dumps(
+                    {"status": "BLOCKED", "reason": "UNKNOWN_PROJECT_ID"}
+                ),
             )
         }
     return response

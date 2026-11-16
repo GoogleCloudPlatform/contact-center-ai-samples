@@ -21,6 +21,7 @@ import logging
 import flask
 import get_token
 import requests
+import status_utilities as su
 
 launchpad = flask.Blueprint("launchpad", __name__)
 logger = logging.getLogger(__name__)
@@ -44,6 +45,11 @@ def validate_project_id():
     logger.info("project_id to validate: %s", project_id)
     if not project_id:
         logger.info("project_id empty")
+        return flask.Response(
+            status=200, response=json.dumps({"status": False}, indent=2)
+        )
+    if not su.is_valid_project_id(project_id):
+        logger.info("project_id invalid format")
         return flask.Response(
             status=200, response=json.dumps({"status": False}, indent=2)
         )
