@@ -16,8 +16,21 @@ limitations under the License.
 
 # Google Cloud Contact Center AI Samples
 
+![status: inactive](https://img.shields.io/badge/status-inactive-red.svg)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![GitHub Super-Linter](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+
+> [!WARNING]
+> **This repository is archived and no longer maintained.**
+>
+> The samples and dependencies in this repository are frozen and will receive
+> no further updates, security patches, or support.
+>
+> For current Google Cloud conversational AI and agent resources, see:
+>
+> * [Google Cloud Conversational AI documentation](https://cloud.google.com/conversational-ai)
+> * [GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai)
+> * [google/adk-samples](https://github.com/google/adk-samples)
 
 Welcome to the Google Cloud
 [Contact Center AI](https://cloud.google.com/solutions/contact-center) sample
