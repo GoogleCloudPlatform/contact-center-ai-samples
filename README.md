@@ -18,7 +18,6 @@ limitations under the License.
 
 ![status: inactive](https://img.shields.io/badge/status-inactive-red.svg)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![GitHub Super-Linter](https://github.com/GoogleCloudPlatform/contact-center-ai-samples/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
 > [!WARNING]
 > **This repository is archived and no longer maintained.**
