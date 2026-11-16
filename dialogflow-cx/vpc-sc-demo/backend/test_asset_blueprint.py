@@ -38,7 +38,7 @@ def get_result(
     """Helper function to get result from a test client."""
     if query_dict is None:
         query_dict = {
-            "project_id": "MOCK_PROJECT_ID",
+            "project_id": "mock-project-id",
             "region": "MOCK_REGION",
             "bucket": "MOCK_BUCKET_NAME",
         }
@@ -348,28 +348,28 @@ def test_asset_status(  # pylint: disable=too-many-arguments
         ),
         (
             blueprint,
-            {"destroy": False, "targets": ["MOCK_TARGET"]},
+            {"destroy": False, "targets": ["module.services"]},
             1,
             None,
             {"response": "MOCK_RESPONSE"},
         ),
         (
             blueprint,
-            {"destroy": False, "targets": ["MOCK_TARGET_1", "MOCK_TARGET_2"]},
+            {"destroy": False, "targets": ["module.services", "module.vpc_network"]},
             2,
             "MOCK_APPLY_RETURN_VALUE",
             {"response": "MOCK_RESPONSE"},
         ),
         (
             blueprint,
-            {"destroy": False, "targets": ["MOCK_TARGET_1", "MOCK_TARGET_2"]},
+            {"destroy": False, "targets": ["module.services", "module.vpc_network"]},
             2,
             None,
             {"response": "MOCK_RESPONSE"},
         ),
         (
             blueprint,
-            {"destroy": False, "targets": ["MOCK_TARGET_1", "MOCK_TARGET_2"]},
+            {"destroy": False, "targets": ["module.services", "module.vpc_network"]},
             2,
             None,
             {"resources": ["MOCK_RESOURCE"]},
@@ -473,10 +473,78 @@ def test_update_target_bad_plan(
         app,
         endpoint,
         method="post",
-        json_data={"destroy": False, "targets": ["MOCK_TARGET"]},
+        json_data={"destroy": False, "targets": ["module.services"]},
     )
     mock_tf_plan.assert_called_once()
     mock_get_token.assert_called_once()
     mock_tf_init.assert_called_once()
     mock_validate_project_id.assert_called_once()
     assert_response(return_value, 200, endpoint, "MOCK_RESPONSE")
+
+
+@pytest.mark.parametrize("app", [blueprint], indirect=["app"])
+@patch.object(
+    get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
+)
+@patch.object(asu, "validate_project_id", return_value=None)
+def test_asset_status_invalid_target(
+    mock_validate_project_id,
+    mock_get_token,
+    app,
+):
+    """Test /asset_status rejects non-allowlisted target query parameter."""
+    endpoint = "/asset_status"
+    return_value = get_result(
+        app,
+        endpoint,
+        query_dict={
+            "project_id": "mock-project-id",
+            "region": "MOCK_REGION",
+            "bucket": "MOCK_BUCKET_NAME",
+            "target": "module.services;id",
+        },
+    )
+    mock_get_token.assert_called_once()
+    mock_validate_project_id.assert_called_once()
+    assert_response(
+        return_value,
+        400,
+        endpoint,
+        json.dumps({"status": "BLOCKED", "reason": "INVALID_TARGET"}),
+    )
+
+
+@pytest.mark.parametrize(
+    "app,bad_targets",
+    [
+        (blueprint, ["module.services;id"]),
+        (blueprint, "module.services"),
+    ],
+    indirect=["app"],
+)
+@patch.object(
+    get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
+)
+@patch.object(asu, "validate_project_id", return_value=None)
+def test_update_target_invalid_target(
+    mock_validate_project_id,
+    mock_get_token,
+    app,
+    bad_targets,
+):
+    """Test /update_target rejects non-allowlisted or non-list targets."""
+    endpoint = "/update_target"
+    return_value = get_result(
+        app,
+        endpoint,
+        method="post",
+        json_data={"destroy": False, "targets": bad_targets},
+    )
+    mock_get_token.assert_called_once()
+    mock_validate_project_id.assert_called_once()
+    assert_response(
+        return_value,
+        400,
+        endpoint,
+        json.dumps({"status": "BLOCKED", "reason": "INVALID_TARGET"}),
+    )

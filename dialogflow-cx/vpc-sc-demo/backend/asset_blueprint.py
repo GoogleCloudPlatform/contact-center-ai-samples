@@ -51,6 +51,11 @@ def asset_status():  # pylint: disable=too-many-locals,too-many-return-statement
         return response
 
     target = flask.request.args.get("target", None)
+    if target is not None and not asu.is_valid_target(target):
+        return flask.Response(
+            status=400,
+            response=json.dumps({"status": "BLOCKED", "reason": "INVALID_TARGET"}),
+        )
     update = flask.request.args.get("update", True)
     env = asu.get_terraform_env(
         token_dict["access_token"],
@@ -139,10 +144,15 @@ def update_target():  # pylint: disable=too-many-return-statements,too-many-bran
     targets = content.get("targets")
     destroy = content["destroy"]
 
-    if targets == ["all"]:
+    if targets in (None, ["all"]):
         update_targets = None
-    else:
+    elif isinstance(targets, list) and all(asu.is_valid_target(t) for t in targets):
         update_targets = targets
+    else:
+        return flask.Response(
+            status=400,
+            response=json.dumps({"status": "BLOCKED", "reason": "INVALID_TARGET"}),
+        )
 
     ctx = context.Context()
     module = "/deploy/terraform/main.tf"

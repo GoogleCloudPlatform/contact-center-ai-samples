@@ -854,11 +854,25 @@ def test_get_token_and_project_bad_project_id(mock_get_token, mock_request):
 @patch.object(
     get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
 )
+def test_get_token_and_project_invalid_project_id(mock_get_token, mock_request):
+    """Test get_token_and_project utility function, invalid project_id format."""
+    mock_request.args = {"project_id": "mock-project-id#;id"}
+    response = su.get_token_and_project(mock_request)
+    assert_response(
+        response, 200, {"status": "BLOCKED", "reason": "UNKNOWN_PROJECT_ID"}
+    )
+    mock_get_token.assert_called_once()
+
+
+@pytest.mark.hermetic
+@patch.object(
+    get_token, "get_token", return_value={"access_token": "MOCK_ACCESS_TOKEN"}
+)
 def test_get_token_and_project_success(mock_get_token, mock_request):
     """Test get_token_and_project utility function, bad token"""
-    mock_request.args = {"project_id": "MOCK_PROJECT_ID"}
+    mock_request.args = {"project_id": "mock-project-id"}
     response = su.get_token_and_project(mock_request)
-    assert response == {"token": "MOCK_ACCESS_TOKEN", "project_id": "MOCK_PROJECT_ID"}
+    assert response == {"token": "MOCK_ACCESS_TOKEN", "project_id": "mock-project-id"}
     mock_get_token.assert_called_once()
 
 

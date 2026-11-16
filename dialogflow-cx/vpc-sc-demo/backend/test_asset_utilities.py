@@ -203,7 +203,7 @@ def test_tf_init(debug, exited, request_args):  # pylint: disable=redefined-oute
                 request_args,
                 debug=debug,
             ),
-            "MOCK_PREFIX",
+            "terraform/mock-project-id",
         )
         if not exited:
             assert result is None
@@ -387,10 +387,65 @@ def test_get_debug(request_debug, logging_level, mock_request):
     assert asu.get_debug(mock_request) == expected
 
 
+@pytest.mark.hermetic
+def test_tf_init_invalid_prefix(request_args):  # pylint: disable=redefined-outer-name
+    """Test tf_init rejects untrusted prefix payloads."""
+    context = MockContext()
+    result = asu.tf_init(
+        context,
+        "MOCK_MODULE",
+        "MOCK_WORKDIR",
+        asu.get_terraform_env("MOCK_ACCESS_TOKEN", request_args),
+        'terraform/mock-project-id#";id',
+    )
+    assert_response(
+        {"response": result},
+        400,
+        {"status": "BLOCKED", "reason": "INVALID_PREFIX"},
+    )
+
+
+@pytest.mark.hermetic
+def test_tf_plan_invalid_target(request_args):  # pylint: disable=redefined-outer-name
+    """Test tf_plan rejects non-allowlisted target payloads."""
+    context = MockContext()
+    result = asu.tf_plan(
+        context,
+        "MOCK_MODULE",
+        "MOCK_WORKDIR",
+        asu.get_terraform_env("MOCK_ACCESS_TOKEN", request_args),
+        target="module.services;id",
+    )
+    assert_response(
+        result,
+        400,
+        {"status": "BLOCKED", "reason": "INVALID_TARGET"},
+    )
+
+
+@pytest.mark.hermetic
+def test_tf_apply_invalid_target(request_args):  # pylint: disable=redefined-outer-name
+    """Test tf_apply rejects non-allowlisted target payloads."""
+    context = MockContext()
+    result = asu.tf_apply(
+        context,
+        "MOCK_MODULE",
+        "MOCK_WORKDIR",
+        asu.get_terraform_env("MOCK_ACCESS_TOKEN", request_args),
+        False,
+        target="module.services;id",
+    )
+    assert_response(
+        {"response": result},
+        400,
+        {"status": "BLOCKED", "reason": "INVALID_TARGET"},
+    )
+
+
 @patch.object(requests, "get", return_value=MockReturnObject(0))
 def test_validate_project_id_failure(mock_requests_get):
     """Test validate_project_id failure."""
-    result = asu.validate_project_id("MOCK_PROJECT_ID", "MOCK_ACCESS_TOKEN")
+    result = asu.validate_project_id("mock-project-id", "MOCK_ACCESS_TOKEN")
     mock_requests_get.assert_called_once()
     assert_response(
         {"response": result},
@@ -405,6 +460,32 @@ def test_validate_project_id_failure(mock_requests_get):
 @patch.object(requests, "get", return_value=MockReturnObject(200))
 def test_validate_project_id_success(mock_requests_get):
     """Test validate_project_id success."""
-    response = asu.validate_project_id("MOCK_PROJECT_ID", "MOCK_ACCESS_TOKEN")
+    response = asu.validate_project_id("mock-project-id", "MOCK_ACCESS_TOKEN")
     mock_requests_get.assert_called_once()
     assert response is None
+
+
+@pytest.mark.parametrize(
+    "bad_project_id",
+    [
+        'mock-project-id#";id',
+        "mock-project-id#fragment",
+        "MOCK_PROJECT_ID",
+        "../mock-project-id",
+        "ab",
+        None,
+    ],
+)
+@patch.object(requests, "get", return_value=MockReturnObject(200))
+def test_validate_project_id_rejects_invalid_format(mock_requests_get, bad_project_id):
+    """Test validate_project_id blocks fragments and shell metacharacters before HTTP call."""
+    result = asu.validate_project_id(bad_project_id, "MOCK_ACCESS_TOKEN")
+    mock_requests_get.assert_not_called()
+    assert_response(
+        {"response": result},
+        500,
+        {
+            "status": "BLOCKED",
+            "reason": "UNKNOWN_PROJECT_ID",
+        },
+    )

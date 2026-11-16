@@ -32,7 +32,15 @@ from session_blueprint import session
         (blueprint, None, 200, {"status": False}, {}, None),
         (
             blueprint,
-            "MOCK_PROJECT_ID",
+            "mock-project-id#;id",
+            200,
+            {"status": False},
+            {"access_token": "MOCK_ACCESS_TOKEN"},
+            True,
+        ),
+        (
+            blueprint,
+            "mock-project-id",
             0,
             {"MOCK_KEY": "MOCK_VAL"},
             {
@@ -44,7 +52,7 @@ from session_blueprint import session
         ),
         (
             blueprint,
-            "MOCK_PROJECT_ID",
+            "mock-project-id",
             200,
             {"status": False},
             {"access_token": "MOCK_ACCESS_TOKEN"},
@@ -52,7 +60,7 @@ from session_blueprint import session
         ),
         (
             blueprint,
-            "MOCK_PROJECT_ID",
+            "mock-project-id",
             200,
             {"status": True},
             {"access_token": "MOCK_ACCESS_TOKEN"},
